@@ -8,6 +8,7 @@
 # upstart services. If the upstart fails, it will retry (indefinitely with an
 # exponential backoff.
 
+DOCK_INIT_LOG_PATH=/var/log/dock-init.log
 UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
 attempt=1
 timeout=1
@@ -18,7 +19,7 @@ do
   then
     bash $UPSTART_SCRIPT
   else
-    bash $UPSTART_SCRIPT >> /var/log/dock-init.log
+    bash $UPSTART_SCRIPT >> $DOCK_INIT_LOG_PATH
   fi
 
   if [[ $? == 0 ]]
