@@ -16,6 +16,20 @@ source lib/log.sh
 # If any command fails, fail with the same code
 set -e
 
+# Info level logging
+# @param $1 Message to log.
+function info() {
+  echo "" && echo "[INFO] $1"
+}
+
+# Error level logging
+# @param $1 Message to log.
+function error() {
+  echo "" && echo "[ERROR] $1"
+  # TODO Report error to rollbar
+}
+
+
 # Paths used by the script
 RUNNABLE_PATH=/opt/runnable
 DOCK_INIT_PATH=$RUNNABLE_PATH/dock-init
