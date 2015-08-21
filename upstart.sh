@@ -4,10 +4,12 @@
 # Ryan Sandor Richards
 #
 # This script updates and restarts all of the services on the dock to preferred
-# deploy tags. It is run on start when a dock ami is deployed on EC2 via shiva
+# deploy tags.
 #
 # NOTE: This script will fast fail with a error status code if ANY of the
 #       commands required fails.
+#
+# WARNING: This should not be run on its own, but only by `init.sh`
 
 source lib/log.sh
 

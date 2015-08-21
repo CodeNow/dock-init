@@ -9,6 +9,8 @@
 # exponential backoff.
 
 source lib/log.sh
+error=$BASH_FUNC_error
+log=$BASH_FUNC_log
 
 UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
 attempt=1

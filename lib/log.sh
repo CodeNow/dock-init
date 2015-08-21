@@ -5,14 +5,14 @@
 
 # Info level logging
 # @param $1 Message to log.
-info() {
+function info() {
   echo "" && echo "[INFO] $1"
 }
 export -f info
 
 # Error level logging
 # @param $1 Message to log.
-error() {
+function error() {
   echo "" && echo "[ERROR] $1"
   # TODO Report error to rollbar
 }
