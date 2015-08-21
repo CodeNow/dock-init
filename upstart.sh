@@ -9,7 +9,7 @@
 # NOTE: This script will fast fail with a error status code if ANY of the
 #       commands required fails.
 
-source "lib/log.sh"
+source lib/log.sh
 
 # If any command fails, fail with the same code
 set -e

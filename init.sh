@@ -8,7 +8,7 @@
 # upstart services. If the upstart fails, it will retry (indefinitely with an
 # exponential backoff.
 
-source "lib/log.sh"
+source lib/log.sh
 
 attempt=1
 timeout=1
