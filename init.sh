@@ -14,7 +14,13 @@ timeout=1
 
 while true
 do
-  bash $UPSTART_SCRIPT
+  if [[ $DOCK_INIT_LOG_STDOUT == 1 ]]
+  then
+    bash $UPSTART_SCRIPT
+  else
+    bash $UPSTART_SCRIPT >> /var/log/dock-init.log
+  fi
+
   if [[ $? == 0 ]]
   then
     break
