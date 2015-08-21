@@ -13,20 +13,29 @@
 set -e
 
 # Paths to repositories and keys
-FILIBUSTER_PATH=/opt/runnable/filibuster
-FILIBUSTER_KEY=/opt/runnable/key/id_rsa_filibuster
-KRAIN_PATH=/opt/runnable/krain
-KRAIN_KEY=/opt/runnable/key/id_rsa_krain
-SAURON_PATH=/opt/runnable/sauron
-SAURON_KEY=/opt/runnable/key/id_rsa_sauron
-DOCKER_LISTENER_PATH=/opt/runnable/docker-listener
-DOCKER_LISTENER_KEY=/opt/runnable/key/id_rsa_docker_listener
-HERMES_PRIVATE_KEY=/opt/runnable/key/id_rsa_hermes_private
+RUNNABLE_PATH=/opt/runnable
+DOCK_INIT_PATH=$RUNNABLE_PATH/dock-init
 
-# Logging utility for the script
+FILIBUSTER_PATH=$RUNNABLE_PATH/filibuster
+KRAIN_PATH=$RUNNABLE_PATH/krain
+SAURON_PATH=$RUNNABLE_PATH/sauron
+DOCKER_LISTENER_PATH=$RUNNABLE_PATH/docker-listener
+
+FILIBUSTER_KEY=$DOCK_INIT_PATH/key/id_rsa_filibuster
+KRAIN_KEY=$DOCK_INIT_PATH/key/id_rsa_krain
+SAURON_KEY=$DOCK_INIT_PATH/key/id_rsa_sauron
+DOCKER_LISTENER_KEY=$DOCK_INIT_PATH/key/id_rsa_docker_listener
+HERMES_PRIVATE_KEY=$DOCK_INIT_PATH/key/id_rsa_hermes_private
+
+# Info level logging
 # @param $1 Message to log.
-log() {
-  echo "" && echo "[INFO] $1"
+info() { echo "" && echo "[INFO] $1" }
+
+# Error level logging
+# @param $1 Message to log.
+error() {
+  echo "" && echo "[ERROR] $1"
+  # TODO Report error to rollbar
 }
 
 # Updates and restarts a service
@@ -35,7 +44,7 @@ log() {
 # @param $3 Path to the service's deploy key
 # @param $4 Version to select before deploy
 upstart() {
-  log "Updating and restarting $1 ($4)" &&
+  info "Updating and restarting $1 ($4)" &&
   cd $2 &&
   ssh-agent bash -c "ssh-add $3; git fetch --all" &&
   git checkout $4 &&
@@ -44,7 +53,7 @@ upstart() {
 }
 
 # Pull image builder
-log "Pulling image-builder:$IMAGE_BUILDER_VERSION"
+info "Pulling image-builder:$IMAGE_BUILDER_VERSION"
 docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION
 
 # Update and start services
@@ -52,4 +61,3 @@ upstart filibuster $FILIBUSTER_PATH $FILIBUSTER_KEY $FILIBUSTER_VERSION
 upstart krain $KRAIN_PATH $KRAIN_KEY $KRAIN_VERSION
 upstart sauron $SAURON_PATH $SAURON_KEY $SAURON_VERSION
 upstart docker-listener $DOCKER_LISTENER_PATH $DOCKER_LISTENER_KEY $DOCKER_LISTENER_VERSION
-
