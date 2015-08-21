@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# dock-init.sh
-# By Ryan Sandor Richards
+# upstart.sh
+# Ryan Sandor Richards
 #
 # This script updates and restarts all of the services on the dock to preferred
 # deploy tags. It is run on start when a dock ami is deployed on EC2 via shiva
 #
 # NOTE: This script will fast fail with a error status code if ANY of the
 #       commands required fails.
+
+source "lib/log.sh"
 
 # If any command fails, fail with the same code
 set -e
@@ -29,17 +31,6 @@ HERMES_PRIVATE_KEY=$DOCK_INIT_PATH/key/id_rsa_hermes_private
 
 UPSTART_CONF_PATH=/etc/init
 DOCKER_LISTENER_UPSTART_CONF=$DOCK_INIT_PATH/docker-listener.conf
-
-# Info level logging
-# @param $1 Message to log.
-info() { echo "" && echo "[INFO] $1" }
-
-# Error level logging
-# @param $1 Message to log.
-error() {
-  echo "" && echo "[ERROR] $1"
-  # TODO Report error to rollbar
-}
 
 # Updates and restarts a service
 # @param $1 Name of the service
