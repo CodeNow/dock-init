@@ -12,7 +12,7 @@
 # If any command fails, fail with the same code
 set -e
 
-# Paths to repositories and keys
+# Paths used by the script
 RUNNABLE_PATH=/opt/runnable
 DOCK_INIT_PATH=$RUNNABLE_PATH/dock-init
 
@@ -26,6 +26,9 @@ KRAIN_KEY=$DOCK_INIT_PATH/key/id_rsa_krain
 SAURON_KEY=$DOCK_INIT_PATH/key/id_rsa_sauron
 DOCKER_LISTENER_KEY=$DOCK_INIT_PATH/key/id_rsa_docker_listener
 HERMES_PRIVATE_KEY=$DOCK_INIT_PATH/key/id_rsa_hermes_private
+
+UPSTART_CONF_PATH=/etc/init
+DOCKER_LISTENER_UPSTART_CONF=$DOCK_INIT_PATH/docker-listener.conf
 
 # Info level logging
 # @param $1 Message to log.
@@ -55,6 +58,10 @@ upstart() {
 # Pull image builder
 info "Pulling image-builder:$IMAGE_BUILDER_VERSION"
 docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION
+
+# Place the correct upstart script for docker-listener
+info "Placing upstart script for docker-listener"
+cp $DOCKER_LISTENER_UPSTART_CONF $UPSTART_CONF_PATH
 
 # Update and start services
 upstart filibuster $FILIBUSTER_PATH $FILIBUSTER_KEY $FILIBUSTER_VERSION
