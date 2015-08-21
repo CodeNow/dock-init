@@ -10,12 +10,14 @@
 
 source lib/log.sh
 
+UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
 attempt=1
 timeout=1
+
 while true
 do
   log "Dock initialization attempt $attempt"
-  bash $DOCK_INIT_SCRIPT
+  bash $UPSTART_SCRIPT
   if [[ $? == 0 ]]
   then
     log "Dock successfully initialized after $attempt tries."
