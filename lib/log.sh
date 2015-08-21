@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # lib/log.sh
 # Ryan Sandor Richards
 #
