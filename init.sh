@@ -13,6 +13,8 @@ UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
 attempt=1
 timeout=1
 
+echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
+
 while true
 do
   if [[ $DOCK_INIT_LOG_STDOUT == 1 ]]

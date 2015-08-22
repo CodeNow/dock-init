@@ -27,7 +27,6 @@ function error() {
   # TODO Report error to rollbar
 }
 
-
 # Paths used by the script
 RUNNABLE_PATH=/opt/runnable
 DOCK_INIT_PATH=$RUNNABLE_PATH/dock-init
