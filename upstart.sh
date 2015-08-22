@@ -11,6 +11,8 @@
 #
 # WARNING: This should not be run on its own, but only by `init.sh`
 
+source /opt/runnable/env
+
 # If any command fails, fail with the same code
 set -e
 

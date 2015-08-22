@@ -8,11 +8,13 @@
 # upstart services. If the upstart fails, it will retry (indefinitely with an
 # exponential backoff.
 
+
 DOCK_INIT_LOG_PATH=/var/log/dock-init.log
 UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
 attempt=1
 timeout=1
 
+source /opt/runnable/env
 echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
 
 while true
