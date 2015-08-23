@@ -73,3 +73,13 @@ of the deploy keys given in the `key/` directory.
 NOTE: On an actual dock the private keys require access rights of at least 600.
 Use the `util/lock-keys.sh` script to ensure that all private keys are, well,
 locked down.
+
+## Building an AMI From Scratch (WIP)
+
+* docker 1.6.2 (bound to /docker on an EBS)
+* weave 0.11.1
+* `/opt/runnable/dock-init`
+* `/opt/runnable/docker-listener` and `/etc/init` (both .conf and .override=manual)
+* `/opt/runnable/filibuster` and `/etc/init` (both .conf and .override=manual)
+* `/opt/runnable/krain` and `/etc/init` (both .conf and .override=manual)
+* `/opt/runnable/sauron` and `/etc/init` (both .conf and .override=manual)
