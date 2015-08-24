@@ -16,6 +16,7 @@ source /opt/runnable/env
 echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
 
 # Create cert (with exp backoff)
+echo `date` "[INFO] Generating Host Certificate"
 attempt=1
 timeout=1
 while true
@@ -35,6 +36,9 @@ do
   attempt=$(( attempt + 1 ))
   timeout=$(( timeout * 2 ))
 done
+
+# Restart docker
+service docker restart
 
 # Upstart dock (with exp backoff)
 attempt=1

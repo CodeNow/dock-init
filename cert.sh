@@ -47,3 +47,4 @@ chmod 400 "$CERT_PATH/cert.pem"
 
 # We no longer need the ca-key.pem on the box, remove it
 rm -f $CERT_PATH/ca-key.pem
+rm -f $CERT_PATH/pass
