@@ -76,6 +76,7 @@ locked down.
 
 ## Building an AMI From Scratch (WIP)
 
+* `/etc/ssl/docker/ca.pem` AND `/etc/ssl/docker/ca-key.pem` (needed to gen host certs on init)
 * docker 1.6.2 (bound to /docker on an EBS)
 * weave 0.11.1
 * `/opt/runnable/dock-init`
