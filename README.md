@@ -115,3 +115,13 @@ for now we will be doing this by hand.
   * `/opt/runnable/filibuster` and `/etc/init` (both .conf and .override=manual)
   * `/opt/runnable/krain` and `/etc/init` (both .conf and .override=manual)
   * `/opt/runnable/sauron` and `/etc/init` (both .conf and .override=manual)
+6. Place the upstart scripts for the following services (`/etc/init/{name}.conf`):
+  * docker-listener
+  * filibuster
+  * krain
+  * sauron
+7. Place the upstart override "manual" files to prevent start on boot (`echo "manual" > /etc/init/{name}.override`)
+  * docker-listener
+  * filibuster
+  * krain
+  * sauron
