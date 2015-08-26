@@ -4,7 +4,7 @@ Scripts and keys needed to initialize docks provisioned via Shiva.
 ## Introduction
 The `dock-init` repository lives on docks and contains the required scripts and
 keys needed fully provision and start a dock in a production environment. The
-project is primarily create new EC2 AMIs that are used by
+project's primarily used to create new EC2 AMIs that are referenced by
 [shiva](https://github.com/CodeNow/shiva) during dock provisioning.
 
 This document will cover the basics of what the initialization scripts do, and
@@ -76,6 +76,7 @@ locked down.
 
 ## Building an AMI From Scratch (WIP)
 
+* `/git-cache` and `/layer-cache` set to specific volumes (xvdc and xvdd???)
 * `/etc/ssl/docker/ca.pem` AND `/etc/ssl/docker/ca-key.pem` (needed to gen host certs on init)
 * docker 1.6.2 (bound to /docker on an EBS)
 * weave 0.11.1
