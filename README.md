@@ -26,6 +26,16 @@ server. Shiva then selects the appropriate dock AMI, and constructs a special
 that sets the correct environment variables (`/opt/runnable/env`), and host tags
 (`/opt/runnable/host_tags`) for the dock and finally executes the `init.sh` script.
 
+## Logs and Debugging
+The logs for the dock init scripts can be found on a dock at the following location:
+
+* `/var/log/dock-init.log`
+
+This should be the first place to look if a dock was provisioned but did not
+register itself with the rest of the system correctly. Also pay careful attention
+to the version numbers for each of the projects when they are pulled. Finally make
+sure the correct host tags are set in `/opt/runnable/host_tags`.
+
 ## Scripts
 
 ### init.sh
@@ -33,11 +43,8 @@ The `init.sh` script is responsible for robustly handling the initialization of
 a dock. Since there are multiple services that must be updated and restarted it
 uses an exponential back-off approach when attempting to initialize the dock.
 
-This script, in particular, is called by the EC2 instance's "user-data" script
-which is set by [shiva](https://github.com/CodeNow/shiva) during provisioning.
-
-The results of the initialization script are logged to the following file on the
-dock: `/var/log/dock-init.log`.
+The script is executed by the EC2 instance's "user-data" script which is set by
+[shiva](https://github.com/CodeNow/shiva) during provisioning.
 
 ### upstart.sh
 The `upstart.sh` script is called by `init.sh` and is responsible for updating
@@ -56,6 +63,17 @@ Once [docker-listener](https://github.com/codenow/docker-listener) has been
 restarted the dock will register itself with
 [mavis](https://github.com/codenow/mavis) and will be able to handle build and
 run tasks.
+
+### cert.sh
+The `cert.sh` script is responsible for generating a new TLS host certificate
+for docker. It expects the AMI is preloaded with the following files:
+
+* `/etc/ssl/docker/ca.pem`
+* `/etc/ssl/docker/ca-key.pem`
+
+The script generates the needed certificate-key pair for the docker host (also
+located at `/etc/ssl/docker`) and removes `/etc/ssl/docker/ca-key.pem` from the
+host.
 
 ### docker-listener.conf
 This is a modified version of the Ubuntu upstart configuration for the
@@ -76,12 +94,24 @@ locked down.
 
 ## Building an AMI From Scratch (WIP)
 
-* `/git-cache` and `/layer-cache` set to specific volumes (xvdc and xvdd???)
-* `/etc/ssl/docker/ca.pem` AND `/etc/ssl/docker/ca-key.pem` (needed to gen host certs on init)
-* docker 1.6.2 (bound to /docker on an EBS)
-* weave 0.11.1
-* `/opt/runnable/dock-init`
-* `/opt/runnable/docker-listener` and `/etc/init` (both .conf and .override=manual)
-* `/opt/runnable/filibuster` and `/etc/init` (both .conf and .override=manual)
-* `/opt/runnable/krain` and `/etc/init` (both .conf and .override=manual)
-* `/opt/runnable/sauron` and `/etc/init` (both .conf and .override=manual)
+NOTE: There should be an ansible script to perform this work in the future, but
+for now we will be doing this by hand.
+
+1. Create an EC2 Instance (of any type) with the following EBS Volumes
+  * xvdb (1000GB)
+  * xvdc (50GB)
+  * xvdd (50GB)
+2. Mount the EBS volumes to the following root folders:
+  * `/docker` -> xvdb
+  * `/git-cache` -> xvdc
+  * `/layer-cache` -> xvdd
+3. Install docker 1.6.2, and weave 0.11.1
+4. Place the TLS certificate files in `/etc/ssl/docker`:
+  * `ca-key.pem`
+  * `ca.pem`
+5. Download the following repositories to `/opt/runnable`:
+  * `/opt/runnable/dock-init`
+  * `/opt/runnable/docker-listener` and `/etc/init` (both .conf and .override=manual)
+  * `/opt/runnable/filibuster` and `/etc/init` (both .conf and .override=manual)
+  * `/opt/runnable/krain` and `/etc/init` (both .conf and .override=manual)
+  * `/opt/runnable/sauron` and `/etc/init` (both .conf and .override=manual)
