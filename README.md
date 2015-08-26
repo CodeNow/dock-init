@@ -92,6 +92,14 @@ NOTE: On an actual dock the private keys require access rights of at least 600.
 Use the `util/lock-keys.sh` script to ensure that all private keys are, well,
 locked down.
 
+## Modifying an Existing AMI
+This is the easy way to build a new AMI for use by shiva. To do so find the
+id of the AMI used by shiva (`configs/.env.production[-beta]`) and spin up a
+new instance with that AMI in AWS (do not provide a user-data script).
+
+The resulting instance will be a perfect snapshot of the last AMI that was built.
+You can then modify it how you wish, and create a new AMI from the running instance.
+
 ## Building an AMI From Scratch (WIP)
 
 NOTE: There should be an ansible script to perform this work in the future, but
