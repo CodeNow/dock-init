@@ -23,8 +23,8 @@ The dock-init scripts are run in response to the provisioning of a new dock via
 First, a `cluster-instance-provision` event is picked up by a shiva worker
 server. Shiva then selects the appropriate dock AMI, and constructs a special
 [User Data Script](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html)
-that sets the correct environment variables for the dock and executes the
-`init.sh` script.
+that sets the correct environment variables (`/opt/runnable/env`), and host tags
+(`/opt/runnable/host_tags`) for the dock and finally executes the `init.sh` script.
 
 ## Scripts
 
