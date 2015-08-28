@@ -102,13 +102,15 @@ You can then modify it how you wish, and create a new AMI from the running insta
 
 ## Building an AMI From Scratch (WIP)
 
-NOTE: There should be an ansible script to perform this work in the future, but
-for now we will be doing this by hand.
+NOTE: Anand has a partial script for creating a new dock but it is missing some
+key features. We will need to update his script to include the new changes and
+merge the script into [devops-scripts](https://github.com/Codenow/devops-scripts)
+master.
 
 1. Create an EC2 Instance (of any type) with the following EBS Volumes
-  * xvdb (1000GB)
-  * xvdc (50GB)
-  * xvdd (50GB)
+  * xvdb (1000 GB)
+  * xvdc (50 GB)
+  * xvdd (50 GB)
 2. Mount the EBS volumes to the following root folders:
   * `/docker` -> xvdb
   * `/git-cache` -> xvdc
@@ -119,17 +121,18 @@ for now we will be doing this by hand.
   * `ca.pem`
 5. Download the following repositories to `/opt/runnable`:
   * `/opt/runnable/dock-init`
-  * `/opt/runnable/docker-listener` and `/etc/init` (both .conf and .override=manual)
-  * `/opt/runnable/filibuster` and `/etc/init` (both .conf and .override=manual)
-  * `/opt/runnable/krain` and `/etc/init` (both .conf and .override=manual)
-  * `/opt/runnable/sauron` and `/etc/init` (both .conf and .override=manual)
-6. Place the upstart scripts for the following services (`/etc/init/{name}.conf`):
-  * docker-listener
-  * filibuster
-  * krain
-  * sauron
-7. Place the upstart override "manual" files to prevent start on boot (`echo "manual" > /etc/init/{name}.override`)
-  * docker-listener
-  * filibuster
-  * krain
-  * sauron
+  * `/opt/runnable/docker-listener`
+  * `/opt/runnable/filibuster`
+  * `/opt/runnable/krain`
+  * `/opt/runnable/sauron`
+6. Place the service upstart scripts:
+  * `/etc/init/docker-listener.conf`
+  * `/etc/init/filibuster.conf`
+  * `/etc/init/krain.conf`
+  * `/etc/init/sauron.conf`
+7. Place the upstart override "manual" files to prevent start on boot:
+  * `echo "manual" > /etc/init/docker-listener.override`
+  * `echo "manual" > /etc/init/filibuster.override`
+  * `echo "manual" > /etc/init/krain.override`
+  * `echo "manual" > /etc/init/sauron.override`
+8. Save an AMI of the Instance via the [AWS Web Admin Panel](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)
