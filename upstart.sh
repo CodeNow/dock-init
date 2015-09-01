@@ -65,10 +65,6 @@ upstart() {
 info "Pulling image-builder:$IMAGE_BUILDER_VERSION"
 docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION
 
-# Place the correct upstart script for docker-listener
-info "Placing upstart script for docker-listener"
-cp $DOCKER_LISTENER_UPSTART_CONF $UPSTART_CONF_PATH
-
 # Update and start services
 upstart filibuster $FILIBUSTER_PATH $FILIBUSTER_KEY $FILIBUSTER_VERSION
 upstart krain $KRAIN_PATH $KRAIN_KEY $KRAIN_VERSION
