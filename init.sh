@@ -31,10 +31,10 @@ replace_env() {
   if [ -n $line ]
   then
     local replace=$(cat $3)
-    echo "[INFO] Setting env $2=$replace in $1:${line}" >> $DOCK_INIT_LOG_PATH
+    echo `date` "[INFO] Setting env $2=$replace in $1:${line}" >> $DOCK_INIT_LOG_PATH
     sed -i.bak "${line}s/env $2=.*/env $2=${replace}/" $1
   else
-    echo "[ERROR] Could not find 'env $2' in $1"
+    echo `date` "[ERROR] Could not find 'env $2' in $1" >> $DOCK_INIT_LOG_PATH
   fi
 }
 
