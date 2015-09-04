@@ -28,16 +28,21 @@ SAURON_CONF=/etc/init/sauron.conf
 # $3 - Path to the value for the environment variable
 replace_env() {
   local line=$(grep -n "env $2=" $1 | cut -f1 -d:)
-  local replace=$(cat $3)
-  echo "Setting env $2=$replace in $1:${line}" >> $DOCK_INIT_LOG_PATH
-  sed -i.bak "${line}s/.*/env $2=${replace}/" $1
+  if [ -n $line ]
+  then
+    local replace=$(cat $3)
+    echo "[INFO] Setting env $2=$replace in $1:${line}" >> $DOCK_INIT_LOG_PATH
+    sed -i.bak "${line}s/env $2=.*/env $2=${replace}/" $1
+  else
+    echo "[ERROR] Could not find 'env $2' in $1"
+  fi
 }
 
 source /opt/runnable/env
 echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
 
 # Replace various service environment values for correct NODE_ENV
-replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_HOSTNAME_PATH', $RABBITMQ_HOSTNAME
+replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_HOSTNAME', $RABBITMQ_HOSTNAME
 replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_PORT' $RABBITMQ_PORT_PATH
 replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_USERNAME' $RABBITMQ_USERNAME_PATH
 replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_PASSWORD' $RABBITMQ_PASSWORD_PATH
