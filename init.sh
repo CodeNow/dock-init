@@ -22,6 +22,8 @@ RABBITMQ_PASSWORD_PATH=/opt/runnable/rabbitmq_password
 DOCKER_LISTENER_CONF=/etc/init/docker-listener.conf
 SAURON_CONF=/etc/init/sauron.conf
 
+REGISTRY_HOST_PATH=/opt/runnable/registry_host
+
 # Replaces an env directive in the given upstart configuration
 # $1 - Path to the upstart configuration
 # $2 - Environment to replace
@@ -72,6 +74,11 @@ do
   attempt=$(( attempt + 1 ))
   timeout=$(( timeout * 2 ))
 done
+
+# Set correct registry.runnable.com host
+registry_host=`cat $REGISTRY_HOST_PATH`
+echo `date` "[INFO] Set registry host: $registry_host" >> $DOCK_INIT_LOG_PATH
+echo "$registry_host registry.runnable.com" >> /etc/hosts
 
 # Restart docker
 service docker restart
