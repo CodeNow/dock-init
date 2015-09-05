@@ -76,7 +76,9 @@ do
 done
 
 # Set correct registry.runnable.com host
-registry_ip=`cat $REGISTRY_IP_PATH " registry.runnable.com"` >> /etc/hosts
+registry_ip=`cat $REGISTRY_IP_PATH`
+echo `date` "[INFO] Writing registry host: $registry_ip"
+echo "$registry_ip registry.runnable.com" >> /etc/hosts
 
 # Restart docker
 service docker restart
