@@ -18,9 +18,13 @@ RABBITMQ_HOSTNAME_PATH=/opt/runnable/rabbitmq_hostname
 RABBITMQ_PORT_PATH=/opt/runnable/rabbitmq_port
 RABBITMQ_USERNAME_PATH=/opt/runnable/rabbitmq_username
 RABBITMQ_PASSWORD_PATH=/opt/runnable/rabbitmq_password
+API_HOST_PATH=/opt/runnable/api_host
+DATADOG_HOST_PATH=/opt/runnable/datadog_host
+DATADOG_PORT_PATH=/opt/runnable/datadog_port
 
 DOCKER_LISTENER_CONF=/etc/init/docker-listener.conf
 SAURON_CONF=/etc/init/sauron.conf
+CHARON_CONF=/etc/init/charon.conf
 
 REGISTRY_HOST_PATH=/opt/runnable/registry_host
 
@@ -50,8 +54,15 @@ replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_USERNAME' $RABBITMQ_USERNAME_PATH
 replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_PASSWORD' $RABBITMQ_PASSWORD_PATH
 replace_env $DOCKER_LISTENER_CONF 'REDIS_IPADDRESS' $REDIS_IPADDRESS_PATH
 replace_env $DOCKER_LISTENER_CONF 'REDIS_PORT' $REDIS_PORT_PATH
+
 replace_env $SAURON_CONF 'REDIS_PORT' $REDIS_PORT_PATH
 replace_env $SAURON_CONF 'REDIS_IPADDRESS' $REDIS_IPADDRESS_PATH
+
+replace_env $CHARON_CONF 'REDIS_PORT' $REDIS_PORT_PATH
+replace_env $CHARON_CONF 'REDIS_HOST' $REDIS_IPADDRESS_PATH
+replace_env $CHARON_CONF 'API_HOST' $API_HOST_PATH
+replace_env $CHARON_CONF 'DATADOG_HOST' $DATADOG_HOST_PATH
+replace_env $CHARON_CONF 'DATADOG_PORT' $DATADOG_PORT_PATH
 
 # Create cert (with exp backoff)
 echo `date` "[INFO] Generating Host Certificate"

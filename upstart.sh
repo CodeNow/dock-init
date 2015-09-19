@@ -37,12 +37,14 @@ FILIBUSTER_PATH=$RUNNABLE_PATH/filibuster
 KRAIN_PATH=$RUNNABLE_PATH/krain
 SAURON_PATH=$RUNNABLE_PATH/sauron
 DOCKER_LISTENER_PATH=$RUNNABLE_PATH/docker-listener
+CHARON_PATH=$RUNNABLE_PATH/charon
 
 FILIBUSTER_KEY=$DOCK_INIT_PATH/key/id_rsa_filibuster
 KRAIN_KEY=$DOCK_INIT_PATH/key/id_rsa_krain
 SAURON_KEY=$DOCK_INIT_PATH/key/id_rsa_sauron
 DOCKER_LISTENER_KEY=$DOCK_INIT_PATH/key/id_rsa_docker_listener
 HERMES_PRIVATE_KEY=$DOCK_INIT_PATH/key/id_rsa_hermes_private
+CHARON_KEY=$DOCK_INIT_PATH/key/id_rsa_charon
 
 UPSTART_CONF_PATH=/etc/init
 DOCKER_LISTENER_UPSTART_CONF=$DOCK_INIT_PATH/docker-listener.conf
@@ -57,7 +59,7 @@ upstart() {
   cd $2 &&
   ssh-agent bash -c "ssh-add $3; git fetch --all" &&
   git checkout $4 &&
-  ssh-agent bash -c "ssh-add $HERMES_PRIVATE_KEY; npm install" &&
+  ssh-agent bash -c "ssh-add $HERMES_PRIVATE_KEY; ssh-add $RUNNABLE_API_CLIENT_KEY; npm install" &&
   service $1 restart
 }
 
@@ -69,4 +71,5 @@ docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION
 upstart filibuster $FILIBUSTER_PATH $FILIBUSTER_KEY $FILIBUSTER_VERSION
 upstart krain $KRAIN_PATH $KRAIN_KEY $KRAIN_VERSION
 upstart sauron $SAURON_PATH $SAURON_KEY $SAURON_VERSION
+upstart charon $CHARON_PATH $CHARON_KEY $CHARON_VERSION
 upstart docker-listener $DOCKER_LISTENER_PATH $DOCKER_LISTENER_KEY $DOCKER_LISTENER_VERSION
