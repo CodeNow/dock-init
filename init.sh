@@ -91,12 +91,8 @@ registry_host=`cat $REGISTRY_HOST_PATH`
 echo `date` "[INFO] Set registry host: $registry_host" >> $DOCK_INIT_LOG_PATH
 echo "$registry_host registry.runnable.com" >> /etc/hosts
 
-# Set correct default DNS for docker containers
-dock_ip=`ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}'`
-sed -i.bak "s/DOCK_DNS_IP/$dock_ip/" /etc/default/docker
-
-# Restart docker
-service docker restart
+# Start docker (manual override now set in /etc/init)
+service docker start
 
 # Upstart dock (with exp backoff)
 attempt=1
