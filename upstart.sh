@@ -45,6 +45,7 @@ SAURON_KEY=$DOCK_INIT_PATH/key/id_rsa_sauron
 DOCKER_LISTENER_KEY=$DOCK_INIT_PATH/key/id_rsa_docker_listener
 HERMES_PRIVATE_KEY=$DOCK_INIT_PATH/key/id_rsa_hermes_private
 CHARON_KEY=$DOCK_INIT_PATH/key/id_rsa_charon
+RUNNABLE_API_CLIENT_KEY=$DOCK_INIT_PATH/key/id_rsa_runnable_api_client
 
 UPSTART_CONF_PATH=/etc/init
 DOCKER_LISTENER_UPSTART_CONF=$DOCK_INIT_PATH/docker-listener.conf
@@ -59,7 +60,11 @@ upstart() {
   cd $2 &&
   ssh-agent bash -c "ssh-add $3; git fetch --all" &&
   git checkout $4 &&
-  ssh-agent bash -c "ssh-add $HERMES_PRIVATE_KEY; ssh-add $RUNNABLE_API_CLIENT_KEY; npm install" &&
+  # OMG this is a hack, we really need to fix this repository...
+  (
+    ssh-agent bash -c "ssh-add $HERMES_PRIVATE_KEY; npm install" ||
+    ssh-agent bash -c "ssh-add $RUNNABLE_API_CLIENT_KEY; npm install"
+  ) &&
   service $1 restart
 }
 
