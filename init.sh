@@ -65,7 +65,7 @@ replace_env $CHARON_CONF 'DATADOG_HOST' $DATADOG_HOST_PATH
 replace_env $CHARON_CONF 'DATADOG_PORT' $DATADOG_PORT_PATH
 
 # Create cert (with exp backoff)
-echo `date` "[INFO] Generating Host Certificate"
+echo `date` "[INFO] Generating Host Certificate" >> $DOCK_INIT_LOG_PATH
 attempt=1
 timeout=1
 while true
