@@ -91,6 +91,9 @@ registry_host=`cat $REGISTRY_HOST_PATH`
 echo `date` "[INFO] Set registry host: $registry_host" >> $DOCK_INIT_LOG_PATH
 echo "$registry_host registry.runnable.com" >> /etc/hosts
 
+# Remove docker key file so it generates a unique id
+rm /etc/docker/key.json
+
 # Start docker (manual override now set in /etc/init)
 service docker start
 
