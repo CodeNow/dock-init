@@ -91,6 +91,14 @@ registry_host=`cat $REGISTRY_HOST_PATH`
 echo `date` "[INFO] Set registry host: $registry_host" >> $DOCK_INIT_LOG_PATH
 echo "$registry_host registry.runnable.com" >> /etc/hosts
 
+# Remove docker key file so it generates a unique id
+rm /etc/docker/key.json
+
+# Add tags to docker config file
+# assume first value in host_tags comma separated list is org ID
+ORG_ID=`cut -d, -f 1 /opt/runnable/host_tags`
+echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
+
 # Start docker (manual override now set in /etc/init)
 service docker start
 
