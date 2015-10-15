@@ -104,15 +104,20 @@ You can then modify it how you wish, and create a new AMI from the running insta
 
 ## Testing changes
 1. log into base dock ``` ssh 10.20.1.33 ```
-2. cd to dock-init utils ``` cd /opt/runnable/dock-init/util ```
-3. checkout your branch ``` ./checkout.sh <your_branch> ```
-4. pull your branch ``` ./pull.sh <your_branch> ```
+2. cd to dock-init utils ``` cd /opt/runnable/dock-init ```
+3. checkout your branch ``` sudo ./util/checkout.sh <your_branch> ```
+4. pull your branch ``` sudo ./util/pull.sh <your_branch> ```
 5. find `beta-example` on [amazon ec2 console](https://us-west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2#Instances:search=beta-example;sort=desc:role)
-6. right click and go to image -> create image
-7. save ami image, create branch in [shiva](https://github.com/CodeNow/shiva) with the same name as <your_branch>
-8. deploy your branch of shiva to beta
-9. spin up new docks using helper scripts on `beta-services` in folder `~/ryan`
-10. ensure the dock comes up and you can run/build on them
+6. right click and `beta-example` go to image -> create image
+7. use these settings
+  * Image name = beta-build-run-dock-<your_branch>
+  * Image description = <something useful>
+  * Change all volumes to SSD
+  * click create image and not ami id
+8. create branch in [astral/shiva](https://github.com/CodeNow/astral) with the same name as <your_branch>
+9. deploy your branch of astral/shiva to beta
+10. spin up new docks using helper scripts on `beta-services` in folder `~/ryan`
+11. ensure the dock comes up and you can run/build on them
 
 ## Building an AMI From Scratch (WIP)
 NOTE: we should turn this into ansible script so we can auto generate AMIs.

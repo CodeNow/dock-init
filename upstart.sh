@@ -65,4 +65,4 @@ upstart charon $CHARON_PATH $CHARON_VERSION
 upstart docker-listener $DOCKER_LISTENER_PATH $DOCKER_LISTENER_VERSION
 
 # Start swarm deamon to register this dock
-docker run -d --restart=always swarm join --addr=`hostname -I | cut -d' ' -f 1`:$DOCKER_PORT token://$SWAM_TOKEN
+docker run -d --restart=always swarm join --addr=`hostname -I | cut -d' ' -f 1`:$DOCKER_PORT token://$SWARM_TOKEN
