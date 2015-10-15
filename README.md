@@ -64,6 +64,8 @@ restarted the dock will register itself with
 [mavis](https://github.com/codenow/mavis) and will be able to handle build and
 run tasks.
 
+Finally we start up swarm container which registers the deamon with our swarm master.
+
 ### cert.sh
 The `cert.sh` script is responsible for generating a new TLS host certificate
 for docker. It expects the AMI is preloaded with the following files:
@@ -100,12 +102,25 @@ new instance with that AMI in AWS (do not provide a user-data script).
 The resulting instance will be a perfect snapshot of the last AMI that was built.
 You can then modify it how you wish, and create a new AMI from the running instance.
 
-## Building an AMI From Scratch (WIP)
+## Testing changes
+1. log into base dock ``` ssh 10.20.1.33 ```
+2. cd to dock-init utils ``` cd /opt/runnable/dock-init ```
+3. checkout your branch ``` sudo ./util/checkout.sh <your_branch> ```
+4. pull your branch ``` sudo ./util/pull.sh <your_branch> ```
+5. find `beta-example` on [amazon ec2 console](https://us-west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2#Instances:search=beta-example;sort=desc:role)
+6. right click and `beta-example` go to image -> create image
+7. use these settings
+  * Image name = beta-build-run-dock-<your_branch>
+  * Image description = <something useful>
+  * Change all volumes to SSD
+  * click create image and not ami id
+8. create branch in [astral/shiva](https://github.com/CodeNow/astral) with the same name as <your_branch>
+9. deploy your branch of astral/shiva to beta
+10. spin up new docks using helper scripts on `beta-services` in folder `~/ryan`
+11. ensure the dock comes up and you can run/build on them
 
-NOTE: Anand has a partial script for creating a new dock but it is missing some
-key features. We will need to update his script to include the new changes and
-merge the script into [devops-scripts](https://github.com/Codenow/devops-scripts)
-master.
+## Building an AMI From Scratch (WIP)
+NOTE: we should turn this into ansible script so we can auto generate AMIs.
 
 1. Create an EC2 Instance (of any type) with the following EBS Volumes
   * xvdb (1000 GB)
