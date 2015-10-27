@@ -1,0 +1,1 @@
+{{ range service "registry" }}{{ if .Tags | contains "master" }}{{ .Address }}{{ end }}{{ end }} registry.runnable.com

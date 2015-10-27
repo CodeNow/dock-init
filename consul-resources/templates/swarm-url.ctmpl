@@ -1,0 +1,1 @@
+token://{{ with vault "secret/swarm" }}{{ .Data.token }}{{ end }}

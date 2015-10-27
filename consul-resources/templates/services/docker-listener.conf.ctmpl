@@ -1,0 +1,57 @@
+#!upstart
+description "docker-listener"
+author "Anandkumar"
+
+env NODE_ENV={{ key "node/env" }}
+env HOST_TAGS={{ env "ORG_ID" }},build,run
+
+env APP_DIR=/opt/runnable/docker-listener
+env DOCKER_CERT_PATH=/opt/ssl/docker/docker-listener
+env LOG_FILE=/var/log/docker-listener.log
+env NPM_BIN=/usr/local/bin/npm
+
+{{ with vault "secret/loggly" }}
+env LOGGLY_TOKEN={{ .Data.token }}
+{{ end }}
+
+{{ range service "rabbitmq" }}
+env RABBITMQ_HOSTNAME={{ .Address }}
+env RABBITMQ_PORT={{ .Port }}
+{{ end }}
+
+{{ with vault "secret/rabbitmq" }}
+env RABBITMQ_PASSWORD={{ .Data.password }}
+env RABBITMQ_USERNAME={{ .Data.username }}
+{{ end }}
+
+{{ range service "redis" }}{{ if .Tags | contains "master" }}
+env REDIS_IPADDRESS={{ .Address }}
+env REDIS_PORT={{ .Port }}
+{{ end }}{{ end }}
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on shutdown
+
+script
+  touch $LOG_FILE
+  chdir $APP_DIR
+  echo $$ > /var/run/docker-listener.pid
+  exec $NPM_BIN start >> $LOG_FILE 2>&1
+end script
+
+pre-start script
+  # Date format same as (new Date()).toISOString() for consistency
+  echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> $LOG_FILE
+end script
+
+pre-stop script
+  rm /var/run/docker-listener.pid
+  echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> $LOG_FILE
+end script
+
+post-start script
+  echo "===== App restarted =====" >> $LOG_FILE
+end script
+
+respawn
+respawn limit 5 1     # give up restart after 5 respawns in 1 seconds

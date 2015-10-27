@@ -10,10 +10,12 @@ rm -f $CERT_PATH/key.pem
 
 # Require that we have ca.pem and ca-key.pem
 if [ ! -e $CERT_PATH/ca-key.pem ]; then
+  echo `date` "[FATAL] Missing ca-key.pem" >> $DOCK_INIT_LOG_PATH
   exit 1
 fi
 
 if [ ! -e $CERT_PATH/ca.pem ]; then
+  echo `date` "[FATAL] Missing ca.pem" >> $DOCK_INIT_LOG_PATH
   exit 1
 fi
 

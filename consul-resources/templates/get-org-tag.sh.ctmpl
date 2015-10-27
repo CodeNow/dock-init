@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+{{ with vault "aws/creds/dock-init" }}
+AWS_ACCESS_KEY="{{ .Data.access_key }}"
+AWS_SECRET_KEY="{{ .Data.secret_key  }}"
+{{ end }}
+
+instance_id=$(ec2-metadata -i | awk '{print $2}')
+
+/usr/local/ec2/bin/ec2-describe-tags \
+  --aws-access-key="$AWS_ACCESS_KEY" \
+  --aws-secret-key="$AWS_SECRET_KEY" \
+  --filter "resource-type=instance" \
+  --filter "resource-id=$instance_id" \
+  --filter "key=org" \
+  --region us-west-2 \
+  | awk '{print $5}'
