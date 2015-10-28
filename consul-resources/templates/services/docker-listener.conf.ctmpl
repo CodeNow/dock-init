@@ -1,6 +1,6 @@
 #!upstart
 description "docker-listener"
-author "Anandkumar"
+author "Bryan Kendall"
 
 env NODE_ENV={{ key "node/env" }}
 env HOST_TAGS={{ env "ORG_ID" }},build,run

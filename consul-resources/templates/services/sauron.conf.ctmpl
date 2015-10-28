@@ -1,8 +1,9 @@
 #!upstart
 description "sauron"
-author "Anandkumar"
+author "Bryan Kendall"
 
-env NODE_ENV=production-beta
+env NODE_ENV={{ key "node/env" }}
+env ORG_ID={{ env "ORG_ID" }}
 
 env APP_DIR=/opt/runnable/sauron
 env LOG_FILE=/var/log/sauron.log

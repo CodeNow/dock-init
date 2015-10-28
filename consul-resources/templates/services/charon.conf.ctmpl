@@ -1,6 +1,6 @@
 #!upstart
-description "docker-listener"
-author "Anandkumar"
+description "charon"
+author "Bryan Kendall"
 
 env NODE_ENV={{ key "node/env" }}
 env PORT=53

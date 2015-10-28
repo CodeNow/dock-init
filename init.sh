@@ -46,7 +46,7 @@ consul-template \
   -once \
   -template=$DOCK_INIT_BASE/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT
 if [[ $? != 0 ]]; then exit 1; fi
-sleep 5 # give amazon a change to get the auth
+sleep 5 # give amazon a chance to get the auth
 ORG_ID=$(bash $ORG_SCRIPT)
 if [[ $? != 0 ]]; then exit 1; fi
 export ORG_ID
