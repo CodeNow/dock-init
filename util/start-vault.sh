@@ -19,7 +19,7 @@ echo $vault_pid > /tmp/vault.pid
 
 echo `date` "[TRACE] Unsealing and Authing Vault" >> $DOCK_INIT_LOG_PATH
 # vault unseal and unlock
-VAULT_ADDR=http://127.0.0.1:8200
+VAULT_ADDR="http://$LOCAL_IP4_ADDRESS:8200"
 export VAULT_ADDR
 vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-01`
 vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-02`
