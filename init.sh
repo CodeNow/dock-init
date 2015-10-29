@@ -121,7 +121,6 @@ rm -f /etc/docker/key.json
 echo `date` "[INFO] Starting Docker" >> $DOCK_INIT_LOG_PATH
 # Start docker (manual override now set in /etc/init)
 service docker start
-sleep 1
 if [[ $? != 0 ]]; then exit 1; fi
 
 echo `date` "[INFO] Waiting for Docker" >> $DOCK_INIT_LOG_PATH
