@@ -69,12 +69,29 @@ consul-template \
   -template=$DOCK_INIT_BASE/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT
 if [[ $? != 0 ]]; then exit 1; fi
 sleep 5 # give amazon a chance to get the auth
-ORG_ID=$(bash $ORG_SCRIPT)
-if [[ $? != 0 ]]; then exit 1; fi
+
+attempt=1
+timeout=1
+while true
+do
+  echo `date` "[INFO] Attempting to get org id..." >> $DOCK_INIT_LOG_PATH
+  ORG_ID=$(bash $ORG_SCRIPT)
+  echo `date` "[INFO] Script Output: $ORG_ID" >> $DOCK_INIT_LOG_PATH
+  if [[ "$ORG_ID" != "" ]]
+  then
+    break
+  fi
+  sleep $timeout
+  attempt=$(( attempt + 1 ))
+  timeout=$(( timeout * 2 ))
+done
+
 export ORG_ID
 # assume first value in host_tags comma separated list is org ID
 ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
 export ORG_ID
+echo `date` "[INFO] Got Org ID: $ORG_ID" >> $DOCK_INIT_LOG_PATH
+
 echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
 
 echo `date` "[INFO] Generate Upstart Scripts" >> $DOCK_INIT_LOG_PATH

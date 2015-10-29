@@ -13,34 +13,11 @@ instance_id=$(ec2-metadata -i | awk '{print $2}')
 EC2_HOME=/usr/local/ec2
 export EC2_HOME
 
-attempt=1
-timeout=1
-while true
-do
-  if [[ "$DOCK_INIT_LOG_PATH" ]]; then
-    echo `date` "[INFO] Attempting to get org id..." >> $DOCK_INIT_LOG_PATH
-  fi
-  orgid=$(/usr/local/ec2/bin/ec2-describe-tags \
-    --aws-access-key="$AWS_ACCESS_KEY" \
-    --aws-secret-key="$AWS_SECRET_KEY" \
-    --filter "resource-type=instance" \
-    --filter "resource-id=$instance_id" \
-    --filter "key=org" \
-    --region us-west-2 \
-    | awk '{print $5}')
-
-  if [[ "$orgid" != "" ]]
-  then
-    if [[ "$DOCK_INIT_LOG_PATH" ]]; then
-      echo `date` "[INFO] Got Org ID $orgid" >> $DOCK_INIT_LOG_PATH
-    fi
-    echo "$orgid"
-    break
-  fi
-  if [[ "$DOCK_INIT_LOG_PATH" ]]; then
-    echo `date` "[INFO] Sleeping before get org id attempt... $timeout" >> $DOCK_INIT_LOG_PATH
-  fi
-  sleep $timeout
-  attempt=$(( attempt + 1 ))
-  timeout=$(( timeout * 2 ))
-done
+/usr/local/ec2/bin/ec2-describe-tags \
+  --aws-access-key="$AWS_ACCESS_KEY" \
+  --aws-secret-key="$AWS_SECRET_KEY" \
+  --filter "resource-type=instance" \
+  --filter "resource-id=$instance_id" \
+  --filter "key=org" \
+  --region us-west-2 \
+  | awk '{print $5}'
