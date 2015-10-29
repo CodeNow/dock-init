@@ -17,6 +17,9 @@ attempt=1
 timeout=1
 while true
 do
+  if [[ "$DOCK_INIT_LOG_PATH" ]]; then
+    echo `date` "[INFO] Attempting to get org id..." >> $DOCK_INIT_LOG_PATH
+  fi
   orgid=$(/usr/local/ec2/bin/ec2-describe-tags \
     --aws-access-key="$AWS_ACCESS_KEY" \
     --aws-secret-key="$AWS_SECRET_KEY" \
@@ -28,8 +31,14 @@ do
 
   if [[ "$orgid" != "" ]]
   then
+    if [[ "$DOCK_INIT_LOG_PATH" ]]; then
+      echo `date` "[INFO] Got Org ID $orgid" >> $DOCK_INIT_LOG_PATH
+    fi
     echo "$orgid"
     break
+  fi
+  if [[ "$DOCK_INIT_LOG_PATH" ]]; then
+    echo `date` "[INFO] Sleeping before get org id attempt... $timeout" >> $DOCK_INIT_LOG_PATH
   fi
   sleep $timeout
   attempt=$(( attempt + 1 ))
