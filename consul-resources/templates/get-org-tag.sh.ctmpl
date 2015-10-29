@@ -8,6 +8,9 @@ AWS_SECRET_KEY="{{ .Data.secret_key  }}"
 
 instance_id=$(ec2-metadata -i | awk '{print $2}')
 
+EC2_HOME=/usr/local/ec2
+export EC2_HOME
+
 /usr/local/ec2/bin/ec2-describe-tags \
   --aws-access-key="$AWS_ACCESS_KEY" \
   --aws-secret-key="$AWS_SECRET_KEY" \

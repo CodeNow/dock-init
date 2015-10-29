@@ -35,7 +35,7 @@ if [[ $? != 0 ]]; then exit 1; fi
 
 echo `date` "[INFO] Start Vault" >> $DOCK_INIT_LOG_PATH
 . $DOCK_INIT_BASE/util/start-vault.sh
-if [[ $? != 0 ]]; then exit 1; fi
+if [[ $? != 0 ]]; then echo "[FATAL] Cannot Start Vault"; exit 1; fi
 
 # Add tags to docker config file
 # assume first value in host_tags comma separated list is org ID
