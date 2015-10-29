@@ -8,10 +8,13 @@ AWS_ACCESS_KEY="{{ .Data.access_key }}"
 AWS_SECRET_KEY="{{ .Data.secret_key  }}"
 {{ end }}
 
-instance_id=$(ec2-metadata -i | awk '{print $2}')
-
 EC2_HOME=/usr/local/ec2
 export EC2_HOME
+
+JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
+export JAVA_HOME
+
+instance_id=$(ec2-metadata -i | awk '{print $2}')
 
 /usr/local/ec2/bin/ec2-describe-tags \
   --aws-access-key="$AWS_ACCESS_KEY" \
