@@ -72,7 +72,7 @@ sleep 5 # give amazon a chance to get the auth
 ORG_ID=$(bash $ORG_SCRIPT)
 if [[ $? != 0 ]]; then exit 1; fi
 # assume first value in host_tags comma separated list is org ID
-ORG_ID=$(echo "$ORG_SCRIPT" | cut -d, -f 1)
+ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
 export ORG_ID
 echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
 
