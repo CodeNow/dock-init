@@ -21,13 +21,13 @@ echo `date` "[TRACE] Unsealing and Authing Vault" >> $DOCK_INIT_LOG_PATH
 # vault unseal and unlock
 VAULT_ADDR="http://$LOCAL_IP4_ADDRESS:8200"
 export VAULT_ADDR
-vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-01`
-vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-02`
-vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-03`
-rm -f $DOCK_INIT_BASE/consul-resources/vault/token-*
 VAULT_TOKEN=$(cat $DOCK_INIT_BASE/consul-resources/vault/auth-token)
 export VAULT_TOKEN
 rm -f $DOCK_INIT_BASE/consul-resources/vault/auth-token
+vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-01` >> $DOCK_INIT_LOG_PATH
+vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-02` >> $DOCK_INIT_LOG_PATH
+vault unseal `cat $DOCK_INIT_BASE/consul-resources/vault/token-03` >> $DOCK_INIT_LOG_PATH
+rm -f $DOCK_INIT_BASE/consul-resources/vault/token-*
 
 vault status >> $DOCK_INIT_LOG_PATH
 
