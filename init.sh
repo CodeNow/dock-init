@@ -23,6 +23,28 @@ UPSTART_SCRIPT=$DOCK_INIT_BASE/upstart.sh
 # source /opt/runnable/env
 echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
 
+echo `date` "[INFO] Starting Consul Reachability Attempts" >> $DOCK_INIT_LOG_PATH
+attempt=1
+timeout=1
+while true
+do
+  echo `date` "[INFO] Trying to reach consul at $CONSUL_HOSTNAME:8500 $attempt" >> $DOCK_INIT_LOG_PATH
+  if [[ $DOCK_INIT_LOG_STDOUT == 1 ]]
+  then
+    curl http://$CONSUL_HOSTNAME:8500/v1/status/leader
+  else
+    curl http://$CONSUL_HOSTNAME:8500/v1/status/leader 2>&1 >> $DOCK_INIT_LOG_PATH
+  fi
+
+  if [[ $? == 0 ]]
+  then
+    break
+  fi
+  sleep $timeout
+  attempt=$(( attempt + 1 ))
+  timeout=$(( timeout * 2 ))
+done
+
 echo `date` "[INFO] Getting IP Address" >> $DOCK_INIT_LOG_PATH
 LOCAL_IP4_ADDRESS=$(ec2-metadata --local-ipv4 | awk '{print $2}')
 export LOCAL_IP4_ADDRESS
