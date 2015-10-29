@@ -71,6 +71,7 @@ if [[ $? != 0 ]]; then exit 1; fi
 sleep 5 # give amazon a chance to get the auth
 ORG_ID=$(bash $ORG_SCRIPT)
 if [[ $? != 0 ]]; then exit 1; fi
+export ORG_ID
 # assume first value in host_tags comma separated list is org ID
 ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
 export ORG_ID
