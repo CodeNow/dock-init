@@ -126,7 +126,7 @@ if [[ $? != 0 ]]; then exit 1; fi
 echo `date` "[INFO] Waiting for Docker" >> $DOCK_INIT_LOG_PATH
 attempt=1
 timeout=1
-while [ ! -e /var/run/docker.sock]
+while [ ! -e /var/run/docker.sock ]
 do
   echo `date` "[INFO] Docker Sock N/A ($attempt)" >> $DOCK_INIT_LOG_PATH
   sleep $timeout
