@@ -9,6 +9,10 @@ env APP_DIR=/opt/runnable/sauron
 env LOG_FILE=/var/log/sauron.log
 env NPM_BIN=/usr/local/bin/npm
 
+{{ with vault "secret/loggly" }}
+env LOGGLY_TOKEN={{ .Data.token }}
+{{ end }}
+
 {{ range service "redis" }}{{ if .Tags | contains "master" }}
 env REDIS_IPADDRESS={{ .Address }}
 env REDIS_PORT={{ .Port }}
