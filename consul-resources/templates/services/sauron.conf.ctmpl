@@ -14,6 +14,16 @@ env REDIS_IPADDRESS={{ .Address }}
 env REDIS_PORT={{ .Port }}
 {{ end }}{{ end }}
 
+{{ range service "rabbitmq" }}
+env RABBITMQ_HOSTNAME={{ .Address }}
+env RABBITMQ_PORT={{ .Port }}
+{{ end }}
+
+{{ with vault "secret/rabbitmq" }}
+env RABBITMQ_PASSWORD={{ .Data.password }}
+env RABBITMQ_USERNAME={{ .Data.username }}
+{{ end }}
+
 start on (local-filesystems and net-device-up IFACE=eth0)
 stop on shutdown
 
