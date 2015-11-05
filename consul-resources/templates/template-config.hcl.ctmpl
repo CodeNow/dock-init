@@ -1,0 +1,5 @@
+consul = "{{ env "CONSUL_HOSTNAME" }}:8500"
+
+vault {
+	address = "http://{{ env "LOCAL_IP4_ADDRESS" }}:8200"
+}

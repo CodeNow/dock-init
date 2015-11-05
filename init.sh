@@ -8,61 +8,95 @@
 # upstart services. If the upstart fails, it will retry (indefinitely with an
 # exponential backoff.
 
+DOCK_INIT_BASE=/opt/runnable/dock-init
+export DOCK_INIT_BASE
+
 DOCK_INIT_LOG_PATH=/var/log/dock-init.log
-CERT_SCRIPT=/opt/runnable/dock-init/cert.sh
-UPSTART_SCRIPT=/opt/runnable/dock-init/upstart.sh
+export DOCK_INIT_LOG_PATH
 
-REDIS_PORT_PATH=/opt/runnable/redis_port
-REDIS_IPADDRESS_PATH=/opt/runnable/redis_ipaddress
-RABBITMQ_HOSTNAME_PATH=/opt/runnable/rabbitmq_hostname
-RABBITMQ_PORT_PATH=/opt/runnable/rabbitmq_port
-RABBITMQ_USERNAME_PATH=/opt/runnable/rabbitmq_username
-RABBITMQ_PASSWORD_PATH=/opt/runnable/rabbitmq_password
-API_HOST_PATH=/opt/runnable/api_host
-DATADOG_HOST_PATH=/opt/runnable/datadog_host
-DATADOG_PORT_PATH=/opt/runnable/datadog_port
+export CONSUL_HOSTNAME
 
-DOCKER_LISTENER_CONF=/etc/init/docker-listener.conf
-SAURON_CONF=/etc/init/sauron.conf
-CHARON_CONF=/etc/init/charon.conf
+CERT_SCRIPT=$DOCK_INIT_BASE/cert.sh
+UPSTART_SCRIPT=$DOCK_INIT_BASE/upstart.sh
 
-REGISTRY_HOST_PATH=/opt/runnable/registry_host
-
-# Replaces an env directive in the given upstart configuration
-# $1 - Path to the upstart configuration
-# $2 - Environment to replace
-# $3 - Path to the value for the environment variable
-replace_env() {
-  local line=$(grep -n "env $2=" $1 | cut -f1 -d:)
-  if [ -n $line ]
-  then
-    local replace=$(cat $3)
-    echo `date` "[INFO] Setting env $2=$replace in $1:${line}" >> $DOCK_INIT_LOG_PATH
-    sed -i.bak "${line}s/env $2=.*/env $2=${replace}/" $1
-  else
-    echo `date` "[ERROR] Could not find 'env $2' in $1" >> $DOCK_INIT_LOG_PATH
-  fi
-}
-
-source /opt/runnable/env
+# FIXME(bryan): do we need this any longer?
+# source /opt/runnable/env
 echo `date` "[INFO] environment:" `env` >> $DOCK_INIT_LOG_PATH
 
-# Replace various service environment values for correct NODE_ENV
-replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_HOSTNAME' $RABBITMQ_HOSTNAME_PATH
-replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_PORT' $RABBITMQ_PORT_PATH
-replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_USERNAME' $RABBITMQ_USERNAME_PATH
-replace_env $DOCKER_LISTENER_CONF 'RABBITMQ_PASSWORD' $RABBITMQ_PASSWORD_PATH
-replace_env $DOCKER_LISTENER_CONF 'REDIS_IPADDRESS' $REDIS_IPADDRESS_PATH
-replace_env $DOCKER_LISTENER_CONF 'REDIS_PORT' $REDIS_PORT_PATH
+echo `date` "[INFO] Starting Consul Reachability Attempts" >> $DOCK_INIT_LOG_PATH
+attempt=1
+timeout=1
+while true
+do
+  echo `date` "[INFO] Trying to reach consul at $CONSUL_HOSTNAME:8500 $attempt" >> $DOCK_INIT_LOG_PATH
+  if [[ $DOCK_INIT_LOG_STDOUT == 1 ]]
+  then
+    curl http://$CONSUL_HOSTNAME:8500/v1/status/leader
+  else
+    curl http://$CONSUL_HOSTNAME:8500/v1/status/leader 2>&1 >> $DOCK_INIT_LOG_PATH
+  fi
 
-replace_env $SAURON_CONF 'REDIS_PORT' $REDIS_PORT_PATH
-replace_env $SAURON_CONF 'REDIS_IPADDRESS' $REDIS_IPADDRESS_PATH
+  if [[ $? == 0 ]]
+  then
+    break
+  fi
+  sleep $timeout
+  attempt=$(( attempt + 1 ))
+  timeout=$(( timeout * 2 ))
+done
 
-replace_env $CHARON_CONF 'REDIS_PORT' $REDIS_PORT_PATH
-replace_env $CHARON_CONF 'REDIS_HOST' $REDIS_IPADDRESS_PATH
-replace_env $CHARON_CONF 'API_HOST' $API_HOST_PATH
-replace_env $CHARON_CONF 'DATADOG_HOST' $DATADOG_HOST_PATH
-replace_env $CHARON_CONF 'DATADOG_PORT' $DATADOG_PORT_PATH
+echo `date` "[INFO] Getting IP Address" >> $DOCK_INIT_LOG_PATH
+LOCAL_IP4_ADDRESS=$(ec2-metadata --local-ipv4 | awk '{print $2}')
+export LOCAL_IP4_ADDRESS
+
+echo `date` "[INFO] configuring consul-template" >> $DOCK_INIT_LOG_PATH
+consul-template \
+  -once \
+  -template="$DOCK_INIT_BASE/consul-resources/templates/template-config.hcl.ctmpl:$DOCK_INIT_BASE/consul-resources/template-config.hcl"
+if [[ $? != 0 ]]; then exit 1; fi
+
+echo `date` "[INFO] Start Vault" >> $DOCK_INIT_LOG_PATH
+. $DOCK_INIT_BASE/util/start-vault.sh
+if [[ $? != 0 ]]; then echo "[FATAL] Cannot Start Vault"; exit 1; fi
+
+# Add tags to docker config file
+# assume first value in host_tags comma separated list is org ID
+echo `date` "[INFO] Setting Github Org ID" >> $DOCK_INIT_LOG_PATH
+ORG_SCRIPT=$DOCK_INIT_BASE/util/get-org-id.sh
+consul-template \
+  -config=$DOCK_INIT_BASE/consul-resources/template-config.hcl \
+  -once \
+  -template=$DOCK_INIT_BASE/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT
+if [[ $? != 0 ]]; then exit 1; fi
+sleep 5 # give amazon a chance to get the auth
+
+attempt=1
+timeout=1
+while true
+do
+  echo `date` "[INFO] Attempting to get org id..." >> $DOCK_INIT_LOG_PATH
+  ORG_ID=$(bash $ORG_SCRIPT)
+  echo `date` "[INFO] Script Output: $ORG_ID" >> $DOCK_INIT_LOG_PATH
+  if [[ "$ORG_ID" != "" ]]
+  then
+    break
+  fi
+  sleep $timeout
+  attempt=$(( attempt + 1 ))
+  timeout=$(( timeout * 2 ))
+done
+
+export ORG_ID
+# assume first value in host_tags comma separated list is org ID
+ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
+export ORG_ID
+echo `date` "[INFO] Got Org ID: $ORG_ID" >> $DOCK_INIT_LOG_PATH
+
+echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
+
+echo `date` "[INFO] Generate Upstart Scripts" >> $DOCK_INIT_LOG_PATH
+. $DOCK_INIT_BASE/generate-upstart-scripts.sh
+if [[ $? != 0 ]]; then exit 1; fi
 
 # Create cert (with exp backoff)
 echo `date` "[INFO] Generating Host Certificate" >> $DOCK_INIT_LOG_PATH
@@ -86,22 +120,38 @@ do
   timeout=$(( timeout * 2 ))
 done
 
+echo `date` "[INFO] Generating Line for /etc/hosts" >> $DOCK_INIT_LOG_PATH
+consul-template \
+  -config=$DOCK_INIT_BASE/consul-resources/template-config.hcl \
+  -once \
+  -template=$DOCK_INIT_BASE/consul-resources/templates/hosts-registry.ctmpl:$DOCK_INIT_BASE/hosts-registry.txt
+if [[ $? != 0 ]]; then exit 1; fi
+
 # Set correct registry.runnable.com host
-registry_host=`cat $REGISTRY_HOST_PATH`
 echo `date` "[INFO] Set registry host: $registry_host" >> $DOCK_INIT_LOG_PATH
-echo "$registry_host registry.runnable.com" >> /etc/hosts
+cat $DOCK_INIT_BASE/hosts-registry.txt >> /etc/hosts
 
 # Remove docker key file so it generates a unique id
-rm /etc/docker/key.json
+echo `date` "[INFO] Removing docker key.json" >> $DOCK_INIT_LOG_PATH
+rm -f /etc/docker/key.json
 
-# Add tags to docker config file
-# assume first value in host_tags comma separated list is org ID
-ORG_ID=`cut -d, -f 1 /opt/runnable/host_tags`
-echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
-
+echo `date` "[INFO] Starting Docker" >> $DOCK_INIT_LOG_PATH
 # Start docker (manual override now set in /etc/init)
 service docker start
+if [[ $? != 0 ]]; then exit 1; fi
 
+echo `date` "[INFO] Waiting for Docker" >> $DOCK_INIT_LOG_PATH
+attempt=1
+timeout=1
+while [ ! -e /var/run/docker.sock ]
+do
+  echo `date` "[INFO] Docker Sock N/A ($attempt)" >> $DOCK_INIT_LOG_PATH
+  sleep $timeout
+  attempt=$(( attempt + 1 ))
+  timeout=$(( timeout * 2 ))
+done
+
+echo `date` "[INFO] Starting Upstart Attempts" >> $DOCK_INIT_LOG_PATH
 # Upstart dock (with exp backoff)
 attempt=1
 timeout=1
@@ -122,3 +172,9 @@ do
   attempt=$(( attempt + 1 ))
   timeout=$(( timeout * 2 ))
 done
+
+echo `date` "[INFO] Stop Vault" >> $DOCK_INIT_LOG_PATH
+. $DOCK_INIT_BASE/util/stop-vault.sh
+if [[ $? != 0 ]]; then exit 1; fi
+
+echo `date` "[INFO] Init Done!" >> $DOCK_INIT_LOG_PATH

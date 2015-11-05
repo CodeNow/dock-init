@@ -1,0 +1,55 @@
+#!upstart
+description "charon"
+author "Bryan Kendall"
+
+env NODE_ENV={{ key "node/env" }}
+env PORT=53
+
+env APP_DIR=/opt/runnable/charon
+env LOG_FILE=/var/log/charon.log
+env NPM_BIN=/usr/local/bin/npm
+
+{{ range service "redis" }}{{ if .Tags | contains "master" }}
+env REDIS_HOST={{ .Address }}
+env REDIS_PORT={{ .Port }}
+{{ end }}{{ end }}
+
+{{ with vault "secret/github/hellorunnable" }}
+env API_TOKEN={{ .Data.token }}
+{{ end }}
+
+env API_HOST={{ key "api/hostname" }}
+
+{{ range service "datadog" }}{{ if .Tags | contains "master" }}
+env DATADOG_HOST={{ .Address }}
+env DATADOG_PORT={{ .Port }}
+{{ end }}{{ end }}
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on shutdown
+
+# NOTE(bryan): I removed NODE_ENV from the start command. don't know why it was
+#   there, it's above.
+script
+  touch $LOG_FILE
+  chdir $APP_DIR
+  echo $$ > /var/run/charon.pid
+  DEBUG=charon* exec $NPM_BIN start >> $LOG_FILE 2>&1
+end script
+
+pre-start script
+  # Date format same as (new Date()).toISOString() for consistency
+  echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> $LOG_FILE
+end script
+
+pre-stop script
+  rm /var/run/charon.pid
+  echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> $LOG_FILE
+end script
+
+post-start script
+  echo "===== App restarted =====" >> $LOG_FILE
+end script
+
+respawn
+respawn limit 5 1     # give up restart after 5 respawns in 1 seconds
