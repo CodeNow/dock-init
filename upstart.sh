@@ -44,10 +44,10 @@ KEY_PATH=$DOCK_INIT_PATH/key/id_rsa_runnabledock
 upstart() {
   info "Updating and restarting $1 ($3)" &&
   cd $2 &&
-  ssh-agent bash -c "ssh-add $KEY_PATH; git fetch --all >> $DOCK_INIT_LOG_PATH" &&
-  git checkout $3 >> $DOCK_INIT_LOG_PATH &&
-  ssh-agent bash -c "ssh-add $KEY_PATH; npm install >> $DOCK_INIT_LOG_PATH" &&
-  service $1 restart >> $DOCK_INIT_LOG_PATH
+  ssh-agent bash -c "ssh-add $KEY_PATH; git fetch --all" &&
+  git checkout $3 &&
+  ssh-agent bash -c "ssh-add $KEY_PATH; npm install" &&
+  service $1 restart
 }
 
 CONSUL_KV_HOST="$CONSUL_HOSTNAME:8500/v1/kv"
@@ -55,7 +55,7 @@ CONSUL_KV_HOST="$CONSUL_HOSTNAME:8500/v1/kv"
 # Pull image builder
 IMAGE_BUILDER_VERSION=$(curl --silent $CONSUL_KV_HOST/image-builder/version | jq --raw-output ".[0].Value" | base64 --decode)
 info "Pulling image-builder:$IMAGE_BUILDER_VERSION"
-docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION >> $DOCK_INIT_LOG_PATH
+docker pull registry.runnable.com/runnable/image-builder:$IMAGE_BUILDER_VERSION
 
 # Update and start services
 FILIBUSTER_VERSION=$(curl --silent $CONSUL_KV_HOST/filibuster/version | jq --raw-output ".[0].Value" | base64 --decode)
