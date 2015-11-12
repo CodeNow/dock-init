@@ -10,12 +10,12 @@ rm -f $CERT_PATH/key.pem
 
 # Require that we have ca.pem and ca-key.pem
 if [ ! -e $CERT_PATH/ca-key.pem ]; then
-  echo `date` "[FATAL] Missing ca-key.pem" >> $DOCK_INIT_LOG_PATH
+  echo `date` "[FATAL] Missing ca-key.pem"
   exit 1
 fi
 
 if [ ! -e $CERT_PATH/ca.pem ]; then
-  echo `date` "[FATAL] Missing ca.pem" >> $DOCK_INIT_LOG_PATH
+  echo `date` "[FATAL] Missing ca.pem"
   exit 1
 fi
 
@@ -48,5 +48,8 @@ openssl x509 \
 chmod 400 "$CERT_PATH/cert.pem"
 
 # We no longer need the ca-key.pem on the box, remove it
-rm -f $CERT_PATH/ca-key.pem
-rm -f $CERT_PATH/pass
+if [[ "$DONT_DELETE_KEYS" == "" ]]
+then
+  rm -f $CERT_PATH/ca-key.pem
+  rm -f $CERT_PATH/pass
+fi
