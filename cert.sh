@@ -46,10 +46,3 @@ openssl x509 \
   -extfile "$CERT_PATH/extfile-$HOST.cnf" \
   -passin file:$CERT_PATH/pass
 chmod 400 "$CERT_PATH/cert.pem"
-
-# We no longer need the ca-key.pem on the box, remove it
-if [[ "$DONT_DELETE_KEYS" == "" ]]
-then
-  rm -f $CERT_PATH/ca-key.pem
-  rm -f $CERT_PATH/pass
-fi

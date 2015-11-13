@@ -68,10 +68,4 @@ trap 'report_err_to_rollbar "Vault Start: Failed Status" "Unable to confirm valu
 vault status
 trap - ERR
 
-if [[ "$DONT_DELETE_KEYS" == "" ]]
-then
-  rm -f $DOCK_INIT_BASE/consul-resources/vault/**/auth-token
-  rm -f $DOCK_INIT_BASE/consul-resources/vault/**/token-*
-fi
-
 echo `date` "[TRACE] Vault Status `vault status`"

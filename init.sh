@@ -27,6 +27,26 @@ export LOCAL_IP4_ADDRESS
 # ENVIRONMENT is going to be an empty string until we get the node env in consul
 environment=""
 
+cleanup_trap ()
+{
+  if [ -e /tmp/vault.pid ]
+  then
+    echo `date` "[INFO] [CLEANUP TRAP] Killing Vault"
+    kill `cat /tmp/vault.pid`
+  fi
+  if [[ "$DONT_DELETE_KEYS" == "" ]]
+  then
+    echo `date` "[INFO] [CLEANUP TRAP] Removing Keys"
+    rm -f $CERT_PATH/ca-key.pem
+    rm -f $CERT_PATH/pass
+    rm -f $DOCK_INIT_BASE/consul-resources/vault/**/auth-token
+    rm -f $DOCK_INIT_BASE/consul-resources/vault/**/token-*
+    rm -f $DOCK_INIT_BASE/key/rollbar.token
+  fi
+}
+
+trap 'cleanup_trap' EXIT
+
 # get the logging to rollbar methods
 . $DOCK_INIT_BASE/util/rollbar.sh
 
@@ -68,7 +88,6 @@ echo `date` "[INFO] Start Vault"
 trap 'report_err_to_rollbar "Dock-Init: Failed to run start-vault.sh" "Vault was unable to start."; exit 1' ERR
 . $DOCK_INIT_BASE/util/start-vault.sh
 trap - ERR
-trap 'echo `date` "[INFO] Stopping Vault"; kill `cat /tmp/vault.pid`;' EXIT
 
 # Add tags to docker config file
 # assume first value in host_tags comma separated list is org ID

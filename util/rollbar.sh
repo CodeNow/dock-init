@@ -1,7 +1,9 @@
 #!/bin/bash
 
-ROLLBAR_TOKEN=`cat $DOCK_INIT_BASE/key/rollbar.token`
-if [[ "$DONT_DELETE_KEYS" == "" ]]; then rm -f $DOCK_INIT_BASE/key/rollbar.token; fi
+if [[ "$ROLLBAR_TOKEN" == "" ]]; then
+  ROLLBAR_TOKEN=`cat $DOCK_INIT_BASE/key/rollbar.token`
+  export ROLLBAR_TOKEN
+fi
 
 # report_to_rollbar "level" "title" "message" "data (a JSON object)"
 report_to_rollbar () {
