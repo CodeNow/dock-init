@@ -20,13 +20,6 @@ export CONSUL_HOSTNAME
 CERT_SCRIPT=$DOCK_INIT_BASE/cert.sh
 UPSTART_SCRIPT=$DOCK_INIT_BASE/upstart.sh
 
-echo `date` "[INFO] Getting IP Address"
-LOCAL_IP4_ADDRESS=$(ec2-metadata --local-ipv4 | awk '{print $2}')
-export LOCAL_IP4_ADDRESS
-
-# ENVIRONMENT is going to be an empty string until we get the node env in consul
-environment=""
-
 cleanup_trap ()
 {
   if [ -e /tmp/vault.pid ]
@@ -46,6 +39,13 @@ cleanup_trap ()
 }
 
 trap 'cleanup_trap' EXIT
+
+echo `date` "[INFO] Getting IP Address"
+LOCAL_IP4_ADDRESS=$(ec2-metadata --local-ipv4 | awk '{print $2}')
+export LOCAL_IP4_ADDRESS
+
+# ENVIRONMENT is going to be an empty string until we get the node env in consul
+environment=""
 
 # get the logging to rollbar methods
 . $DOCK_INIT_BASE/util/rollbar.sh
