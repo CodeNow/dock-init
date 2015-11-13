@@ -69,6 +69,11 @@ upstart charon $CHARON_PATH $CHARON_VERSION
 DOCKER_LISTENER_VERSION=$(curl --silent $CONSUL_KV_HOST/docker-listener/version | jq --raw-output ".[0].Value" | base64 --decode)
 upstart docker-listener $DOCKER_LISTENER_PATH $DOCKER_LISTENER_VERSION
 
+# start datadog now that services are up (or coming up)
+# NOTE: datadog is managed by `service`, not `upstart`
+# NOTE: to disable a `service` program, use `update-rc.d [service] disable`
+service datadog-agent start
+
 # Start swarm deamon to register this dock
 info "Running swarm container"
 consul-template \
