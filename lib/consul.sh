@@ -11,7 +11,7 @@ source ./lib/rollbar.sh
 # @param $1 attempt The attempt number passed by the backoff routine below
 consul::connect_backoff() {
   local attempt=${1}
-  log::info "Trying to reach consul at $CONSUL_HOSTNAME:8500 $attempt"
+  log::info "Trying to reach consul at $CONSUL_HOSTNAME:8500 (attempt: $attempt)"
   rollbar::warning_trap \
     "Dock-Init: Cannot Reach Consul Server" \
     "Attempting to reach Consul and failing."
@@ -21,14 +21,13 @@ consul::connect_backoff() {
 
 # Ensures that consul is available to the dock via curl
 consul::connect() {
-  log::info 'Attempting to reach consul...'
   backoff consul::connect_backoff
 }
 
 # Connects to consul and gets the environment for the dock
 consul::get_environment() {
   rollbar::fatal_trap \
-    "Dock-Init: Cannot get Environment"
+    "Dock-Init: Cannot get Environment" \
     "Unable to reach Consul and retrieve Environment."
   environment=$(curl http://"${CONSUL_HOSTNAME}":8500/v1/kv/node/env 2> /dev/null | jq --raw-output ".[0].Value" | base64 --decode)
   export environment
