@@ -1,5 +1,8 @@
 #!/bin/bash
 
+source ./lib/log.sh
+source ./lib/rollbar.sh
+
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
 # @module consul
@@ -9,9 +12,11 @@
 consul::connect_backoff() {
   local attempt=${1}
   log::info "Trying to reach consul at $CONSUL_HOSTNAME:8500 $attempt"
-  trap 'report_warn_to_rollbar "Dock-Init: Cannot Reach Consul Server" "Attempting to reach Consul and failing."' ERR
+  rollbar::warning_trap \
+    "Dock-Init: Cannot Reach Consul Server" \
+    "Attempting to reach Consul and failing."
   curl http://"${CONSUL_HOSTNAME}":8500/v1/status/leader 2>&1
-  trap - ERR
+  rollbar::clear_trap
 }
 
 # Ensures that consul is available to the dock via curl
