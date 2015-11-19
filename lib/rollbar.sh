@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./log.sh
+source ./lib/log.sh
 
 # Module for handling reporting to rollbar within dock-init bash scripts. This
 # module exposes various report_* and trap_* methods that can be used to easily
@@ -11,7 +11,7 @@ source ./log.sh
 
 # Ensure the module has a rollbar token
 if [[ -n "${ROLLBAR_TOKEN}" ]]; then
-  ROLLBAR_TOKEN=`cat $DOCK_INIT_BASE/key/rollbar.token`
+  ROLLBAR_TOKEN=$(cat "$DOCK_INIT_BASE"/key/rollbar.token)
   export ROLLBAR_TOKEN
 fi
 
@@ -21,19 +21,23 @@ fi
 # @param $3 message Message to report
 # @param $4 data Additional JSON data to report
 rollbar::report () {
-  echo `date` "[INFO] Reporting to Rollbar: $@"
   local level="$1"
   local title="$2"
   local message="$3"
   local data="$4"
 
+  log::info "Reporting to Rollbar (${level})"
+
   # verify that data is valid JSON
   if [[ "$data" == "" ]]; then data="{}"; fi
-  trap "data='{}'; echo '`date` [WARN] Invalid JSON Data was Passed with $title, $message';" ERR
+
+  local json_trap="data='{}'; log::warn 'Invalid JSON Data was Passed with $title, $message';"
+  trap '$json_trap' ERR
   echo "$data" | jq "." > /dev/null 2>&1
   trap - ERR
 
-  local timestamp=`date +'%s'`
+  local timestamp=''
+  timestamp=$(date +'%s')
   local payload='
   {
     "access_token": "'"${ROLLBAR_TOKEN}"'",
@@ -54,10 +58,12 @@ rollbar::report () {
     }
   }';
   # trap a curl error here to print a fatal error.
-  trap 'echo `date` "[FATAL] COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
-  curl -s -q -H "Content-Type: application/json" -d "$payload" "https://api.rollbar.com/api/1/item/" > /dev/null 2>&1
+  trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
+  curl -s -q -H "Content-Type: application/json" \
+    -d "$payload" \
+    "https://api.rollbar.com/api/1/item/" > /dev/null 2>&1
   trap - ERR
-  echo `date` "[INFO] Reported to Rollbar"
+  log::info "Reported to Rollbar"
 }
 
 # Reports errors via rollbar.

@@ -1,11 +1,13 @@
+#!/bin/bash
+
 # Step-wise utility functions for the main `init.sh` dock-init script. Each step
 # for the script has been broken up into a single function in this file to make
 # the script itself much easier to test.
 # @author Ryan Sandor Richards
 # @module dockinit
 
-source ./log
-source ./rollbar
+source ./lib/log.sh
+source ./lib/rollbar.sh
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
@@ -19,11 +21,11 @@ dockinit::cleanup_exit_trap()
 
   if [ -n "${DONT_DELETE_KEYS}" ]; then
     log::info '[CLEANUP TRAP] Removing Keys'
-    rm -f ${CERT_PATH}/ca-key.pem \
-          ${CERT_PATH}/pass \
-          ${DOCK_INIT_BASE}/consul-resources/vault/**/auth-token \
-          ${DOCK_INIT_BASE}/consul-resources/vault/**/token-* \
-          ${DOCK_INIT_BASE}/key/rollbar.token
+    rm -f "${CERT_PATH}"/ca-key.pem \
+          "${CERT_PATH}"/pass \
+          "${DOCK_INIT_BASE}"/consul-resources/vault/**/auth-token \
+          "${DOCK_INIT_BASE}"/consul-resources/vault/**/token-* \
+          "${DOCK_INIT_BASE}"/key/rollbar.token
   fi
 }
 
@@ -36,7 +38,7 @@ dockinit::set_cleanup_trap() {
 # Sets the value of `$ORG_ID` as the org label in the docker configuration
 dockinit::set_config_org() {
   log::info "Setting organization id in docker configuration"
-  echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org=$ORG_ID\" >> /etc/default/docker
+  echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/default/docker
 }
 
 # Generates upstart scripts for the dock
@@ -45,7 +47,7 @@ dockinit::generate_upstart_scripts() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to Generate Upstart Script" \
     "Failed to generate the upstart scripts."
-  . $DOCK_INIT_BASE/generate-upstart-scripts.sh
+  . "$DOCK_INIT_BASE"/generate-upstart-scripts.sh
   rollbar::clear_trap
 }
 
@@ -54,7 +56,7 @@ dockinit::generate_certs_backoff() {
   rollbar::warn_trap \
     "Dock-Init: Generate Host Certificate" \
     "Failed to generate Docker Host Certificate."
-  bash $CERT_SCRIPT
+  bash "$CERT_SCRIPT"
   rollabr::clear_trap
 }
 
@@ -72,11 +74,11 @@ dockinit::generate_etc_hosts() {
     "Dock-Init: Failed to Host Registry Entry" \
     "Consule-Template was unable to realize the given template."
 
-  local template=""
-  template += "$DOCK_INIT_BASE/consul-resources/templates/hosts-registry.ctmpl"
-  template += ":$DOCK_INIT_BASE/hosts-registry.txt"
+  local template=''
+  template+="$DOCK_INIT_BASE/consul-resources/templates/hosts-registry.ctmpl"
+  template+=":$DOCK_INIT_BASE/hosts-registry.txt"
   consul-template \
-    -config=${DOCK_INIT_BASE}/consul-resources/template-config.hcl \
+    -config="${DOCK_INIT_BASE}"/consul-resources/template-config.hcl \
     -once \
     -template="${template}"
 
@@ -85,8 +87,8 @@ dockinit::generate_etc_hosts() {
 
 # Sets the correct registry.runnable.com host
 dockinit::set_registry_host() {
-  log::info "Set registry host: $registry_host"
-  cat $DOCK_INIT_BASE/hosts-registry.txt >> /etc/hosts
+  log::info "Set registry host"
+  cat "$DOCK_INIT_BASE"/hosts-registry.txt >> /etc/hosts
 }
 
 # Remove docker key file so it generates a unique id
@@ -123,13 +125,13 @@ dockinit::start_docker() {
 # Backoff method for attempting to upstart the dock
 dockinit::attempt_upstart_backoff() {
   local attempt=${1}
-  log::info "Upstarting dock ($attempt)"
+  log::info "Upstarting dock (${attempt})"
   local data='{"attempt":'"${attempt}"'}'
   rollbar::warn_trap \
     "Dock-Init: Cannot Upstart Services" \
     "Attempting to upstart the services and failing." \
-    "$data"
-  bash $UPSTART_SCRIPT
+    "${data}"
+  bash "${UPSTART_SCRIPT}"
   rollbar::clear_trap
 }
 
@@ -145,6 +147,6 @@ dockinit::cleanup::stop_vault() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to stop Vault" \
     "Server was unable to stop Vault."
-  . $DOCK_INIT_BASE/util/stop-vault.sh
+  . "$DOCK_INIT_BASE"/util/stop-vault.sh
   rollbar::clear_trap
 }

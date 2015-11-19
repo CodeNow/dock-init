@@ -1,5 +1,8 @@
 #!/bin/bash
 
+source ./lib/log.sh
+source ./lib/rollbar.sh
+
 # AWS utility methods for the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
 # @module aws
@@ -13,17 +16,26 @@ aws::get_local_ip() {
 
 # Backoff routine that attempts to fetch the dock's org id from EC2 tags
 aws::fetch_org_id_from_tags() {
-  echo `date` "[INFO] Attempting to get org id..."
+  local attempt=${1}
+
+  log::info 'Attempting to get org id...'
   data='{"vault_addr":"'"${VAULT_ADDR}"'","attempt":'"${attempt}"'}'
-  trap 'report_warn_to_rollbar "Dock-Init: Cannot Fetch Org" "Attempting to get the Org Tag from AWS and failing." "$data"' ERR
-  ORG_ID=$(bash $ORG_SCRIPT)
-  echo `date` "[TRACE] Script Output: $ORG_ID"
-  trap - ERR
+
+  rollbar::warning_trap \
+    "Dock-Init: Cannot Fetch Org" \
+    "Attempting to get the Org Tag from AWS and failing." \
+    "$data"
+  ORG_ID=$(bash "$ORG_SCRIPT")
+  log::trace "Script Output: $ORG_ID"
+  rollbar::clear_trap
+
   if [[ "$ORG_ID" != "" ]]; then
     return 0
   else
     # report the attempt to rollbar, since we don't want this to always fail
-    report_warn_to_rollbar "Dock-Init: Failed to Fetch Org" "Org Script returned an empty string. Retrying."
+    rollbar::report_warning \
+      "Dock-Init: Failed to Fetch Org" \
+      "Org Script returned an empty string. Retrying."
     return 1
   fi
 }
@@ -41,7 +53,7 @@ aws::get_org_id() {
 
   local config="$DOCK_INIT_BASE/consul-resources/template-config.hcl"
   local template="$DOCK_INIT_BASE"
-  template += "/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT"
+  template+="/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT"
 
   consul-template -config="${config}" -once -template="${template}"
 

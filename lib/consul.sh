@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
 # @module consul
@@ -8,7 +10,7 @@ consul::connect_backoff() {
   local attempt=${1}
   log::info "Trying to reach consul at $CONSUL_HOSTNAME:8500 $attempt"
   trap 'report_warn_to_rollbar "Dock-Init: Cannot Reach Consul Server" "Attempting to reach Consul and failing."' ERR
-  curl http://$CONSUL_HOSTNAME:8500/v1/status/leader 2>&1
+  curl http://"${CONSUL_HOSTNAME}":8500/v1/status/leader 2>&1
   trap - ERR
 }
 
@@ -23,10 +25,7 @@ consul::get_environment() {
   rollbar::fatal_trap \
     "Dock-Init: Cannot get Environment"
     "Unable to reach Consul and retrieve Environment."
-  environment=$(curl http://$CONSUL_HOSTNAME:8500/v1/kv/node/env \
-    2> /dev/null
-    | jq --raw-output ".[0].Value" \
-    | base64 --decode)
+  environment=$(curl http://"${CONSUL_HOSTNAME}":8500/v1/kv/node/env 2> /dev/null | jq --raw-output ".[0].Value" | base64 --decode)
   export environment
   rollbar::clear_trap
 }
