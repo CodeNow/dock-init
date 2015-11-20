@@ -9,14 +9,15 @@
 # @author Bryan Kendall
 # @module dock
 
-source "${DOCK_INIT_BASE}/lib/util/log.sh"
-source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
-source "${DOCK_INIT_BASE}/lib/vault.sh"
-source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
+source "${DOCK_INIT_BASE}/lib/cert.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/upstart.sh"
-source "${DOCK_INIT_BASE}/lib/cert.sh"
+source "${DOCK_INIT_BASE}/lib/vault.sh"
+
+source "${DOCK_INIT_BASE}/lib/util/log.sh"
+source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
