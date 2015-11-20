@@ -20,7 +20,8 @@ dockinit::cleanup_exit_trap()
     kill "$(cat /tmp/vault.pid)"
   fi
 
-  if [[ "${DONT_DELETE_KEYS}" == '' ]]; then
+  if [ "${DONT_DELETE_KEYS}" ]; then
+  else
     log::info '[CLEANUP TRAP] Removing Keys'
     rm -f "${CERT_PATH}"/ca-key.pem \
           "${CERT_PATH}"/pass \
