@@ -1,19 +1,38 @@
 #!/bin/bash
 
-# Step-wise utility functions for the main `init.sh` dock-init script. Each step
-# for the script has been broken up into a single function in this file to make
-# the script itself much easier to test.
+# This is the primary dock initialization module that is executed via the
+# `init.sh` script when a dock is provisioned via shiva. It loads various
+# libraries (located in `lib/`)` and composes the exposed methods together to
+# fully initialize, start, and register a dock.
+#
 # @author Ryan Sandor Richards
-# @module dockinit
+# @author Bryan Kendall
+# @module dock
 
 source ./lib/log.sh
 source ./lib/rollbar.sh
 source ./lib/vault.sh
+source ./lib/backoff.sh
+source ./lib/aws.sh
+source ./lib/consul.sh
+
+# Base directory for dock-init
+export DOCK_INIT_BASE=/opt/runnable/dock-init
+
+# Provided by the user script that runs this script
+export CONSUL_HOSTNAME
+
+# Paths to the cert and upstart scripts
+export CERT_SCRIPT=${DOCK_INIT_BASE}/cert.sh
+export UPSTART_SCRIPT=${DOCK_INIT_BASE}/upstart.sh
+
+# Set empty environment is until we get the node env from consul
+export environment=""
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
 # been set (useful for testing)
-dockinit::cleanup_exit_trap() {
+dock::cleanup::exit_trap() {
   # Kill vault and clean up the pid file
   if [ -e /tmp/vault.pid ]; then
     log::info '[CLEANUP TRAP] Killing Vault'
@@ -33,19 +52,19 @@ dockinit::cleanup_exit_trap() {
 }
 
 # Sets the cleanup trap for the entire script
-dockinit::set_cleanup_trap() {
+dock::cleanup::set_exit_trap() {
   log::info "Setting key cleanup trap"
-  trap 'dockinit::cleanup_exit_trap' EXIT
+  trap 'dock::cleanup::exit_trap' EXIT
 }
 
 # Sets the value of `$ORG_ID` as the org label in the docker configuration
-dockinit::set_config_org() {
+dock::set_config_org() {
   log::info "Setting organization id in docker configuration"
   echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/default/docker
 }
 
 # Generates upstart scripts for the dock
-dockinit::generate_upstart_scripts() {
+dock::generate_upstart_scripts() {
   log::info "Generating Upstart Scripts"
   rollbar::fatal_trap \
     "Dock-Init: Failed to Generate Upstart Script" \
@@ -55,7 +74,7 @@ dockinit::generate_upstart_scripts() {
 }
 
 # Backoff method for generating host certs
-dockinit::generate_certs_backoff() {
+dock::generate_certs_backoff() {
   rollbar::warning_trap \
     "Dock-Init: Generate Host Certificate" \
     "Failed to generate Docker Host Certificate."
@@ -64,13 +83,13 @@ dockinit::generate_certs_backoff() {
 }
 
 # Generates host certs for the dock
-dockinit::generate_certs() {
+dock::generate_certs() {
   log::info "Generating Host Certificate"
-  backoff dockinit::generate_certs_backoff
+  backoff dock::generate_certs_backoff
 }
 
 # Generates the correct /etc/hosts file for the dock
-dockinit::generate_etc_hosts() {
+dock::generate_etc_hosts() {
   log::info "Generating /etc/hosts"
 
   rollbar::fatal_trap \
@@ -89,19 +108,19 @@ dockinit::generate_etc_hosts() {
 }
 
 # Sets the correct registry.runnable.com host
-dockinit::set_registry_host() {
+dock::set_registry_host() {
   log::info "Set registry host"
   cat "$DOCK_INIT_BASE"/hosts-registry.txt >> /etc/hosts
 }
 
 # Remove docker key file so it generates a unique id
-dockinit::remove_docker_key_file() {
+dock::remove_docker_key_file() {
   log::info "Removing docker key.json"
   rm -f /etc/docker/key.json
 }
 
 # Start dockers (due to manual override now set in /etc/init)
-dockinit::start_docker() {
+dock::start_docker() {
   log::info "Starting Docker"
   rollbar::fatal_trap \
     "Dock-Init: Failed to Start Docker" \
@@ -126,7 +145,7 @@ dockinit::start_docker() {
 }
 
 # Backoff method for attempting to upstart the dock
-dockinit::attempt_upstart_backoff() {
+dock::attempt_upstart_backoff() {
   local attempt=${1}
   log::info "Upstarting dock (${attempt})"
   local data='{"attempt":'"${attempt}"'}'
@@ -139,17 +158,44 @@ dockinit::attempt_upstart_backoff() {
 }
 
 # Attempts to upstart the dock with exponential backoff
-dockinit::attempt_upstart() {
+dock::attempt_upstart() {
   log::info "Starting Upstart Attempts"
-  backoff dockinit::attempt_upstart_backoff
+  backoff dock::attempt_upstart_backoff
 }
 
 # Attempts to stop vault after the dock has been intiialized
-dockinit::cleanup::stop_vault() {
+dock::cleanup::stop_vault() {
   log::info "[CLEANUP] Stop Vault"
   rollbar::fatal_trap \
     "Dock-Init: Failed to stop Vault" \
     "Server was unable to stop Vault."
   vault::stop
   rollbar::clear_trap
+}
+
+# Master function for performing all tasks and initializing the dock
+dock::init() {
+  dock::cleanup::set_exit_trap
+
+  # Connect to and configure consul then collect various information we need
+  aws::get_local_ip
+  consul::connect
+  consul::get_environment
+  consul::configure_consul_template
+  consul::start_vault
+  aws::get_org_id
+
+  # Now that we have everything we need and consul is ready, initialize the dock
+  dock::set_config_org
+  dock::generate_upstart_scripts
+  dock::generate_certs
+  dock::generate_etc_hosts
+  dock::set_registry_host
+  dock::remove_docker_key_file
+  dock::start_docker
+  dock::attempt_upstart
+  log::info "Init Done!"
+
+  # Perform any cleanup tasks now that the dock is up and running
+  dock::cleanup::stop_vault
 }
