@@ -47,20 +47,20 @@ dock::cleanup::set_exit_trap() {
   trap 'dock::cleanup::exit_trap' EXIT
 }
 
+# Attempts to stop vault after the dock has been intiialized
+dock::cleanup::stop_vault() {
+  log::info "[CLEANUP] Stop Vault"
+  rollbar::fatal_trap \
+    "Dock-Init: Failed to stop Vault" \
+    "Server was unable to stop Vault."
+  vault::stop
+  rollbar::clear_trap
+}
+
 # Sets the value of `$ORG_ID` as the org label in the docker configuration
 dock::set_config_org() {
   log::info "Setting organization id in docker configuration"
   echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/default/docker
-}
-
-# Generates upstart scripts for the dock
-dock::generate_upstart_scripts() {
-  log::info "Generating Upstart Scripts"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to Generate Upstart Script" \
-    "Failed to generate the upstart scripts."
-  upstart::generate_scripts
-  rollbar::clear_trap
 }
 
 # Backoff method for generating host certs
@@ -109,51 +109,6 @@ dock::remove_docker_key_file() {
   rm -f /etc/docker/key.json
 }
 
-# Start dockers (due to manual override now set in /etc/init)
-dock::start_docker() {
-  log::info "Starting Docker"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to Start Docker" \
-    "Server was unable to start service."
-  service docker start
-  rollbar::clear_trap
-
-  log::info "Waiting for Docker"
-  local attempt=1
-  local timeout=1
-  while [ ! -e /var/run/docker.sock ]
-  do
-    log::info "Docker Sock N/A ($attempt)"
-    local title="Dock-Init: Cannot Reach Docker"
-    local message="Attempting to reach Docker and failing."
-    local data="{\"docker_host\":\"/var/run/docker.sock\",\"attempt\":\"${attempt}\"}"
-    rollbar::report_warning "${title}" "${message}" "$data"
-    sleep $timeout
-    attempt=$(( attempt + 1 ))
-    timeout=$(( timeout * 2 ))
-  done
-}
-
-# Attempts to stop vault after the dock has been intiialized
-dock::cleanup::stop_vault() {
-  log::info "[CLEANUP] Stop Vault"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to stop Vault" \
-    "Server was unable to stop Vault."
-  vault::stop
-  rollbar::clear_trap
-}
-
-# Stops all dock services
-dock::stop() {
-  service filibuster stop
-  service krain stop
-  service sauron stop
-  service charon stop
-  service docker-listener stop
-  service docker stop
-}
-
 # Master function for performing all tasks and initializing the dock
 dock::init() {
   dock::cleanup::set_exit_trap
@@ -168,12 +123,10 @@ dock::init() {
 
   # Now that we have everything we need and consul is ready, initialize the dock
   dock::set_config_org
-  dock::generate_upstart_scripts
   dock::generate_certs
   dock::generate_etc_hosts
   dock::set_registry_host
   dock::remove_docker_key_file
-  dock::start_docker
   upstart::start
 
   # Give the all clear message!
