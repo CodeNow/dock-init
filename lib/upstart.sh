@@ -119,7 +119,7 @@ upstart::start_swarm_container() {
 
 # Starts all services needed for the dock
 upstart::start() {
-  log::info "Upstarting dock (${attempt})"
+  log::info "Upstarting dock"
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services
   upstart::start_swarm_container
