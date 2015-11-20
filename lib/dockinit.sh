@@ -59,7 +59,7 @@ dockinit::generate_certs_backoff() {
     "Dock-Init: Generate Host Certificate" \
     "Failed to generate Docker Host Certificate."
   bash "$CERT_SCRIPT"
-  rollabr::clear_trap
+  rollbar::clear_trap
 }
 
 # Generates host certs for the dock

@@ -26,8 +26,6 @@ rollbar::report () {
   local message="$3"
   local data="$4"
 
-  log::info "Reporting to Rollbar (${level})"
-
   # verify that data is valid JSON
   if [[ "$data" == "" ]]; then data="{}"; fi
 
@@ -63,7 +61,7 @@ rollbar::report () {
     -d "$payload" \
     "https://api.rollbar.com/api/1/item/" > /dev/null 2>&1
   trap - ERR
-  log::info "Reported to Rollbar"
+  log::info "Error Reported to Rollbar ($level)"
 }
 
 # Reports errors via rollbar.
