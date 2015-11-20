@@ -10,7 +10,7 @@
 # @module dock
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
-source "${DOCK_INIT_BASE}/lib/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"

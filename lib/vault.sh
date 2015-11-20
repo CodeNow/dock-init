@@ -6,7 +6,7 @@
 # @author Bryan Kendall
 # @module vault
 
-source "${DOCK_INIT_BASE}/lib/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 CONSUL_KV_HOST="$CONSUL_HOSTNAME:8500/v1/kv"

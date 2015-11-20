@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
-source "${DOCK_INIT_BASE}/lib/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
 # AWS utility methods for the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
