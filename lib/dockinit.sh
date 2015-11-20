@@ -8,6 +8,7 @@
 
 source ./lib/log.sh
 source ./lib/rollbar.sh
+source ./lib/vault.sh
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
@@ -147,6 +148,6 @@ dockinit::cleanup::stop_vault() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to stop Vault" \
     "Server was unable to stop Vault."
-  . "$DOCK_INIT_BASE"/util/stop-vault.sh
+  vault::stop
   rollbar::clear_trap
 }

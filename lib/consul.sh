@@ -2,6 +2,7 @@
 
 source ./lib/log.sh
 source ./lib/rollbar.sh
+source ./lib/vault.sh
 
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
@@ -56,8 +57,6 @@ consul::start_vault() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to run start-vault.sh" \
     "Vault was unable to start."
-
-  . $DOCK_INIT_BASE/lib/start-vault.sh
-
+  vault::start
   rollbar::clear_trap
 }
