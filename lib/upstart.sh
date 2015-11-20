@@ -70,7 +70,7 @@ upstart::pull_image_builder() {
 
 # Updates a service to the consul version, installs packages, then restarts it.
 # @param $1 Name of the service
-upstart::upstart_service_backoff() {
+upstart::upstart_named_service() {
   local name="${1}"
   local attempt="${2}"
   local data='{"attempt":'"${attempt}"'}'
@@ -94,8 +94,12 @@ upstart::upstart_service_backoff() {
 
 # Upstarts a service with the given name
 # @param $1 name Name of the service
-upstart::upstart_service() {
-  backoff "upstart::upstart_service_backoff $name"
+upstart::upstart_services() {
+  upstart::upstart_named_service "filibuster"
+  upstart::upstart_named_service "krain"
+  upstart::upstart_named_service "sauron"
+  upstart::upstart_named_service "charon"
+  upstart::upstart_named_service "docker-listener"
 }
 
 # Starts the docker swarm container
@@ -116,11 +120,7 @@ upstart::start_swarm_container() {
 # Starts all services needed for the dock
 upstart::start() {
   log::info "Upstarting dock (${attempt})"
-  upstart::pull_image_builder
-  upstart::upstart_service "filibuster"
-  upstart::upstart_service "krain"
-  upstart::upstart_service "sauron"
-  upstart::upstart_service "charon"
-  upstart::upstart_service "docker-listener"
-  upstart::start_swarm
+  backoff upstart::pull_image_builder
+  backoff upstart::upstart_services
+  upstart::start_swarm_container
 }
