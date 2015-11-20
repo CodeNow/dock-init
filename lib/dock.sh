@@ -9,15 +9,12 @@
 # @author Bryan Kendall
 # @module dock
 
-source ./lib/log.sh
-source ./lib/rollbar.sh
-source ./lib/vault.sh
-source ./lib/backoff.sh
-source ./lib/aws.sh
-source ./lib/consul.sh
-
-# Base directory for dock-init
-export DOCK_INIT_BASE=/opt/runnable/dock-init
+source "${DOCK_INIT_BASE}"/lib/log.sh
+source "${DOCK_INIT_BASE}"/lib/rollbar.sh
+source "${DOCK_INIT_BASE}"/lib/vault.sh
+source "${DOCK_INIT_BASE}"/lib/backoff.sh
+source "${DOCK_INIT_BASE}"/lib/aws.sh
+source "${DOCK_INIT_BASE}"/lib/consul.sh
 
 # Provided by the user script that runs this script
 export CONSUL_HOSTNAME

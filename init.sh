@@ -4,5 +4,6 @@
 # library and calls the master initialization function.
 # @author Ryan Sandor Richards
 
-source ./lib/dock.sh
+export DOCK_INIT_BASE=/opt/runnable/dock-init
+source "${DOCK_INIT_BASE}"/lib/dock.sh
 dock::init

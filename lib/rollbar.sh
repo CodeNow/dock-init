@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./lib/log.sh
+source "${DOCK_INIT_BASE}"/lib/log.sh
 
 # Module for handling reporting to rollbar within dock-init bash scripts. This
 # module exposes various report_* and trap_* methods that can be used to easily
