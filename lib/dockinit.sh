@@ -13,14 +13,15 @@ source ./lib/vault.sh
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
 # been set (useful for testing)
-dockinit::cleanup_exit_trap()
-{
+dockinit::cleanup_exit_trap() {
+  # Kill vault and clean up the pid file
   if [ -e /tmp/vault.pid ]; then
     log::info '[CLEANUP TRAP] Killing Vault'
     kill "$(cat /tmp/vault.pid)"
     rm /tmp/vault.pid
   fi
 
+  # Delete the keys unless the `DO_NOT_DELETE` flag is set
   if [[ "${DONT_DELETE_KEYS}" == "" ]]; then
     log::info '[CLEANUP TRAP] Removing Keys'
     rm -f "${CERT_PATH}"/ca-key.pem \
