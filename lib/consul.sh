@@ -1,8 +1,8 @@
 #!/bin/bash
 
-source "${DOCK_INIT_BASE}"/lib/log.sh
-source "${DOCK_INIT_BASE}"/lib/rollbar.sh
-source "${DOCK_INIT_BASE}"/lib/vault.sh
+source "${DOCK_INIT_BASE}/lib/util/log.sh"
+source "${DOCK_INIT_BASE}/lib/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards

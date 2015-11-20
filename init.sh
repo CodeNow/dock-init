@@ -5,5 +5,5 @@
 # @author Ryan Sandor Richards
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
-source "${DOCK_INIT_BASE}"/lib/dock.sh
+source "${DOCK_INIT_BASE}/lib/dock.sh"
 dock::init
