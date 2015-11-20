@@ -3,7 +3,7 @@
 # Unit tests for the `lib/util/backoff.sh` module.
 # @author Ryan Sandor Richards
 
-source $DOCK_INIT_BASE/lib/util/backoff.sh
+source "$DOCK_INIT_BASE/lib/util/backoff.sh"
 
 describe 'dock-init'
   describe 'util'
@@ -85,7 +85,7 @@ describe 'dock-init'
         stub::set 'sleep'
         backoff action
         assert equal "1 2 3 4 5 " "$attempts"
-        unstub_command 'sleep'
+        stub::restore 'sleep'
       end
     end #backoff
   end #util
