@@ -20,7 +20,7 @@ upstart::configure_service() {
     "Consule-Template was unable to realize the given template."
 
   local template_path="$DOCK_INIT_BASE/consul-resources/templates/services"
-  template_path+="$name.conf.ctmpl"
+  template_path+="/$name.conf.ctmpl"
   template_path+=":/etc/init/$name.conf"
 
   consul-template \
