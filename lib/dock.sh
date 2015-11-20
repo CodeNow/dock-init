@@ -170,6 +170,16 @@ dock::cleanup::stop_vault() {
   rollbar::clear_trap
 }
 
+# Stops all dock services
+dock::stop() {
+  service filibuster stop
+  service krain stop
+  service sauron stop
+  service charon stop
+  service docker-listener stop
+  service docker stop
+}
+
 # Master function for performing all tasks and initializing the dock
 dock::init() {
   dock::cleanup::set_exit_trap
