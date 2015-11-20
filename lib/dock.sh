@@ -16,16 +16,7 @@ source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/upstart.sh"
-
-# Provided by the user script that runs this script
-export CONSUL_HOSTNAME
-
-# Paths to the cert and upstart scripts
-export CERT_SCRIPT=${DOCK_INIT_BASE}/cert.sh
-export UPSTART_SCRIPT=${DOCK_INIT_BASE}/upstart.sh
-
-# Set empty environment is until we get the node env from consul
-export environment=""
+source "${DOCK_INIT_BASE}/lib/cert.sh"
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
@@ -67,7 +58,7 @@ dock::generate_upstart_scripts() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to Generate Upstart Script" \
     "Failed to generate the upstart scripts."
-  . "$DOCK_INIT_BASE"/generate-upstart-scripts.sh
+  upstart::generate_scripts
   rollbar::clear_trap
 }
 
@@ -76,7 +67,7 @@ dock::generate_certs_backoff() {
   rollbar::warning_trap \
     "Dock-Init: Generate Host Certificate" \
     "Failed to generate Docker Host Certificate."
-  bash "$CERT_SCRIPT"
+  cert::generate
   rollbar::clear_trap
 }
 
