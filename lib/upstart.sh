@@ -98,6 +98,7 @@ upstart::upstart_service() {
   backoff "upstart::upstart_service_backoff $name"
 }
 
+# Starts the docker swarm container
 upstart::start_swarm_container() {
   local template="$DOCK_INIT_BASE/consul-resources/templates/"
   template+="swarm-url.ctmpl:$DOCK_INIT_BASE/swarm-token.txt"
