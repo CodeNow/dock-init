@@ -4,7 +4,7 @@ set -e
 echo `date` "[INFO] Configuring Upstart Scripts"
 
 # get the logging to rollbar methods
-. $DOCK_INIT_BASE/util/rollbar.sh
+. $DOCK_INIT_BASE/lib/rollbar.sh
 
 SERVICE_TEMPLATE_DIR=$DOCK_INIT_BASE/consul-resources/templates/services
 
