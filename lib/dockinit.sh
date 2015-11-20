@@ -55,7 +55,7 @@ dockinit::generate_upstart_scripts() {
 
 # Backoff method for generating host certs
 dockinit::generate_certs_backoff() {
-  rollbar::warn_trap \
+  rollbar::warning_trap \
     "Dock-Init: Generate Host Certificate" \
     "Failed to generate Docker Host Certificate."
   bash "$CERT_SCRIPT"
@@ -129,7 +129,7 @@ dockinit::attempt_upstart_backoff() {
   local attempt=${1}
   log::info "Upstarting dock (${attempt})"
   local data='{"attempt":'"${attempt}"'}'
-  rollbar::warn_trap \
+  rollbar::warning_trap \
     "Dock-Init: Cannot Upstart Services" \
     "Attempting to upstart the services and failing." \
     "${data}"
