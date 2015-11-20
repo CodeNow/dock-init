@@ -75,7 +75,7 @@ upstart::upstart_named_service() {
   local attempt="${2}"
   local data='{"attempt":'"${attempt}"'}'
   local version="$(upstart::service_version $name)"
-  local key_path="$DOCK_INIT_PATH/key/id_rsa_runnabledock"
+  local key_path="$DOCK_INIT_BASE/key/id_rsa_runnabledock"
 
   rollbar::warning_trap \
     "$name: Cannot Upstart Services" \
