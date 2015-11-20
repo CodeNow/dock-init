@@ -18,6 +18,7 @@ dockinit::cleanup_exit_trap()
   if [ -e /tmp/vault.pid ]; then
     log::info '[CLEANUP TRAP] Killing Vault'
     kill "$(cat /tmp/vault.pid)"
+    rm /tmp/vault.pid
   fi
 
   if [[ "${DONT_DELETE_KEYS}" == "" ]]; then
