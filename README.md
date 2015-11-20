@@ -35,9 +35,31 @@ This should be the first place to look if a dock was provisioned but did not
 register itself with the rest of the system correctly. Also pay careful attention
 to the version numbers for each of the projects when they are pulled.
 
-## Project Layout
+## Development
 
-### Source
+### Install Tools
+First, install [shellcheck](https://github.com/koalaman/shellcheck). It is a linter
+for shell scripts and it is used for helping us conform to the style guide. Here's
+the command you'll need to run (OSX):
+
+```sh
+brew install shellcheck
+```
+
+Second, you'll need to install [shpec](https://github.com/rylnd/shpec) locally
+as well. Shpec is a spec based unit testing framework specifically geared to
+test scripts, here's how to install (OSX):
+
+```sh
+sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
+```
+
+### Running tests
+To run the test suite use the following command: `bash test.sh`. This will setup
+the test environment and run the unit test suites. The test suites can be found
+under the `test/` directory.
+
+### Source: `init.sh` and `lib/`
 
 The project's main script is `init.sh`. This performs the following actions:
 
@@ -50,12 +72,12 @@ The rest of the implementation for the project lives in the `lib/` directory.
 For the most part the filenames have been chosen to give as much context as
 possible to make the project easy to navigate.
 
-### Consul Resources
+### Consul Resources: `consul-resources/`
 Dock-init uses consul and the wonderful `consul-template` utility to generate
 service upstart scripts via values found in consul. These templates and other
 resources associated with consul live in the `consul-resources/` directory.
 
-### Deploy Keys
+### Deploy Keys: `key/`
 Each of the services lives on the dock as git repository. When the `init.sh`
 script fetches all repository information for a service it uses one or more
 of the deploy keys given in the `key/` directory.
@@ -64,7 +86,7 @@ NOTE: On an actual dock the private keys require access rights of at least 600.
 Use the `util/lock-keys.sh` script to ensure that all private keys are, well,
 locked down.
 
-### Development Utilities
+### Development Utilities: `util/`
 The project also comes equipped with a slew of development utility scripts under
 the `util/` directory. These scripts make it easy to test dock-init on an ec2
 instance, pull specific versions of the library, and perform other tasks.

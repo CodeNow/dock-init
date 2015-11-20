@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Routines for handling exponetial back off
+# @module util:backoff
+
 # Attempts to run the given function and on failure sleeps then tries again.
 # Each failure increases the sleep time by a power of two, and thus we backoff
 # our attempts exponentially.

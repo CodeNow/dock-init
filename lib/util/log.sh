@@ -7,7 +7,7 @@
 #
 # @see https://github.com/trentm/node-bunyan#levels
 # @author Ryan Sandor Richards
-# @module log
+# @module util:log
 
 # Converts a log level string to the appropriate integer
 # @param [$1] given_level Optional given level to convert into an integer

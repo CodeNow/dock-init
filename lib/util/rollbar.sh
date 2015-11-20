@@ -7,7 +7,7 @@ source "${DOCK_INIT_BASE}/lib/util/log.sh"
 # ineteract and send messages to rollbar.
 # @author Bryan Kendall
 # @author Ryan Sandor Richards
-# @module rollbar
+# @module util:rollbar
 
 # Ensure the module has a rollbar token
 if [[ -n "${ROLLBAR_TOKEN}" ]]; then
