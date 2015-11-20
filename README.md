@@ -5,7 +5,7 @@ Scripts and keys needed to initialize docks provisioned via Shiva.
 The `dock-init` repository lives on docks and contains the required scripts and
 keys needed fully provision and start a dock in a production environment. The
 project's primarily used to create new EC2 AMIs that are referenced by
-[shiva](https://github.com/CodeNow/shiva) during dock provisioning.
+[shiva](https://github.com/CodeNow/astral) during dock provisioning.
 
 This document will cover the basics of what the initialization scripts do, and
 how to create a new dock AMI.
@@ -16,7 +16,7 @@ expected to have an `/opt/runnable` path containing all required dock service
 repositories along with `dock-init`.
 
 The dock-init scripts are run in response to the provisioning of a new dock via
-[shiva](https://github.com/CodeNow/shiva):
+[shiva](https://github.com/CodeNow/astral):
 
 ![Shiva Interaction](https://docs.google.com/drawings/d/1bpHidufswuNd7cNkHvm9jIUs-o9P9XWmag5meeRaMkg/pub?w=708&h=228)
 
@@ -29,70 +29,46 @@ that sets the correct environment variables (`/opt/runnable/env`), and host tags
 ## Logs and Debugging
 The logs for the dock init scripts can be found on a dock at the following location:
 
-* `/var/log/dock-init.log`
+* `/var/log/user-script-dock-init.log.log`
 
 This should be the first place to look if a dock was provisioned but did not
 register itself with the rest of the system correctly. Also pay careful attention
-to the version numbers for each of the projects when they are pulled. Finally make
-sure the correct host tags are set in `/opt/runnable/host_tags`.
+to the version numbers for each of the projects when they are pulled.
 
-## Scripts
+## Project Layout
 
-### init.sh
-The `init.sh` script is responsible for robustly handling the initialization of
-a dock. Since there are multiple services that must be updated and restarted it
-uses an exponential back-off approach when attempting to initialize the dock.
+### Source
 
-The script is executed by the EC2 instance's "user-data" script which is set by
-[shiva](https://github.com/CodeNow/shiva) during provisioning.
+The project's main script is `init.sh`. This performs the following actions:
 
-### upstart.sh
-The `upstart.sh` script is called by `init.sh` and is responsible for updating
-the required services and images to the preferred versions (as set by shivas
-user-data script), pulling the required images (image-builder), and restarting
-all of the docks core services.
+1. Connect to consul
+2. Check the version of dock-init itself (via consul)
+3. If needed, perform a pull to the correct version of dock-init
+4. Execute the `dock::init` method defined in `lib/dock.sh`
 
-The script updates and restarts the services in the following order:
+The rest of the implementation for the project lives in the `lib/` directory.
+For the most part the filenames have been chosen to give as much context as
+possible to make the project easy to navigate.
 
-1. [filibuster](https://github.com/Runnable/Filibuster)
-2. [krain](https://github.com/codenow/krain)
-3. [sauron](https://github.com/codenow/sauron)
-4. [docker-listener](https://github.com/codenow/docker-listener)
+### Consul Resources
+Dock-init uses consul and the wonderful `consul-template` utility to generate
+service upstart scripts via values found in consul. These templates and other
+resources associated with consul live in the `consul-resources/` directory.
 
-Once [docker-listener](https://github.com/codenow/docker-listener) has been
-restarted the dock will register itself with
-[mavis](https://github.com/codenow/mavis) and will be able to handle build and
-run tasks.
-
-Finally we start up swarm container which registers the deamon with our swarm master.
-
-### cert.sh
-The `cert.sh` script is responsible for generating a new TLS host certificate
-for docker. It expects the AMI is preloaded with the following files:
-
-* `/etc/ssl/docker/ca.pem`
-* `/etc/ssl/docker/ca-key.pem`
-
-The script generates the needed certificate-key pair for the docker host (also
-located at `/etc/ssl/docker`) and removes `/etc/ssl/docker/ca-key.pem` from the
-host.
-
-### docker-listener.conf
-This is a modified version of the Ubuntu upstart configuration for the
-docker-listener service. Our infrastructure requires that each dock report a
-set of tags on startup. These tags are used to route build and run events to
-customer specific docks. The `docker-listener.conf` has been modified to read
-the host tags from a special file that is written by shiva's `user-data` script
-before restarting the service.
-
-## Deploy Keys
-Each of the services lives on the dock as git repository. When the `upstart.sh`
+### Deploy Keys
+Each of the services lives on the dock as git repository. When the `init.sh`
 script fetches all repository information for a service it uses one or more
 of the deploy keys given in the `key/` directory.
 
 NOTE: On an actual dock the private keys require access rights of at least 600.
 Use the `util/lock-keys.sh` script to ensure that all private keys are, well,
 locked down.
+
+### Development Utilities
+The project also comes equipped with a slew of development utility scripts under
+the `util/` directory. These scripts make it easy to test dock-init on an ec2
+instance, pull specific versions of the library, and perform other tasks.
+
 
 ## Modifying an Existing AMI
 This is the easy way to build a new AMI for use by shiva. To do so find the
