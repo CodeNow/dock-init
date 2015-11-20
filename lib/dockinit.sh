@@ -71,7 +71,7 @@ dockinit::generate_certs() {
 
 # Generates the correct /etc/hosts file for the dock
 dockinit::generate_etc_hosts() {
-  log:info "Generating /etc/hosts"
+  log::info "Generating /etc/hosts"
 
   rollbar::fatal_trap \
     "Dock-Init: Failed to Host Registry Entry" \
