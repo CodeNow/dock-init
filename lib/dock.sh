@@ -15,6 +15,7 @@ source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
+source "${DOCK_INIT_BASE}/lib/upstart.sh"
 
 # Provided by the user script that runs this script
 export CONSUL_HOSTNAME
@@ -141,25 +142,6 @@ dock::start_docker() {
   done
 }
 
-# Backoff method for attempting to upstart the dock
-dock::attempt_upstart_backoff() {
-  local attempt=${1}
-  log::info "Upstarting dock (${attempt})"
-  local data='{"attempt":'"${attempt}"'}'
-  rollbar::warning_trap \
-    "Dock-Init: Cannot Upstart Services" \
-    "Attempting to upstart the services and failing." \
-    "${data}"
-  bash "${UPSTART_SCRIPT}"
-  rollbar::clear_trap
-}
-
-# Attempts to upstart the dock with exponential backoff
-dock::attempt_upstart() {
-  log::info "Starting Upstart Attempts"
-  backoff dock::attempt_upstart_backoff
-}
-
 # Attempts to stop vault after the dock has been intiialized
 dock::cleanup::stop_vault() {
   log::info "[CLEANUP] Stop Vault"
@@ -200,7 +182,9 @@ dock::init() {
   dock::set_registry_host
   dock::remove_docker_key_file
   dock::start_docker
-  dock::attempt_upstart
+  upstart::start
+
+  # Give the all clear message!
   log::info "Init Done!"
 
   # Perform any cleanup tasks now that the dock is up and running
