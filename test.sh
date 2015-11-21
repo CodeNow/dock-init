@@ -6,6 +6,7 @@
 # tests from running.
 # @author Ryan Sandor Richards
 
-source $DOCK_INIT_BASE/test/fixtures/stub.sh
+export LOG_LEVEL=none
 export DOCK_INIT_BASE=$(pwd)
+source $DOCK_INIT_BASE/test/fixtures/stub.sh
 shpec test/**/*.sh

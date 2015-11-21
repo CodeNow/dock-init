@@ -11,10 +11,9 @@
 # the current attempt count, and the secon paramter will be the next sleep
 # timeout.
 #
-# @param $1 action Function to execute under the exponetial backoff
+# @param $1 action Command to execute under the exponetial backoff
 backoff() {
   local action=${1}
-  local argc=$#
   local attempt=1
   local timeout=1
   while true; do
