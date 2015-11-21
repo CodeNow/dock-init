@@ -1,0 +1,7 @@
+language: bash
+
+before_script:
+    - sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
+
+script:
+    - bash test.sh
