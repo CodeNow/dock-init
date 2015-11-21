@@ -5,6 +5,7 @@
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export CONSUL_HOSTNAME=10.20.1.59
+export CONSUL_PORT=8500
 export DONT_DELETE_KEYS=true
 export LOG_LEVEL=trace
 

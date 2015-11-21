@@ -25,6 +25,17 @@ consul::connect() {
   backoff consul::connect_backoff
 }
 
+# Echos a value from consul foer the given keypath
+# @param $1 keypath Keypath for the value to get from consul
+consul::get() {
+  # Strip leading slashes so it works with both '/my/path' and 'my/path'
+  local path=$(echo "$1" | sed 's/^\///')
+  local url="http://$CONSUL_HOSTNAME:$CONSULT_PORT/v1/kv/$path"
+  curl --silent "$url" 2> /dev/null | \
+    jq --raw-output ".[0].Value" | \
+    base64 --decode
+}
+
 # Connects to consul and gets the environment for the dock
 consul::get_environment() {
   rollbar::fatal_trap \
