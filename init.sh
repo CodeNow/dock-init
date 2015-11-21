@@ -36,10 +36,19 @@ ssh_execute() {
 auto_update() {
   log::info "Updating dock-init"
   consul::connect
+
+  log::trace 'Fetching dock-init version from consul...'
   local version=$(consul::get '/dock-init/version')
-  cd "$(dirname "$0")" && \
-    ssh_execute "git fetch origin $version" && \
-    ssh_execute "git checkout $version"
+  log::trace "dock-init version found: $version"
+
+  log::trace "moving to dock init base directory ($DOCK_INIT_BASE)"
+  cd "$DOCK_INIT_BASE"
+
+  log::trace "fetching all from repository"
+  ssh_execute "git fetch --all"
+
+  log::trace "Checking out dock-init version: $version"
+  ssh_execute "git checkout $version"
 }
 
 # Initializes the dock
