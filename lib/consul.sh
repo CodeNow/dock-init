@@ -30,7 +30,7 @@ consul::connect() {
 consul::get() {
   # Strip leading slashes so it works with both '/my/path' and 'my/path'
   local path=$(echo "$1" | sed 's/^\///')
-  local url="http://$CONSUL_HOSTNAME:$CONSULT_PORT/v1/kv/$path"
+  local url="http://$CONSUL_HOSTNAME:$CONSUL_PORT/v1/kv/$path"
   curl --silent "$url" 2> /dev/null | \
     jq --raw-output ".[0].Value" | \
     base64 --decode
