@@ -9,4 +9,5 @@ export CONSUL_HOSTNAME
 export environment=""
 
 source "${DOCK_INIT_BASE}/lib/dock.sh"
+
 dock::init

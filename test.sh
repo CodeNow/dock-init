@@ -9,4 +9,6 @@
 export LOG_LEVEL=none
 export DOCK_INIT_BASE=$(pwd)
 source $DOCK_INIT_BASE/test/fixtures/stub.sh
-shpec test/**/*.sh
+
+# TODO Flesh out tests and add test/*.sh
+shpec test/*/*.sh

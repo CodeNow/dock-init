@@ -49,7 +49,7 @@ upstart::generate_scripts() {
   upstart::configure_service "docker-listener"
   upstart::configure_service "sauron"
   upstart::configure_service "charon"
-  echo `date` "[TRACE] Done Generating Upstart Scripts"
+  log::trace "Done Generating Upstart Scripts"
 }
 
 # Gets the version for a particular service from consul
@@ -57,7 +57,7 @@ upstart::generate_scripts() {
 upstart::service_version() {
   local name="${1}"
   local consul_kv_host="$CONSUL_HOSTNAME:8500/v1/kv"
-  curl --silent $consul_kv_host/$name/version | \
+  curl --silent "$consul_kv_host/$name/version" | \
     jq --raw-output ".[0].Value" | \
     base64 --decode
 }
@@ -68,7 +68,7 @@ upstart::upstart_named_service() {
   local name="${1}"
   local attempt="${2}"
   local data='{"attempt":'"${attempt}"'}'
-  local version="$(upstart::service_version $name)"
+  local version=$(upstart::service_version "$name")
   local key_path="$DOCK_INIT_BASE/key/id_rsa_runnabledock"
 
   rollbar::warning_trap \
@@ -81,7 +81,7 @@ upstart::upstart_named_service() {
   ssh-agent bash -c "ssh-add $key_path; git fetch --all" &&
   git checkout "$version" &&
   ssh-agent bash -c "ssh-add $key_path; npm install" &&
-  service $name restart
+  service "$name" restart
 
   rollbar::clear_trap
 }
@@ -126,7 +126,8 @@ upstart::upstart_services() {
 upstart::pull_image_builder() {
   local attempt="${1}"
   local name="image-builder"
-  local version="$(upstart::service_version $name)"
+  local version
+  version="$(upstart::service_version $name)"
   local data='{"attempt":'"${attempt}"'}'
   log::info "Pulling image-builder:$version (${attempt})"
   rollbar::warning_trap \
@@ -148,8 +149,8 @@ upstart::start_swarm_container() {
     -once \
     -template="$template"
   docker run -d --restart=always swarm \
-    join --addr=`hostname -I | cut -d' ' -f 1`:4242 \
-    $(cat $DOCK_INIT_BASE/swarm-token.txt)
+    join --addr="$(hostname -I | cut -d' ' -f 1):4242" \
+    "$(cat $DOCK_INIT_BASE/swarm-token.txt)"
 }
 
 # Starts all services needed for the dock
