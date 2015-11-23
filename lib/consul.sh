@@ -12,11 +12,12 @@ source "${DOCK_INIT_BASE}/lib/vault.sh"
 # @param $1 attempt The attempt number passed by the backoff routine below
 consul::connect_backoff() {
   local attempt=${1}
-  log::info "Trying to reach consul at $CONSUL_HOSTNAME:8500 (attempt: $attempt)"
+  local host="$CONSUL_HOSTNAME:$CONSUL_PORT"
+  log::info "Trying to reach consul at $host (attempt: $attempt)"
   rollbar::warning_trap \
     "Dock-Init: Cannot Reach Consul Server" \
     "Attempting to reach Consul and failing."
-  curl http://"${CONSUL_HOSTNAME}":8500/v1/status/leader 2>&1
+  curl "http://$host/v1/status/leader" 2>&1
   rollbar::clear_trap
 }
 
@@ -36,12 +37,21 @@ consul::get() {
     base64 --decode
 }
 
+# Fetches the environment for the dock via consul
+# Note: added this here to make the `get_environment` command cleaner.
+consul::fetch_environment() {
+  local host="${CONSUL_HOSTNAME}:${CONSUL_PORT}"
+  curl "http://$host/v1/kv/node/env" 2> /dev/null | \
+    jq --raw-output ".[0].Value" | \
+    base64 --decode
+}
+
 # Connects to consul and gets the environment for the dock
 consul::get_environment() {
   rollbar::fatal_trap \
     "Dock-Init: Cannot get Environment" \
     "Unable to reach Consul and retrieve Environment."
-  environment=$(curl http://"${CONSUL_HOSTNAME}":8500/v1/kv/node/env 2> /dev/null | jq --raw-output ".[0].Value" | base64 --decode)
+  environment=$(consul::fetch_environment)
   export environment
   rollbar::clear_trap
 }

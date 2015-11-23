@@ -1,5 +1,5 @@
 backend "consul" {
-  address = "{{ env "CONSUL_HOSTNAME" }}:8500"
+  address = "{{ env "CONSUL_HOSTNAME" }}:{{ env "CONSUL_PORT" }}"
   path = "vault"
   advertise_addr = "http://{{ env "LOCAL_IP4_ADDRESS" }}:8200"
 }

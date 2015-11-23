@@ -56,7 +56,7 @@ upstart::generate_scripts() {
 # @param $1 name Name of the service
 upstart::service_version() {
   local name="${1}"
-  local consul_kv_host="$CONSUL_HOSTNAME:8500/v1/kv"
+  local consul_kv_host="$CONSUL_HOSTNAME:$CONSUL_PORT/v1/kv"
   curl --silent "$consul_kv_host/$name/version" | \
     jq --raw-output ".[0].Value" | \
     base64 --decode
