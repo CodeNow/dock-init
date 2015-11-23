@@ -30,6 +30,9 @@ aws::fetch_org_id_from_tags() {
   rollbar::clear_trap
 
   if [[ "$ORG_ID" != "" ]]; then
+    # Assume first value in host_tags comma separated list is org ID...
+    ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
+    export ORG_ID
     return 0
   else
     # report the attempt to rollbar, since we don't want this to always fail
@@ -65,13 +68,7 @@ aws::get_org_id() {
   # Attempt to fetch the org id from the tags via the fetch script
   backoff aws::fetch_org_id_from_tags
 
-  # Parse the org id (assume first value in host_tags comma separated list is
-  # org ID)
-  ORG_ID=$(echo "$ORG_ID" | cut -d, -f 1)
-  export ORG_ID
-
-  if [[ "$ORG_ID" == "" ]]
-  then
+  if [[ "$ORG_ID" == "" ]]; then
     # this will print an error, so that's good
     rollbar::report_error \
       "Dock-Init: Org ID is Empty After cut" \
