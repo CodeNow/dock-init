@@ -21,7 +21,7 @@ upstart::generate_scripts() {
 
 # Configures the template for a given service
 # @param $1 name Name of the service
-# @param #2 path Path to the servic
+# @param $2 path Path to the servic
 upstart::configure_service() {
   local name="${1}"
   log::trace "Configuring $name"

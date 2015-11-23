@@ -18,8 +18,7 @@ backoff() {
   local timeout=1
   while true; do
     $action $attempt $timeout
-    if (( $? == 0 ))
-    then
+    if (( $? == 0 )); then
       break
     fi
     sleep $timeout

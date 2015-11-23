@@ -47,7 +47,7 @@ dock::cleanup::set_exit_trap() {
   trap 'dock::cleanup::exit_trap' EXIT
 }
 
-# Attempts to stop vault after the dock has been intiialized
+# Attempts to stop vault after the dock has been initialized
 dock::cleanup::stop_vault() {
   log::info "[CLEANUP] Stop Vault"
   rollbar::fatal_trap \
