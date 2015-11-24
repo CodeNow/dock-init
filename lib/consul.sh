@@ -37,21 +37,12 @@ consul::get() {
     base64 --decode
 }
 
-# Fetches the environment for the dock via consul
-# Note: added this here to make the `get_environment` command cleaner.
-consul::fetch_environment() {
-  local host="${CONSUL_HOSTNAME}:${CONSUL_PORT}"
-  curl "http://$host/v1/kv/node/env" 2> /dev/null | \
-    jq --raw-output ".[0].Value" | \
-    base64 --decode
-}
-
 # Connects to consul and gets the environment for the dock
 consul::get_environment() {
   rollbar::fatal_trap \
     "Dock-Init: Cannot get Environment" \
     "Unable to reach Consul and retrieve Environment."
-  environment=$(consul::fetch_environment)
+  environment=$(consul::get 'node/env')
   export environment
   rollbar::clear_trap
 }
