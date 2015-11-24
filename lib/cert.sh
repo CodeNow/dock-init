@@ -12,10 +12,7 @@ CERT_PATH="/etc/ssl/docker"
 
 # Prints the docker host string
 cert::get_host() {
-  /sbin/ifconfig eth0 | \
-    grep "inet addr" | \
-    awk -F: '{print $2}' | \
-    awk '{print $1}'
+  hostname -i
 }
 
 # Remove any preloaded certs (from the original instance used to build the AMI)
