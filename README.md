@@ -141,15 +141,12 @@ NOTE: we should turn this into ansible script so we can auto generate AMIs.
   * `/opt/runnable/docker-listener`
   * `/opt/runnable/filibuster`
   * `/opt/runnable/krain`
-  * `/opt/runnable/sauron`
 6. Place the service upstart scripts:
   * `/etc/init/docker-listener.conf`
   * `/etc/init/filibuster.conf`
   * `/etc/init/krain.conf`
-  * `/etc/init/sauron.conf`
 7. Place the upstart override "manual" files to prevent start on boot:
   * `echo "manual" > /etc/init/docker-listener.override`
   * `echo "manual" > /etc/init/filibuster.override`
   * `echo "manual" > /etc/init/krain.override`
-  * `echo "manual" > /etc/init/sauron.override`
 8. Save an AMI of the Instance via the [AWS Web Admin Panel](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)

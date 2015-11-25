@@ -47,7 +47,6 @@ upstart::configure_service() {
 upstart::generate_scripts() {
   log::info "Configuring Upstart Scripts"
   upstart::configure_service "docker-listener"
-  upstart::configure_service "sauron"
   upstart::configure_service "charon"
   log::trace "Done Generating Upstart Scripts"
 }
@@ -116,7 +115,6 @@ upstart::start_docker() {
 upstart::upstart_services() {
   upstart::upstart_named_service "filibuster"
   upstart::upstart_named_service "krain"
-  upstart::upstart_named_service "sauron"
   upstart::upstart_named_service "charon"
   upstart::upstart_named_service "docker-listener"
 }
@@ -168,7 +166,6 @@ upstart::stop() {
   log::info "Stopping all dock services"
   service filibuster stop
   service krain stop
-  service sauron stop
   service charon stop
   service docker-listener stop
   service docker stop
