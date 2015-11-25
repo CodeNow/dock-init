@@ -138,17 +138,19 @@ upstart::pull_image_builder() {
 
 # Starts the docker swarm container
 upstart::start_swarm_container() {
-  local template="$DOCK_INIT_BASE/consul-resources/templates/"
-  template+="swarm-url.ctmpl:$DOCK_INIT_BASE/swarm-token.txt"
+  local name="swarm"
+  local version
+  version="$(upstart::service_version $name)"
 
-  log::info "Running swarm container"
-  consul-template \
-    -config="$DOCK_INIT_BASE/consul-resources/template-config.hcl" \
-    -once \
-    -template="$template"
-  docker run -d --restart=always swarm \
+  log::info "Starting swarm:$version"
+  rollbar::warning_trap \
+    "Dock-Init: Cannot Start Swarm Container" \
+    "Starting Swarm Container is failing." \
+    "version: ${version}"
+  docker run -d --restart=always $name:$version \
     join --addr="$HOST_IP:4242" \
-    "$(cat $DOCK_INIT_BASE/swarm-token.txt)"
+    consul://$CONSUL_HOSTNAME:$CONSUL_PORT/$name
+  rollbar::clear_trap
 }
 
 # Starts all services needed for the dock
