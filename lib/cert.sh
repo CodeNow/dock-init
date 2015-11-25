@@ -41,23 +41,23 @@ cert::generate() {
     -subj "/CN=$HOST_IP" \
     -new \
     -key "$CERT_PATH/key.pem" \
-    -out "$CERT_PATH/server-$host.csr"
-  chmod 400 "$CERT_PATH/server-$host.csr"
+    -out "$CERT_PATH/server-$HOST_IP.csr"
+  chmod 400 "$CERT_PATH/server-$HOST_IP.csr"
 
   # put host IP in alternate names
-  echo "subjectAltName = IP:$host,IP:127.0.0.1,DNS:localhost" > \
-    "$CERT_PATH/extfile-$host.cnf"
+  echo "subjectAltName = IP:$HOST_IP,IP:127.0.0.1,DNS:localhost" > \
+    "$CERT_PATH/extfile-$HOST_IP.cnf"
 
   # generate host certificate
   openssl x509 \
     -req \
     -days 365 \
-    -in "$CERT_PATH/server-$host.csr" \
+    -in "$CERT_PATH/server-$HOST_IP.csr" \
     -CA $CERT_PATH/ca.pem \
     -CAkey $CERT_PATH/ca-key.pem \
     -CAcreateserial \
     -out "$CERT_PATH/cert.pem" \
-    -extfile "$CERT_PATH/extfile-$host.cnf" \
+    -extfile "$CERT_PATH/extfile-$HOST_IP.cnf" \
     -passin file:$CERT_PATH/pass
   chmod 400 "$CERT_PATH/cert.pem"
 
