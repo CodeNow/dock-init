@@ -78,9 +78,9 @@ upstart::upstart_named_service() {
 
   log::info "Updating and restarting $name @ $version" &&
   cd "/opt/runnable/$name" &&
-  ssh-agent bash -c "ssh-add $key_path; git fetch --all" &&
+  ssh-agent bash -c "ssh-add $key_path; git fetch $version" &&
   git checkout "$version" &&
-  ssh-agent bash -c "ssh-add $key_path; npm install" &&
+  ssh-agent bash -c "ssh-add $key_path; npm install --production" &&
   service "$name" restart
 
   rollbar::clear_trap
@@ -172,4 +172,5 @@ upstart::stop() {
   service charon stop
   service docker-listener stop
   service docker stop
+  docker ps | awk '/swarm/ { print $1 }' | xargs docker kill
 }
