@@ -111,10 +111,11 @@ dock::remove_docker_key_file() {
 
 # Master function for performing all tasks and initializing the dock
 dock::init() {
+  # Setup the exit trap and rollbar
   dock::cleanup::set_exit_trap
+  rollbar::init
 
   # Connect to and configure consul then collect various information we need
-  aws::get_local_ip
   consul::connect
   consul::get_environment
   consul::configure_consul_template

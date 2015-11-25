@@ -10,11 +10,6 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
 CERT_PATH="/etc/ssl/docker"
 
-# Prints the docker host string
-cert::get_host() {
-  hostname -i
-}
-
 # Remove any preloaded certs (from the original instance used to build the AMI)
 cert::remove() {
   rm -f $CERT_PATH/cert.pem
@@ -23,8 +18,7 @@ cert::remove() {
 
 # Generates the host certs for this dock
 cert::generate() {
-  # Get the host and remove any left-over certs from the machine
-  local host="$(cert::get_host)"
+  # Remove any left-over certs from the machine
   cert::remove
 
   # Require that we have the correct pems
@@ -44,7 +38,7 @@ cert::generate() {
 
   # generate host CSR
   openssl req \
-    -subj "/CN=$host" \
+    -subj "/CN=$HOST_IP" \
     -new \
     -key "$CERT_PATH/key.pem" \
     -out "$CERT_PATH/server-$host.csr"

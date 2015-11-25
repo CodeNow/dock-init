@@ -54,6 +54,10 @@ test scripts, here's how to install (OSX):
 sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
 ```
 
+A few other tools are required to test locally, here's how to install them:
+
+- `brew install jq`
+
 ### Running tests
 To run the test suite use the following command: `bash test.sh`. This will setup
 the test environment and run the unit test suites. The test suites can be found

@@ -9,33 +9,24 @@ source "${DOCK_INIT_BASE}/lib/util/log.sh"
 # @author Ryan Sandor Richards
 # @module util:rollbar
 
-# Ensure the module has a rollbar token
-if [[ -n "${ROLLBAR_TOKEN}" ]]; then
-  ROLLBAR_TOKEN=$(cat "$DOCK_INIT_BASE"/key/rollbar.token)
-  export ROLLBAR_TOKEN
-fi
+# Ensures the module has a rollbar token
+rollbar::init() {
+  if [[ "$ROLLBAR_TOKEN" == "" ]]; then
+    export ROLLBAR_TOKEN=$(cat "$DOCK_INIT_BASE"/key/rollbar.token)
+  fi
+}
 
-# Reports a general message to rollbar with the given error level
+# Echos a payload based on the provided arguments
 # @param $1 level The error level of the report
 # @param $2 title Title for the report
 # @param $3 message Message to report
 # @param $4 data Additional JSON data to report
-rollbar::report () {
+rollbar::_get_payload() {
   local level="$1"
   local title="$2"
   local message="$3"
   local data="$4"
-
-  # verify that data is valid JSON
-  if [[ "$data" == "" ]]; then data="{}"; fi
-
-  local json_trap="data='{}'; log::warn 'Invalid JSON Data was Passed with $title, $message';"
-  trap '$json_trap' ERR
-  echo "$data" | jq "." > /dev/null 2>&1
-  trap - ERR
-
-  local timestamp=''
-  timestamp=$(date +'%s')
+  local timestamp=$(date +'%s')
   local payload='
   {
     "access_token": "'"${ROLLBAR_TOKEN}"'",
@@ -51,14 +42,39 @@ rollbar::report () {
         }
       },
       "server": {
-        "host": "'"${LOCAL_IP4_ADDRESS}"'"
+        "host": "'"${HOST_IP}"'"
       }
     }
   }';
+  echo "$payload"
+}
+
+# Reports a general message to rollbar with the given error level
+# @param $1 level The error level of the report
+# @param $2 title Title for the report
+# @param $3 message Message to report
+# @param $4 data Additional JSON data to report
+rollbar::report () {
+  local level="$1"
+  local title="$2"
+  local message="$3"
+  local data="$4"
+
+  # verify that data is valid JSON
+  if [[ "$data" == "" ]]; then data="{}"; fi
+
+  local json_trap="
+    data='{}';
+    log::warn 'Invalid JSON Data was Passed with $title, $message';
+  "
+  trap '$json_trap' ERR
+  echo "$data" | jq "." > /dev/null 2>&1
+  trap - ERR
+
   # trap a curl error here to print a fatal error.
   trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
   curl -s -q -H "Content-Type: application/json" \
-    -d "$payload" \
+    -d "$(rollbar::_get_payload $level $title $message $data)" \
     "https://api.rollbar.com/api/1/item/" > /dev/null 2>&1
   trap - ERR
   log::info "Error Reported to Rollbar ($level)"
@@ -73,7 +89,7 @@ rollbar::report_error() {
   local message="$2"
   local data="$3"
   log::error "${title}: ${message}"
-  rollbar::report "error" "${title}" "${message}" "${data}"
+  rollbar::report 'error' "${title}" "${message}" "${data}"
 }
 
 # Reports warnings via rollbar.
@@ -85,7 +101,7 @@ rollbar::report_warning() {
   local message="$2"
   local data="$3"
   log::warn "${title}: ${message}"
-  rollbar::report "warning" "${title}" "${message}" "${data}"
+  rollbar::report 'warning' "${title}" "${message}" "${data}"
 }
 
 # Creates an error trap that reports any failures to rollbar with the given

@@ -7,13 +7,6 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # @author Ryan Sandor Richards
 # @module aws
 
-# Uses the `ec2-metadata` tool to determine the dock's local ip4 address
-aws::get_local_ip() {
-  log::info 'Getting IP Address'
-  LOCAL_IP4_ADDRESS=$(ec2-metadata --local-ipv4 | awk '{print $2}')
-  export LOCAL_IP4_ADDRESS
-}
-
 # Backoff routine that attempts to fetch the dock's org id from EC2 tags
 aws::fetch_org_id_from_tags() {
   local attempt=${1}

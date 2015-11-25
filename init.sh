@@ -11,6 +11,7 @@
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export CONSUL_HOSTNAME
+export HOST_IP=$(hostname -i)
 export environment=""
 
 if [ -z "${CONSUL_PORT+x}" ]; then

@@ -37,7 +37,7 @@ vault::start_server() {
   local vault_pid=$!
   echo "$vault_pid" > /tmp/vault.pid
   rollbar::clear_trap
-  export VAULT_ADDR="http://$LOCAL_IP4_ADDRESS:8200"
+  export VAULT_ADDR="http://$HOST_IP:8200"
 }
 
 # Backoff routine to wait for vault to become available

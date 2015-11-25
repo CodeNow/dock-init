@@ -149,7 +149,7 @@ upstart::start_swarm_container() {
     -once \
     -template="$template"
   docker run -d --restart=always swarm \
-    join --addr="$(hostname -I | cut -d' ' -f 1):4242" \
+    join --addr="$HOST_IP:4242" \
     "$(cat $DOCK_INIT_BASE/swarm-token.txt)"
 }
 
