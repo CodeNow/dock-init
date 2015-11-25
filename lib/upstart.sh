@@ -78,7 +78,7 @@ upstart::upstart_named_service() {
 
   log::info "Updating and restarting $name @ $version" &&
   cd "/opt/runnable/$name" &&
-  ssh-agent bash -c "ssh-add $key_path; git fetch $version" &&
+  ssh-agent bash -c "ssh-add $key_path; git fetch origin" &&
   git checkout "$version" &&
   ssh-agent bash -c "ssh-add $key_path; npm install --production" &&
   service "$name" restart
