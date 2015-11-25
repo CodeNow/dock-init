@@ -49,7 +49,7 @@ auto_update() {
   if [[ "$FETCH_ORIGIN_ALL" != "" ]]; then
     ssh_execute "git fetch origin $version"
   else
-    ssh_execute "git fetch origin --all"
+    ssh_execute "git fetch origin"
   fi
 
   log::trace "Checking out dock-init version: $version"
