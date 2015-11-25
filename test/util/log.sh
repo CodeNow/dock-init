@@ -4,6 +4,7 @@
 # @author Ryan Sandor Richards
 
 source "$DOCK_INIT_BASE/lib/util/log.sh"
+source "$DOCK_INIT_BASE/test/fixtures/stub.sh"
 
 describe 'util/log.sh'
   # before

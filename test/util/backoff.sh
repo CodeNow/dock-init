@@ -4,6 +4,7 @@
 # @author Ryan Sandor Richards
 
 source "$DOCK_INIT_BASE/lib/util/backoff.sh"
+source "$DOCK_INIT_BASE/test/fixtures/stub.sh"
 
 describe 'util/backoff.sh'
   it 'should execute the action'
