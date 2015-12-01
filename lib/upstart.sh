@@ -141,15 +141,15 @@ upstart::start_swarm_container() {
   local name="swarm"
   local version
   version="$(upstart::service_version $name)"
-
+  local data='{"version":'"${version}"'}'
   log::info "Starting swarm:$version"
   rollbar::warning_trap \
     "Dock-Init: Cannot Start Swarm Container" \
     "Starting Swarm Container is failing." \
-    "version: ${version}"
+    "${data}"
   docker run -d --restart=always $name:$version \
     join --addr="$HOST_IP:4242" \
-    consul://$CONSUL_HOSTNAME:$CONSUL_PORT/$name
+    "consul://$CONSUL_HOSTNAME:$CONSUL_PORT/$name"
   rollbar::clear_trap
 }
 
