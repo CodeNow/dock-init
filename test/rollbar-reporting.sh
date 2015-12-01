@@ -23,7 +23,7 @@ if ! command -v jq > /dev/null; then
   exit 1
 fi
 
-. "$DIR/../util/rollbar.sh"
+. "$DIR/../lib/util/rollbar.sh"
 
 # Error Catcher
 trap 'echo "**** TEST FAILED: $0:$LINENO"; exit 1' ERR
