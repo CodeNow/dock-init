@@ -26,7 +26,9 @@ export HOST_IP='127.0.0.1'
 test_path="$1"
 if [[ "$test_path" == "" ]]; then
   # TODO Flesh out tests and add test/*.sh
-  test_path="test/*/*.sh"
+  test_path1="test/*.sh"
+  test_path2="test/*/*.sh"
+  test_path="$test_path1 $test_path2"
 fi
 
 # Run the tests using shpec

@@ -14,7 +14,7 @@ stub::set() {
   if [[ $body == '' ]]; then
     eval "${name}() { return 0; }"
   else
-    eval "${name}() { ${body} \$1 \$2 \$3 \$4; }"
+    eval "${name}() { ${body} \$@; }"
   fi
 }
 
