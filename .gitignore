@@ -1,3 +1,4 @@
+npm-debug.log
 consul-resources/template-config.hcl
 consul-resources/vault/vault.hcl
 hosts-registry.txt
