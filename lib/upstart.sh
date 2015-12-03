@@ -47,7 +47,6 @@ upstart::configure_service() {
 upstart::generate_scripts() {
   log::info "Configuring Upstart Scripts"
   upstart::configure_service "docker-listener"
-  upstart::configure_service "sauron"
   upstart::configure_service "charon"
   log::trace "Done Generating Upstart Scripts"
 }
@@ -116,7 +115,6 @@ upstart::start_docker() {
 upstart::upstart_services() {
   upstart::upstart_named_service "filibuster"
   upstart::upstart_named_service "krain"
-  upstart::upstart_named_service "sauron"
   upstart::upstart_named_service "charon"
   upstart::upstart_named_service "docker-listener"
 }
@@ -140,17 +138,19 @@ upstart::pull_image_builder() {
 
 # Starts the docker swarm container
 upstart::start_swarm_container() {
-  local template="$DOCK_INIT_BASE/consul-resources/templates/"
-  template+="swarm-url.ctmpl:$DOCK_INIT_BASE/swarm-token.txt"
-
-  log::info "Running swarm container"
-  consul-template \
-    -config="$DOCK_INIT_BASE/consul-resources/template-config.hcl" \
-    -once \
-    -template="$template"
-  docker run -d --restart=always swarm \
+  local name="swarm"
+  local version
+  version="$(upstart::service_version $name)"
+  local data='{"version":'"${version}"'}'
+  log::info "Starting swarm:$version"
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot Start Swarm Container" \
+    "Starting Swarm Container is failing." \
+    "${data}"
+  docker run -d --restart=always "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
-    "$(cat $DOCK_INIT_BASE/swarm-token.txt)"
+    "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"
+  rollbar::clear_trap
 }
 
 # Starts all services needed for the dock
@@ -168,7 +168,6 @@ upstart::stop() {
   log::info "Stopping all dock services"
   service filibuster stop
   service krain stop
-  service sauron stop
   service charon stop
   service docker-listener stop
   service docker stop
