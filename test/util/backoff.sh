@@ -87,16 +87,38 @@ describe 'util/backoff.sh'
     stub::restore 'sleep'
   end
 
-  it 'should run a success function'
+  it 'should run a failure function'
     local storage=""
     action() {
-      storage+="hello "
+      if (( ${1} == 2 )); then
+        storage+=" world"
+      else
+        false
+      fi
+    }
+    failure() {
+      storage+="hello"
+    }
+    stub::set 'sleep'
+    backoff action failure
+    assert equal "hello world" "$storage"
+    stub::restore 'sleep'
+  end
+
+  it 'should skip failure function if not a function'
+    local storage=""
+    action() {
+      if (( ${1} == 2 )); then
+        storage+="hello "
+      else
+        false
+      fi
     }
     success() {
       storage+="world"
     }
     stub::set 'sleep'
-    backoff action success
+    backoff action 'OMG' success
     assert equal "hello world" "$storage"
     stub::restore 'sleep'
   end
@@ -114,30 +136,30 @@ describe 'util/backoff.sh'
       storage+="world"
     }
     stub::set 'sleep'
-    backoff action '' failure
+    backoff action failure 'WEE'
     assert equal "worldhello" "$storage"
     stub::restore 'sleep'
   end
 
-  it 'should run a failure function'
+  it 'should run a success function'
     local storage=""
     action() {
       if (( ${1} == 2 )); then
-        storage+="hello "
+        storage+="cruel "
       else
         false
       fi
     }
+    failure() {
+      storage+="goodnight "
+    }
     success() {
       storage+="world"
     }
-    failure() {
-      storage+="! "
-    }
     stub::set 'sleep'
-    backoff action success failure
+    backoff action failure success
     # failure is run first, then action (a second time), then success
-    assert equal "! hello world" "$storage"
+    assert equal "goodnight cruel world" "$storage"
     stub::restore 'sleep'
   end
 end # util/backoff.sh
