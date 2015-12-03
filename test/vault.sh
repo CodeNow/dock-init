@@ -7,7 +7,7 @@ source "$DOCK_INIT_BASE/test/fixtures/stub.sh"
 
 describe 'vault.sh'
   describe 'vault::connect'
-    it 'it should call backoff with appropriate arguments'
+    it 'should call backoff with appropriate arguments'
       local storage=""
       backoffStub () {
         storage+="$@"
@@ -22,7 +22,7 @@ describe 'vault.sh'
   end
 
   describe 'vault::connect_backoff'
-    it 'it should curl for the vault address'
+    it 'should curl for the vault address'
       local storage=""
       curlStub () {
         storage+="$@"
@@ -39,7 +39,7 @@ describe 'vault.sh'
   end
 
   describe 'vault::_connect_backoff_failure'
-    it 'it should report to rollbar'
+    it 'should report to rollbar'
       local storage=""
       rollbarReportStub () {
         storage+="$@"
@@ -56,7 +56,7 @@ describe 'vault.sh'
   end
 
   describe 'vault::configure'
-    it 'it should generate a config for vault'
+    it 'should generate a config for vault'
       local storage=""
       consulTemplateStub () {
         storage+="$@"
@@ -73,7 +73,7 @@ describe 'vault.sh'
   end
 
   describe 'vault::unlock'
-    it 'it should unseal vault and get the status'
+    it 'should unseal vault and get the status'
       local storage=""
       traceStub () {
         storage+="$@ "
