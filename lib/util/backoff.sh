@@ -12,14 +12,25 @@
 # timeout.
 #
 # @param $1 action Command to execute under the exponetial backoff
+# @param $2 successFunc Function to run after successful $action
+# @param $3 failureFunc Function to run after errored $action
 backoff() {
   local action=${1}
+  local successFunc=${2}
+  local failureFunc=${3}
   local attempt=1
   local timeout=1
   while true; do
     $action $attempt $timeout
     if (( $? == 0 )); then
+      if [ "$(type -t $successFunc)" = function ]; then
+        $successFunc $attempt $timeout
+      fi
       break
+    else
+      if [ "$(type -t $failureFunc)" = function ]; then
+        $failureFunc $attempt $timeout
+      fi
     fi
     sleep $timeout
     attempt=$(( attempt + 1 ))

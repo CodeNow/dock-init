@@ -40,23 +40,28 @@ vault::start_server() {
   export VAULT_ADDR="http://$HOST_IP:8200"
 }
 
-# Backoff routine to wait for vault to become available
-vault::connect_backoff() {
+vault::_connect_backoff_failure() {
   local attempt=${1}
   local data='{"vault_addr":"'"${VAULT_ADDR}"'","attempt":'"${attempt}"'}'
   log::info "Trying to reach Vault at $VAULT_ADDR $attempt"
-  rollbar::warning_trap \
+  rollbar::report_warning \
     "Vault Start: Cannot Reach Vault Server" \
     "Attempting to reach local Vault and failing." \
     "$data"
+}
+
+# Backoff routine to wait for vault to become available
+vault::connect_backoff() {
   curl -s "$VAULT_ADDR/v1/auth/seal-status"
-  rollbar::clear_trap
 }
 
 # Waits for vault to become available via a backoff
 vault::connect() {
   log::trace "Connecting to vault"
-  backoff vault::connect_backoff
+  backoff \
+    vault::connect_backoff \
+    '' \
+    vault::_connect_backoff_failure
 }
 
 # Unseals, unlocks, and checks vault status
