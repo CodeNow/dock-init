@@ -60,7 +60,6 @@ vault::connect() {
   log::trace "Connecting to vault"
   backoff \
     vault::connect_backoff \
-    '' \
     vault::_connect_backoff_failure
 }
 
