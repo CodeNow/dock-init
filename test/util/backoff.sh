@@ -86,4 +86,80 @@ describe 'util/backoff.sh'
     assert equal "1 2 3 4 5 " "$attempts"
     stub::restore 'sleep'
   end
+
+  it 'should run a failure function'
+    local storage=""
+    action() {
+      if (( ${1} == 2 )); then
+        storage+=" world"
+      else
+        false
+      fi
+    }
+    failure() {
+      storage+="hello"
+    }
+    stub::set 'sleep'
+    backoff action failure
+    assert equal "hello world" "$storage"
+    stub::restore 'sleep'
+  end
+
+  it 'should skip failure function if not a function'
+    local storage=""
+    action() {
+      if (( ${1} == 2 )); then
+        storage+="hello "
+      else
+        false
+      fi
+    }
+    success() {
+      storage+="world"
+    }
+    stub::set 'sleep'
+    backoff action 'OMG' success
+    assert equal "hello world" "$storage"
+    stub::restore 'sleep'
+  end
+
+  it 'should skip success function if not a function'
+    local storage=""
+    action() {
+      if (( ${1} == 2 )); then
+        storage+="hello"
+      else
+        false
+      fi
+    }
+    failure() {
+      storage+="world"
+    }
+    stub::set 'sleep'
+    backoff action failure 'WEE'
+    assert equal "worldhello" "$storage"
+    stub::restore 'sleep'
+  end
+
+  it 'should run a success function'
+    local storage=""
+    action() {
+      if (( ${1} == 2 )); then
+        storage+="cruel "
+      else
+        false
+      fi
+    }
+    failure() {
+      storage+="goodnight "
+    }
+    success() {
+      storage+="world"
+    }
+    stub::set 'sleep'
+    backoff action failure success
+    # failure is run first, then action (a second time), then success
+    assert equal "goodnight cruel world" "$storage"
+    stub::restore 'sleep'
+  end
 end # util/backoff.sh
