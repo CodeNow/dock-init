@@ -129,7 +129,7 @@ upstart::start_docker() {
   done
 }
 
-# Upstarts a service with the given name.
+# Upstarts services that are supposed to be running on the dock.
 # @param $1 attempt Attempt number.
 upstart::upstart_services() {
   local attempt="${1}"
