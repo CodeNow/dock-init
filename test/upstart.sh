@@ -50,7 +50,7 @@ describe 'upstart.sh'
     end
   end
 
-  describe 'upstart::upstart_services'
+  describe 'upstart::upstart_services_with_backoff_params'
     it 'should start all our services'
       local storage=""
       serviceStub() { storage+="$@ "; }
@@ -58,7 +58,7 @@ describe 'upstart.sh'
       stub::set upstart::upstart_service serviceStub
 
       local attempt=8
-      upstart::upstart_services $attempt
+      upstart::upstart_services_with_backoff_params $attempt
 
       assert equal "filibuster 8 krain 8 charon 8 docker-listener 8 datadog-agent 8 " "$storage"
 

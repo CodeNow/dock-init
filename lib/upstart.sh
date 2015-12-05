@@ -131,7 +131,7 @@ upstart::start_docker() {
 
 # Upstarts services that are supposed to be running on the dock.
 # @param $1 attempt Attempt number.
-upstart::upstart_services() {
+upstart::upstart_services_with_backoff_params() {
   local attempt="${1}"
   upstart::upstart_named_service "filibuster" $attempt
   upstart::upstart_named_service "krain" $attempt
@@ -180,7 +180,7 @@ upstart::start() {
   upstart::generate_scripts
   upstart::start_docker
   backoff upstart::pull_image_builder
-  backoff upstart::upstart_services
+  backoff upstart::upstart_services_with_backoff_params
   upstart::start_swarm_container
 }
 
