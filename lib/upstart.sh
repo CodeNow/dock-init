@@ -85,6 +85,25 @@ upstart::upstart_named_service() {
   rollbar::clear_trap
 }
 
+# Starts a service installed on the machine.
+# @param $1 Name of the service
+# @param $2 Attempt number
+upstart::upstart_service() {
+  local name="${1}"
+  local attempt="${2}"
+  local data='{"attempt":'"${attempt}"'}'
+
+  rollbar::warning_trap \
+    "$name: Cannot Upstart Service" \
+    "Attempting to upstart the service and failing." \
+    "${data}"
+
+  log::info "Starting $name"
+  service "$name" restart
+
+  rollbar::clear_trap
+}
+
 # Start dockers (due to manual override now set in /etc/init)
 upstart::start_docker() {
   log::info "Starting Docker"
@@ -110,13 +129,15 @@ upstart::start_docker() {
   done
 }
 
-# Upstarts a service with the given name
-# @param $1 name Name of the service
-upstart::upstart_services() {
-  upstart::upstart_named_service "filibuster"
-  upstart::upstart_named_service "krain"
-  upstart::upstart_named_service "charon"
-  upstart::upstart_named_service "docker-listener"
+# Upstarts services that are supposed to be running on the dock.
+# @param $1 attempt Attempt number.
+upstart::upstart_services_with_backoff_params() {
+  local attempt="${1}"
+  upstart::upstart_named_service "filibuster" $attempt
+  upstart::upstart_named_service "krain" $attempt
+  upstart::upstart_named_service "charon" $attempt
+  upstart::upstart_named_service "docker-listener" $attempt
+  upstart::upstart_service "datadog-agent" $attempt
 }
 
 # Pulls the latest docker image for the runnable image builder
@@ -159,7 +180,7 @@ upstart::start() {
   upstart::generate_scripts
   upstart::start_docker
   backoff upstart::pull_image_builder
-  backoff upstart::upstart_services
+  backoff upstart::upstart_services_with_backoff_params
   upstart::start_swarm_container
 }
 

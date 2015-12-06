@@ -35,4 +35,35 @@ describe 'upstart.sh'
       unset HOST_IP
     end
   end
+
+  describe 'upstart::upstart_service'
+    it 'should start the given service'
+      local storage=""
+      serviceStub() { storage+="$@"; }
+      stub::set 'service' serviceStub
+
+      upstart::upstart_service 'foobar'
+
+      assert equal "foobar restart" "$storage"
+
+      stub::restore 'service'
+    end
+  end
+
+  describe 'upstart::upstart_services_with_backoff_params'
+    it 'should start all our services'
+      local storage=""
+      serviceStub() { storage+="$@ "; }
+      stub::set upstart::upstart_named_service serviceStub
+      stub::set upstart::upstart_service serviceStub
+
+      local attempt=8
+      upstart::upstart_services_with_backoff_params $attempt
+
+      assert equal "filibuster 8 krain 8 charon 8 docker-listener 8 datadog-agent 8 " "$storage"
+
+      stub::restore upstart::upstart_named_service
+      stub::restore upstart::upstart_service
+    end
+  end
 end # upstart.sh
