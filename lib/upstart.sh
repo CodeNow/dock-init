@@ -168,7 +168,8 @@ upstart::start_swarm_container() {
     "Dock-Init: Cannot Start Swarm Container" \
     "Starting Swarm Container is failing." \
     "${data}"
-  docker run -d --restart=always "${name}:${version}" \
+  docker run -d --restart=always --name "${name}" \
+    "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
     "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"
   rollbar::clear_trap

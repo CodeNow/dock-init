@@ -21,8 +21,9 @@ describe 'upstart.sh'
 
       upstart::start_swarm_container
 
-      local expectedArgs="run -d --restart=always swarm:1.0.0 join"
-      expectedArgs="${expectedArgs} --addr=host_ip:4242"
+      local expectedArgs="run -d --restart=always --name swarm"
+      expectedArgs="${expectedArgs} swarm:1.0.0"
+      expectedArgs="${expectedArgs} join --addr=host_ip:4242"
       expectedArgs="${expectedArgs} consul://consul_hostname:consul_port/swarm"
 
       assert equal "$dockerArgs" "$expectedArgs"
