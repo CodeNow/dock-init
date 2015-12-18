@@ -14,6 +14,9 @@ export CONSUL_HOSTNAME
 export HOST_IP=$(hostname -i)
 export environment=""
 
+# For node-gyp, requires home to be defined when doing an NPM install
+export HOME=/home/ubuntu
+
 if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
 else
