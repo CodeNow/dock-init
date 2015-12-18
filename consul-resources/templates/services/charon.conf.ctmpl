@@ -20,10 +20,8 @@ env API_TOKEN={{ .Data.token }}
 
 env API_HOST={{ key "api/hostname" }}
 
-{{ range service "datadog" }}{{ if .Tags | contains "master" }}
-env DATADOG_HOST={{ .Address }}
-env DATADOG_PORT={{ .Port }}
-{{ end }}{{ end }}
+env DATADOG_HOST=localhost
+env DATADOG_PORT=8125
 
 start on (local-filesystems and net-device-up IFACE=eth0)
 stop on shutdown
