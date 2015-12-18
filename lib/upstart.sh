@@ -79,7 +79,7 @@ upstart::upstart_named_service() {
   cd "/opt/runnable/$name" &&
   ssh-agent bash -c "ssh-add $key_path; git fetch origin" &&
   git checkout "$version" &&
-  ssh-agent bash -c "ssh-add $key_path; npm install --production" &&
+  ssh-agent bash -c "ssh-add $key_path; USERPROFILE=/home/ubuntu npm install --production" &&
   service "$name" restart
 
   rollbar::clear_trap
