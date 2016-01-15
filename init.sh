@@ -47,10 +47,10 @@ auto_update() {
   cd "$DOCK_INIT_BASE"
 
   log::trace "fetching all from repository"
-  if [[ "$FETCH_ORIGIN_ALL" != "" ]]; then
-    ssh_execute "git fetch origin $version"
-  else
+  if [ -z "$FETCH_ORIGIN_ALL" ]; then
     ssh_execute "git fetch origin"
+  else
+    ssh_execute "git fetch origin $version"
   fi
 
   log::trace "Checking out dock-init version: $version"
