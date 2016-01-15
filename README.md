@@ -10,7 +10,7 @@ project's primarily used to create new EC2 AMIs that are referenced by
 This document will cover the basics of what the initialization scripts do, and
 how to create a new dock AMI.
 
-## Overview
+## Overviewt
 Docks are instantiated on EC2 by running specialized dock AMIs. These AMIs are
 expected to have an `/opt/runnable` path containing all required dock service
 repositories along with `dock-init`.
@@ -59,7 +59,7 @@ A few other tools are required to test locally, here's how to install them:
 - `brew install jq`
 
 ### Running tests
-To run the test suite use the following command: `bash test.sh`. This will setup
+To run the test suite use the following command: `bash unit.sh`. This will setup
 the test environment and run the unit test suites. The test suites can be found
 under the `test/` directory.
 
