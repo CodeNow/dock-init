@@ -15,6 +15,7 @@ export HOST_IP=$(hostname -i)
 export environment=""
 
 if [ -z "${CONSUL_PORT+x}" ]; then
+  # CONSUL_PORT value not set, default to 8500
   export CONSUL_PORT=8500
 else
   export CONSUL_PORT
