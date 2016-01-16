@@ -154,6 +154,9 @@ upstart::pull_image_builder() {
     "Attempting to upstart the services and failing." \
     "${data}"
   docker pull "registry.runnable.com/runnable/image-builder:$version"
+  if [ $? != 0 ]; then
+    echo "exit here, docker pull returned non-zero"
+  fi
   rollbar::clear_trap
 }
 
