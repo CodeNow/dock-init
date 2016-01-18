@@ -153,7 +153,7 @@ upstart::pull_image_builder() {
     "Dock-Init: Cannot Upstart Services" \
     "Attempting to upstart the services and failing." \
     "${data}"
-  docker pull "registry.runnable.com/runnable/image-builder:$version"
+  backoff docker pull "registry.runnable.com/runnable/image-builder:$version"
   rollbar::clear_trap
 }
 
