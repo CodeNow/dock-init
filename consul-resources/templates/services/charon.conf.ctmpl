@@ -18,7 +18,7 @@ env REDIS_PORT={{ .Port }}
 env API_TOKEN={{ .Data.token }}
 {{ end }}
 
-env API_HOST={{ key "api/hostname" }}
+env API_URL={{ key "api/url" }}
 
 env DATADOG_HOST=localhost
 env DATADOG_PORT=8125
