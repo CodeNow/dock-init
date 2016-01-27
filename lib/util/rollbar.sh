@@ -73,9 +73,11 @@ rollbar::report () {
 
   # trap a curl error here to print a fatal error.
   trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
+  local json
+  json=$(rollbar::_get_payload "$level" "$title" "$message" "$data")
   curl -s -q -H "Content-Type: application/json" \
-    -d "$(rollbar::_get_payload $level $title $message $data)" \
-    "https://api.rollbar.com/api/1/item/" > /dev/null 2>&1
+    -d "$json" \
+    "https://api.rollbar.com/api/1/item/" > /dev/null
   trap - ERR
   log::info "Error Reported to Rollbar ($level)"
 }
