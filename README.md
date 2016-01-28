@@ -10,7 +10,7 @@ project's primarily used to create new EC2 AMIs that are referenced by
 This document will cover the basics of what the initialization scripts do, and
 how to create a new dock AMI.
 
-## Overviewt
+## Overview
 Docks are instantiated on EC2 by running specialized dock AMIs. These AMIs are
 expected to have an `/opt/runnable` path containing all required dock service
 repositories along with `dock-init`.
