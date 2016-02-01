@@ -2,6 +2,7 @@ language: bash
 
 before_script:
     - sudo sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
+    - sudo apt-get install jq
 
 script:
     - bash unit.sh
