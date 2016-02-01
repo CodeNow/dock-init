@@ -8,3 +8,4 @@ consul-resources/vault/**/token-01
 consul-resources/vault/**/token-02
 consul-resources/vault/**/token-03
 key/rollbar.token
+.stubdata
