@@ -66,9 +66,9 @@ describe 'util/rollbar.sh'
           }
         }
       }'
-      expected=$(echo $expected | jq -cM ".")
+      expected=$(echo $expected | jq ".")
       local result=$(rollbar::_get_payload "$level" "$title" "$message" "$data")
-      result=$(echo $expected | jq -cM ".")
+      result=$(echo $expected | jq ".")
       assert equal "$expected" "$result"
     end
   end # 'rollbar::_get_payload'
