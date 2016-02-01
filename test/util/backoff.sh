@@ -7,8 +7,15 @@ source "$DOCK_INIT_BASE/lib/util/backoff.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
 describe 'util/backoff.sh'
-  before_each() { stub action; stub sleep; }
-  after_each() { action::restore; sleep::restore; }
+  before_each() {
+    stub action
+    stub sleep
+  }
+
+  after_each() {
+    action::restore
+    sleep::restore
+  }
 
   it 'should execute the action'
     before_each
@@ -44,7 +51,8 @@ describe 'util/backoff.sh'
 
   it 'should exponentially back off'
     before_each
-    action::errors ; action::on_call 10 true
+    action::errors
+    action::on_call 10 true
     backoff action
     action::called_with 10 512
     after_each

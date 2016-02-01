@@ -74,7 +74,7 @@ _stub::data::get() {
   local name="$1"
   local key="$2"
   local prefix=$(_stub::data::prefix "$name" "$key")
-  $_stub_grep "$prefix" .stubdata | $_stub_cut -d '=' -f 2
+  $_stub_grep "$prefix=" .stubdata | $_stub_cut -d '=' -f 2
 }
 
 # Deletes data for a stub.
