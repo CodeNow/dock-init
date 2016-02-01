@@ -4,162 +4,71 @@
 # @author Ryan Sandor Richards
 
 source "$DOCK_INIT_BASE/lib/util/backoff.sh"
-source "$DOCK_INIT_BASE/test/fixtures/stub.sh"
+source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
 describe 'util/backoff.sh'
+  before_each() { stub action; stub sleep; }
+  after_each() { action::restore; sleep::restore; }
+
   it 'should execute the action'
+    before_each
     local expected='action taken wow20030'
-    action() { echo "$expected"; }
-    local result=$(backoff action)
-    assert equal "$result" "$expected"
+    action::returns "$expected"
+    assert equal "$(backoff action)" "$expected"
+    after_each
   end
 
-  it 'should pass the attempt number'
-    local expected='attempt:1'
-    action() { echo "attempt:${1}"; }
-    local result=$(backoff action)
-    assert equal "$result" "$expected"
-  end
-
-  it 'should pass the timeout'
-    local expected='timeout:1'
-    action() { echo "timeout:${2}"; }
-    local result=$(backoff action)
-    assert equal "$result" "$expected"
+  it 'should pass the attempt number and next timeout to the action'
+    before_each
+    action::errors ; action::on_call 6 true
+    backoff action
+    action::called_with 6 32
+    after_each
   end
 
   it 'should retry on failure'
-    stub::set 'sleep'
-    local max_attempts=5
-    local counter=0
-    action() {
-      local attempt="${1}"
-      counter=$(( counter + 1 ))
-      if (( attempt < max_attempts )); then
-        return 1;
-      fi
-    }
+    before_each
+    action::errors ; action::on_call 5 true
     backoff action
-    assert equal "$counter" "$max_attempts"
-    stub::restore 'sleep'
+    action::called 5
+    after_each
   end
 
   it 'should sleep between tries'
-    local did_sleep=0
-    sleep_stub() { did_sleep=1; }
-    stub::set 'sleep' sleep_stub
-    action() {
-      local attempt="${1}"
-      if (( attempt == 1 )); then
-        return 1
-      fi
-    }
+    before_each
+    action::errors ; action::on_call 4 true
     backoff action
-    assert equal "$did_sleep" "1"
-    stub::restore 'sleep'
+    sleep::called 3
+    after_each
   end
 
   it 'should exponentially back off'
-    local timeouts=""
-    local max_attempts=4
-    sleep_stub() { timeouts+="${1} "; }
-    stub::set 'sleep' sleep_stub
-    action() {
-      if (( ${1} < max_attempts )); then
-        return 1
-      fi
-    }
+    before_each
+    action::errors ; action::on_call 10 true
     backoff action
-    assert equal "1 2 4 " "$timeouts"
-    stub::restore 'sleep'
-  end
-
-  it 'should increase the number of attempts'
-    local max_attempts=5
-    local attempts=""
-    action() {
-      attempts+="${1} ";
-      if (( $1 < max_attempts )); then return 1; fi
-    }
-    stub::set 'sleep'
-    backoff action
-    assert equal "1 2 3 4 5 " "$attempts"
-    stub::restore 'sleep'
+    action::called_with 10 512
+    after_each
   end
 
   it 'should run a failure function'
-    local storage=""
-    action() {
-      if (( ${1} == 2 )); then
-        storage+=" world"
-      else
-        false
-      fi
-    }
-    failure() {
-      storage+="hello"
-    }
-    stub::set 'sleep'
+    before_each
+    stub failure
+    action::errors ; action::on_call 2 true
     backoff action failure
-    assert equal "hello world" "$storage"
-    stub::restore 'sleep'
-  end
-
-  it 'should skip failure function if not a function'
-    local storage=""
-    action() {
-      if (( ${1} == 2 )); then
-        storage+="hello "
-      else
-        false
-      fi
-    }
-    success() {
-      storage+="world"
-    }
-    stub::set 'sleep'
-    backoff action 'OMG' success
-    assert equal "hello world" "$storage"
-    stub::restore 'sleep'
-  end
-
-  it 'should skip success function if not a function'
-    local storage=""
-    action() {
-      if (( ${1} == 2 )); then
-        storage+="hello"
-      else
-        false
-      fi
-    }
-    failure() {
-      storage+="world"
-    }
-    stub::set 'sleep'
-    backoff action failure 'WEE'
-    assert equal "worldhello" "$storage"
-    stub::restore 'sleep'
+    failure::called_once
+    failure::restore
+    after_each
   end
 
   it 'should run a success function'
-    local storage=""
-    action() {
-      if (( ${1} == 2 )); then
-        storage+="cruel "
-      else
-        false
-      fi
-    }
-    failure() {
-      storage+="goodnight "
-    }
-    success() {
-      storage+="world"
-    }
-    stub::set 'sleep'
+    before_each
+    action::exec true
+    stub failure
+    stub success
     backoff action failure success
-    # failure is run first, then action (a second time), then success
-    assert equal "goodnight cruel world" "$storage"
-    stub::restore 'sleep'
+    success::called_once
+    failure::restore
+    success::restore
+    after_each
   end
 end # util/backoff.sh

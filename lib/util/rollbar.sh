@@ -12,7 +12,7 @@ source "${DOCK_INIT_BASE}/lib/util/log.sh"
 # Ensures the module has a rollbar token
 rollbar::init() {
   if [[ "$ROLLBAR_TOKEN" == "" ]]; then
-    export ROLLBAR_TOKEN=$(cat "$DOCK_INIT_BASE"/key/rollbar.token)
+    export ROLLBAR_TOKEN=$(cat "$DOCK_INIT_BASE/key/rollbar.token")
   fi
 }
 
@@ -61,15 +61,15 @@ rollbar::report () {
   local data="$4"
 
   # verify that data is valid JSON
-  if [[ "$data" == "" ]]; then data="{}"; fi
+  if [[ "$data" == "" ]]; then
+    data='{}'
+  fi
 
-  local json_trap="
-    data='{}';
-    log::warn 'Invalid JSON Data was Passed with $title, $message';
-  "
-  trap '$json_trap' ERR
   echo "$data" | jq "." > /dev/null 2>&1
-  trap - ERR
+  if (( $? != 0 )); then
+    log::warn 'Invalid JSON Data was Passed with $title, $message'
+    data='{}'
+  fi
 
   # trap a curl error here to print a fatal error.
   trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
