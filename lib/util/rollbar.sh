@@ -94,19 +94,6 @@ rollbar::report_error() {
   rollbar::report 'error' "${title}" "${message}" "${data}"
 }
 
-# Reports fatal errors via rollbar.
-# @param $1 Title for the report
-# @param $2 Message to report
-# @param $3 Additional data to report (format?)
-rollbar::report_fatal() {
-  local title="$1"
-  local message="$2"
-  local data="$3"
-  log::error "${title}: ${message}"
-  rollbar::report 'critical' "${title}" "${message}" "${data}"
-  exit 1
-}
-
 # Reports warnings via rollbar.
 # @param $1 Title for the report
 # @param $2 Message to report
