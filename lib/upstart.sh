@@ -145,34 +145,40 @@ upstart::upstart_services_with_backoff_params() {
 upstart::pull_image_builder() {
   local attempt="${1}"
   local name="image-builder"
-  local version
-  version="$(upstart::service_version $name)"
-  local data='{"attempt":'"${attempt}"'}'
+  local version="$(upstart::service_version $name)"
+
   log::info "Pulling image-builder:$version (${attempt})"
-  rollbar::warning_trap \
-    "Dock-Init: Cannot Upstart Services" \
-    "Attempting to upstart the services and failing." \
-    "${data}"
   docker pull "registry.runnable.com/runnable/image-builder:$version"
-  rollbar::clear_trap
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"attempt":'"${attempt}"'}'
+    rollbar::report_warning \
+      "Dock-Init: Cannot Upstart Services" \
+      "Attempting to upstart the services and failing." \
+      "${data}"
+    return 1
+  fi
 }
 
 # Starts the docker swarm container
 upstart::start_swarm_container() {
   local name="swarm"
-  local version
-  version="$(upstart::service_version $name)"
-  local data='{"version":'"${version}"'}'
+  local version="$(upstart::service_version $name)"
+
   log::info "Starting swarm:$version"
-  rollbar::fatal_trap \
-    "Dock-Init: Cannot Start Swarm Container" \
-    "Starting Swarm Container is failing." \
-    "${data}"
   docker run -d --restart=always --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
     "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"
-  rollbar::clear_trap
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"version":'"${version}"'}'
+    rollbar::report_error \
+      "Dock-Init: Cannot Start Swarm Container" \
+      "Starting Swarm Container is failing." \
+      "${data}"
+    return 1
+  fi
 }
 
 # Starts all services needed for the dock
@@ -182,7 +188,7 @@ upstart::start() {
   upstart::start_docker
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services_with_backoff_params
-  upstart::start_swarm_container
+  backoff upstart::start_swarm_container
 }
 
 # Stops all dock services
