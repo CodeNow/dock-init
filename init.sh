@@ -40,7 +40,7 @@ auto_update() {
 
   log::trace 'Fetching dock-init version from consul...'
   local version=$(consul::get '/dock-init/version')
-  log::trace "dock-init version found: $version"
+  log::info "dock-init version found: $version"
 
   log::trace "moving to dock init base directory ($DOCK_INIT_BASE)"
   cd "$DOCK_INIT_BASE"
@@ -52,7 +52,7 @@ auto_update() {
     ssh_execute "git fetch origin"
   fi
 
-  log::trace "Checking out dock-init version: $version"
+  log::info "Checking out dock-init version: $version"
   ssh_execute "git checkout $version"
 }
 
