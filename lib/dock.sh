@@ -99,8 +99,9 @@ dock::generate_etc_hosts() {
 
 # Sets the correct registry.runnable.com host
 dock::set_registry_host() {
-  log::info "Set registry host"
-  cat "$DOCK_INIT_BASE"/hosts-registry.txt >> /etc/hosts
+  local registry_host=$(cat "$DOCK_INIT_BASE/hosts-registry.txt")
+  log::info "Set registry host: $registry_host"
+  echo "$registry_host" >> /etc/hosts
 }
 
 # Remove docker key file so it generates a unique id
