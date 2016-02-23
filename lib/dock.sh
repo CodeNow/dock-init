@@ -66,7 +66,7 @@ dock::set_config_org() {
 # adds org to hostname. must be done after HOST_IP is defined
 dock::set_hostname() {
   log::info "Adding organization id in hostname"
-  hostname `hostname`--"$ORG_ID"
+  hostname `hostname`."${ORG_ID}"
 }
 
 # Backoff method for generating host certs
