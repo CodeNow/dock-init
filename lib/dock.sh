@@ -63,7 +63,7 @@ dock::set_config_org() {
   echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/default/docker
 }
 
-# adds org to hostname. must be done after HOST_IP is defined
+# adds org to hostname
 dock::set_hostname() {
   log::info "Adding organization id in hostname"
   hostname `hostname`."${ORG_ID}"
