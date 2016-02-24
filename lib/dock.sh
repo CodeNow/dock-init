@@ -63,6 +63,12 @@ dock::set_config_org() {
   echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/default/docker
 }
 
+# adds org to hostname
+dock::set_hostname() {
+  log::info "Adding organization id in hostname"
+  hostname `hostname`."${ORG_ID}"
+}
+
 # Backoff method for generating host certs
 dock::generate_certs_backoff() {
   rollbar::warning_trap \
@@ -124,6 +130,7 @@ dock::init() {
   aws::get_org_id
 
   # Now that we have everything we need and consul is ready, initialize the dock
+  dock::set_hostname
   dock::set_config_org
   dock::generate_certs
   dock::generate_etc_hosts
