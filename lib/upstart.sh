@@ -46,7 +46,6 @@ upstart::configure_service() {
 # from consul
 upstart::generate_scripts() {
   log::info "Configuring Upstart Scripts"
-  upstart::configure_service "docker-listener"
   upstart::configure_service "charon"
   log::trace "Done Generating Upstart Scripts"
 }
@@ -136,7 +135,6 @@ upstart::upstart_services_with_backoff_params() {
   upstart::upstart_named_service "filibuster" $attempt
   upstart::upstart_named_service "krain" $attempt
   upstart::upstart_named_service "charon" $attempt
-  upstart::upstart_named_service "docker-listener" $attempt
   upstart::upstart_service "datadog-agent" $attempt
 }
 
@@ -197,7 +195,6 @@ upstart::stop() {
   service filibuster stop
   service krain stop
   service charon stop
-  service docker-listener stop
   service docker stop
   docker ps | awk '/swarm/ { print $1 }' | xargs docker kill
 }

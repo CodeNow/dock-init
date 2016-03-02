@@ -132,21 +132,19 @@ NOTE: we should turn this into ansible script so we can auto generate AMIs.
   * `/docker` -> xvdb
   * `/git-cache` -> xvdc
   * `/layer-cache` -> xvdd
-3. Install docker 1.6.2, and weave 0.11.1
+3. Install docker 1.9.2, and weave 0.14.0
 4. Place the TLS certificate files in `/etc/ssl/docker`:
   * `ca-key.pem`
   * `ca.pem`
 5. Download the following repositories to `/opt/runnable`:
   * `/opt/runnable/dock-init`
-  * `/opt/runnable/docker-listener`
   * `/opt/runnable/filibuster`
   * `/opt/runnable/krain`
 6. Place the service upstart scripts:
-  * `/etc/init/docker-listener.conf`
   * `/etc/init/filibuster.conf`
   * `/etc/init/krain.conf`
 7. Place the upstart override "manual" files to prevent start on boot:
-  * `echo "manual" > /etc/init/docker-listener.override`
   * `echo "manual" > /etc/init/filibuster.override`
   * `echo "manual" > /etc/init/krain.override`
+  * `echo "manual" > /etc/init/docker.override`
 8. Save an AMI of the Instance via the [AWS Web Admin Panel](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)
