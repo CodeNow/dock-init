@@ -1,8 +1,13 @@
 language: bash
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - jq
 
 before_script:
-    - sudo sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
-    - sudo apt-get install jq
+- sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
 
 script:
-    - bash unit.sh
+- bash unit.sh
