@@ -1,11 +1,6 @@
 language: bash
 sudo: false
 
-addons:
-  apt:
-    packages:
-    - jq
-
 before_script:
 - sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
 
