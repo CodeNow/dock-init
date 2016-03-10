@@ -12,7 +12,7 @@ aws::fetch_org_id_from_tags() {
   local attempt=${1}
 
   log::info 'Attempting to get org id...'
-  data='{"vault_addr":"'"${VAULT_ADDR}"'","attempt":'"${attempt}"'}'
+  data='{"attempt":'"${attempt}"'}'
 
   rollbar::warning_trap \
     "Dock-Init: Cannot Fetch Org" \

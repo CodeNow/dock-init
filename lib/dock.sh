@@ -13,7 +13,6 @@ source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/cert.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/upstart.sh"
-source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
@@ -23,13 +22,6 @@ source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
 # been set (useful for testing)
 dock::cleanup::exit_trap() {
-  # Kill vault and clean up the pid file
-  if [ -e /tmp/vault.pid ]; then
-    log::info '[CLEANUP TRAP] Killing Vault'
-    kill "$(cat /tmp/vault.pid)"
-    rm /tmp/vault.pid
-  fi
-
   # Delete the keys unless the `DO_NOT_DELETE` flag is set
   if [[ "${DONT_DELETE_KEYS}" == "" ]]; then
     log::info '[CLEANUP TRAP] Removing Keys'
@@ -45,16 +37,6 @@ dock::cleanup::exit_trap() {
 dock::cleanup::set_exit_trap() {
   log::info "Setting key cleanup trap"
   trap 'dock::cleanup::exit_trap' EXIT
-}
-
-# Attempts to stop vault after the dock has been initialized
-dock::cleanup::stop_vault() {
-  log::info "[CLEANUP] Stop Vault"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to stop Vault" \
-    "Server was unable to stop Vault."
-  vault::stop
-  rollbar::clear_trap
 }
 
 # Sets the value of `$ORG_ID` as the org label in the docker configuration
@@ -126,7 +108,6 @@ dock::init() {
   consul::connect
   consul::get_environment
   consul::configure_consul_template
-  consul::start_vault
   aws::get_org_id
 
   # Now that we have everything we need and consul is ready, initialize the dock
@@ -140,7 +121,4 @@ dock::init() {
 
   # Give the all clear message!
   log::info "Init Done!"
-
-  # Perform any cleanup tasks now that the dock is up and running
-  dock::cleanup::stop_vault
 }
