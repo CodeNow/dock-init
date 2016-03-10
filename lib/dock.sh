@@ -27,6 +27,7 @@ dock::cleanup::exit_trap() {
     log::info '[CLEANUP TRAP] Removing Keys'
     rm -f "${CERT_PATH}"/ca-key.pem \
           "${CERT_PATH}"/pass \
+          "${DOCK_INIT_BASE}"/consul-resources/template-config.hcl \
           "${DOCK_INIT_BASE}"/consul-resources/vault/**/auth-token \
           "${DOCK_INIT_BASE}"/consul-resources/vault/**/token-* \
           "${DOCK_INIT_BASE}"/key/rollbar.token
