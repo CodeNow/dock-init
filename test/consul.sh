@@ -5,8 +5,9 @@
 source "$DOCK_INIT_BASE/lib/consul.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
-describe 'consul::'
+describe 'consul.sh'
   stub log::info
+  stub rollbar::fatal_trap
 
   describe 'configure_consul_template'
     stub consul::get
@@ -15,6 +16,11 @@ describe 'consul::'
 
     consul::get::returns 'TEST-NODE-ENV'
     cat::returns 'MOCK-TOKEN'
+
+    it 'should wrap the configuration in a fatal trap'
+      consul::configure_consul_template
+      rollbar::fatal_trap::called_once
+    end
 
     it 'should fetch the node environment'
       consul::configure_consul_template
@@ -43,4 +49,5 @@ describe 'consul::'
   end # configure_consul_template
 
   log::info::restore
+  rollbar::fatal_trap::restore
 end # dock.sh
