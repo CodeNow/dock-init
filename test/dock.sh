@@ -14,7 +14,7 @@ describe 'dock.sh'
       stub hostname
       hostname::returns 'ip-10-17-38-1'
       export ORG_ID='123123123'
-      dock::set_hostname
+      local value=$(dock::set_hostname)
       hostname::called_with "ip-10-17-38-1.123123123"
       hostname::restore
       unset ORG_ID
