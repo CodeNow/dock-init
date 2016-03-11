@@ -2,7 +2,6 @@
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
-source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
@@ -54,21 +53,17 @@ consul::configure_consul_template() {
     "Dock-Init: Failed to Render Template Config" \
     "Consul-Template was unable to realize the given template."
 
+  # expose VAULT_TOKEN for consul-template config
+  local NODE_ENV=$(consul::get node/env)
+  local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
+  VAULT_TOKEN=$(cat "${token_path}"/auth-token)
+  export VAULT_TOKEN
+
   local template="$DOCK_INIT_BASE/consul-resources/templates/"
   template+="template-config.hcl.ctmpl"
   template+=":$DOCK_INIT_BASE/consul-resources/template-config.hcl"
 
   consul-template -once -template="$template"
 
-  rollbar::clear_trap
-}
-
-# Starts vault so we can grab secret information such as AWS keys, etc.
-consul::start_vault() {
-  log::info "Starting Vault"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to run start-vault.sh" \
-    "Vault was unable to start."
-  vault::start
   rollbar::clear_trap
 }

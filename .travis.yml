@@ -1,8 +1,12 @@
 language: bash
+sudo: false
+
+env:
+- PREFIX=$HOME
 
 before_script:
-    - sudo sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
-    - sudo apt-get install jq
+- sh -c "$(curl -L https://raw.github.com/rylnd/shpec/master/install.sh)"
+- export PATH=$PATH:$HOME/bin
 
 script:
-    - bash unit.sh
+- bash unit.sh
