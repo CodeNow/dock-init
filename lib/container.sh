@@ -36,15 +36,19 @@ container::_start_swarm_container() {
 container::_start_registry_container() {
   local name="registry"
   local version="$(consul::service_version $name)"
+  log::info "Starting registry:${version} container"
+
+  vault::create_s3_policy
+
   local aws_keys="$(vault::get_s3_keys)"
   local access_key="$(echo ${aws_keys} | awk '/access_key/ { print $2 }')"
   local secret_key="$(echo ${aws_keys} | awk '/secret_key/ { print $2 }')"
+  log::trace "aws_keys: ${aws_keys} access_key: ${access_key} secret_key: ${secret_key} "
+
   local region="$(consul::s3_info region)"
   local bucket_name="${ORG_ID}"
+  log::trace "region: ${region} bucket_name: ${bucket_name}"
 
-  log::info "Starting registry:${version} container"
-  log::trace "aws_keys: ${aws_keys} access_key: ${access_key}"
-  log::trace "secret_key: ${secret_key} region: ${region} bucket_name: ${bucket_name}"
 
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \

@@ -32,8 +32,6 @@ vault::create_s3_policy() {
 # secret_key      BK9++oBABaBvRKcT5KEF69xQGcH7ZpPRF3oqVEv7
 # security_token  <nil>
 vault::get_s3_keys() {
-  vault::create_s3_policy
-
   rollbar::fatal_trap \
     "Dock-Init: Cannot create policy template" \
     "failed get s3 creds"
