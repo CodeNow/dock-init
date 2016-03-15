@@ -7,6 +7,7 @@ source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 # Starts the docker swarm container
 container::_start_swarm_container() {
