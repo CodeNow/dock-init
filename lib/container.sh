@@ -33,13 +33,11 @@ container::_start_swarm_container() {
 container::_start_registry_container() {
   local name="registry"
   local version="$(consul::service_version $name)"
-  local awsaccesskey="$(consul::aws_key $name)"
-  local awssecretkey="$(consul::aws_key $name)"
-  local region="$(consul::get_key ${name}/region)"
-  local region_endpoint="$(consul::get_key ${name}/region)"
-  local bucket_name="$(consul::get_key ${name}/region)"
-  local key_id="$(consul::get_key ${name}/region)"
-  local root_dir="$(consul::get_key ${name}/region)"
+  local aws_keys="$(vault::get_s3_keys)"
+  local awsaccesskey="$(echo ${aws_keys} | awk '/access_key/ { print $2 }')"
+  local awssecretkey="$(echo ${aws_keys} | awk '/secret_key/ { print $2 }')"
+  local region="$(consul::s3_info $region)"
+  local bucket_name="${ORG_ID}"
 
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
@@ -47,14 +45,7 @@ container::_start_registry_container() {
     -e REGISTRY_STORAGE_STORAGE_S3_ACCESSKEY="${awsaccesskey}" \
     -e REGISTRY_STORAGE_STORAGE_S3_SECRETKEY="${awssecretkey}" \
     -e REGISTRY_STORAGE_STORAGE_S3_REGION="${region}" \
-    -e REGISTRY_STORAGE_STORAGE_S3_REGIONENDPOINT="${region_endpoint}" \
     -e REGISTRY_STORAGE_STORAGE_S3_BUCKET="${bucket_name} "\
-    -e REGISTRY_STORAGE_STORAGE_S3_ENCRYPT=true \
-    -e REGISTRY_STORAGE_STORAGE_S3_KEYID="${key_id} "\
-    -e REGISTRY_STORAGE_STORAGE_S3_SECURE=true \
-    -e REGISTRY_STORAGE_STORAGE_S3_V4AUTH=true \
-    -e REGISTRY_STORAGE_STORAGE_S3_CHUNKSIZE=5242880 \
-    -e REGISTRY_STORAGE_STORAGE_S3_ROOTDIRECTORY="${root_dir}" \
     "${name}:${version}"`
 
 
