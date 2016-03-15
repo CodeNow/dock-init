@@ -36,7 +36,7 @@ container::_start_registry_container() {
   local aws_keys="$(vault::get_s3_keys)"
   local awsaccesskey="$(echo ${aws_keys} | awk '/access_key/ { print $2 }')"
   local awssecretkey="$(echo ${aws_keys} | awk '/secret_key/ { print $2 }')"
-  local region="$(consul::s3_info $region)"
+  local region="$(consul::s3_info region)"
   local bucket_name="${ORG_ID}"
 
   docker_logs=`docker run \
