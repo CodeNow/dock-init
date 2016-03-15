@@ -14,6 +14,8 @@ container::_start_swarm_container() {
   local name="swarm"
   local version="$(consul::service_version $name)"
 
+  log::info "Starting swarm:${version} container"
+
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     "${name}:${version}" \
@@ -39,6 +41,8 @@ container::_start_registry_container() {
   local awssecretkey="$(echo ${aws_keys} | awk '/secret_key/ { print $2 }')"
   local region="$(consul::s3_info region)"
   local bucket_name="${ORG_ID}"
+
+  log::info "Starting registry:${version} container"
 
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
