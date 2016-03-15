@@ -21,7 +21,7 @@ vault::create_s3_policy() {
 
   local policy_template="${DOCK_INIT_BASE}/vault-resources/s3.policy"
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
-  sed /X_ORG_ID/$ORG_ID "${policy_template}" > "${policy_location}"
+  sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" > "${policy_location}"
 
   vault write aws/roles/deploy policy=@"${policy_location}"
 
@@ -43,7 +43,7 @@ vault::get_s3_keys() {
     "Attempting to create s3 policy template."
 
   log::info "Attempting to create s3 policy template"
-  vault read aws/creds/s3/$ORG_ID
+  vault read "aws/creds/s3/${ORG_ID}"
 
   rollbar::clear_trap
 }
