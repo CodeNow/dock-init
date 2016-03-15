@@ -2,18 +2,14 @@
 
 # Functions for interacting with vault
 # @author Anandkumar Patel
+# @module vault
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
-# Consul routines used by the main `init.sh` dock-init script.
-# @author Ryan Sandor Richards
-# @module vault
-
-# Backoff andler for ensuring the dock can connect to vault
-# @param $1 attempt The attempt number passed by the backoff routine below
+# create s3 policy for this org
 vault::create_s3_policy() {
-  rollbar::error_trap \
+  rollbar::fatal_trap \
     "Dock-Init: Cannot create policy template" \
     "Attempting to create s3 policy template."
 
@@ -38,7 +34,7 @@ vault::create_s3_policy() {
 vault::get_s3_keys() {
   vault::create_s3_policy
 
-  rollbar::error_trap \
+  rollbar::fatal_trap \
     "Dock-Init: Cannot create policy template" \
     "Attempting to create s3 policy template."
 
