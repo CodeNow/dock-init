@@ -11,7 +11,7 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 vault::create_s3_policy() {
   rollbar::fatal_trap \
     "Dock-Init: Cannot create policy template" \
-    "Attempting to create s3 policy template."
+    "failed to create s3 policy template"
 
   log::info "Attempting to create s3 policy template"
 
@@ -19,7 +19,7 @@ vault::create_s3_policy() {
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
   sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" > "${policy_location}"
 
-  vault write aws/roles/deploy policy=@"${policy_location}"
+  vault write "aws/roles/s3/${ORG_ID}" policy=@"${policy_location}"
 
   rollbar::clear_trap
 }
@@ -36,9 +36,9 @@ vault::get_s3_keys() {
 
   rollbar::fatal_trap \
     "Dock-Init: Cannot create policy template" \
-    "Attempting to create s3 policy template."
+    "failed get s3 creds"
 
-  log::info "Attempting to create s3 policy template"
+  log::info "Attempting get s3 creds"
   vault read "aws/creds/s3/${ORG_ID}"
 
   rollbar::clear_trap
