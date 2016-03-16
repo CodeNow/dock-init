@@ -51,7 +51,7 @@ container::_start_registry_container() {
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
     -e REGISTRY_STORAGE=s3 \
     -e REGISTRY_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
-    -e REGISTRY_STORAGE_S3_BUCKET="${bucket} "\
+    -e REGISTRY_STORAGE_S3_BUCKET="${bucket}"\
     -e REGISTRY_STORAGE_S3_REGION="${region}" \
     -e REGISTRY_STORAGE_S3_SECRETKEY="${S3_SECRET_KEY}" \
     "${name}:${version}"`
