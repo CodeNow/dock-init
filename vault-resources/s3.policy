@@ -7,8 +7,8 @@
                 "s3:*"
             ],
             "Resource": [
-                "arn:aws:s3:::X_BUCKET/X_ORG_ID",
-                "arn:aws:s3:::X_BUCKET/X_ORG_ID/*"
+                "arn:aws:s3:::X_BUCKET",
+                "arn:aws:s3:::X_BUCKET/*"
             ]
         }
     ]

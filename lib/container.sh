@@ -48,7 +48,7 @@ container::_start_registry_container() {
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     -p 80:5000 \
-    -e REGISTRY_HTTP_DEBUG_ADDR="localhost:5001" \
+    -e REGISTRY_HTTP_DEBUG_ADDR=":5001" \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
     -e REGISTRY_LOG_LEVEL="debug" \
     -e REGISTRY_STORAGE=s3 \
