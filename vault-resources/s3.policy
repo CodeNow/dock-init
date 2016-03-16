@@ -4,7 +4,7 @@
         {
             "Effect": "Allow",
             "Action": "s3:ListAllMyBuckets",
-            "Resource": "arn:aws:s3:::X_ORG_ID"
+            "Resource": "arn:aws:s3:::X_BUCKET/X_ORG_ID"
         },
         {
             "Effect": "Allow",
@@ -12,7 +12,7 @@
                 "s3:ListBucket",
                 "s3:GetBucketLocation"
             ],
-            "Resource": "arn:aws:s3:::X_ORG_ID/*"
+            "Resource": "arn:aws:s3:::X_BUCKET/X_ORG_ID/*"
         },
         {
             "Effect": "Allow",
@@ -21,7 +21,7 @@
                 "s3:GetObject",
                 "s3:DeleteObject"
             ],
-            "Resource": "arn:aws:s3:::X_ORG_ID/*"
+            "Resource": "arn:aws:s3:::X_BUCKET/X_ORG_ID/*"
         }
     ]
 }

@@ -38,25 +38,20 @@ container::_start_registry_container() {
   local version="$(consul::service_version $name)"
   log::info "Starting registry:${version} container"
 
-  vault::create_s3_policy
-
-  local aws_keys="$(vault::get_s3_keys)"
-  local access_key="$(echo ${aws_keys} | awk '/access_key/ { print $2 }')"
-  local secret_key="$(echo ${aws_keys} | awk '/secret_key/ { print $2 }')"
-  log::trace "aws_keys: ${aws_keys} access_key: ${access_key} secret_key: ${secret_key} "
-
   local region="$(consul::s3_info region)"
-  local bucket_name="${ORG_ID}"
-  log::trace "region: ${region} bucket_name: ${bucket_name}"
+  local bucket="$(consul::s3_info bucket)"
+  log::trace "region: ${region} bucket: ${bucket}"
 
+  vault::create_s3_policy "${bucket}"
+  vault::set_s3_keys
 
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     -p 5000:5000 \
-    -e REGISTRY_STORAGE_STORAGE_S3_ACCESSKEY="${access_key}" \
-    -e REGISTRY_STORAGE_STORAGE_S3_SECRETKEY="${secret_key}" \
+    -e REGISTRY_STORAGE_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
+    -e REGISTRY_STORAGE_STORAGE_S3_SECRETKEY="${S3_SECRET_KEY}" \
     -e REGISTRY_STORAGE_STORAGE_S3_REGION="${region}" \
-    -e REGISTRY_STORAGE_STORAGE_S3_BUCKET="${bucket_name} "\
+    -e REGISTRY_STORAGE_STORAGE_S3_BUCKET="${bucket} "\
     "${name}:${version}"`
 
 
