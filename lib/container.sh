@@ -48,11 +48,14 @@ container::_start_registry_container() {
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     -p 80:5000 \
+    -e REGISTRY_HTTP_DEBUG_ADDR="localhost:5001" \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
+    -e REGISTRY_LOG_LEVEL="debug" \
     -e REGISTRY_STORAGE=s3 \
     -e REGISTRY_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
     -e REGISTRY_STORAGE_S3_BUCKET="${bucket}"\
     -e REGISTRY_STORAGE_S3_REGION="${region}" \
+    -e REGISTRY_STORAGE_S3_ROOTDIRECTORY="/${ORG_ID}" \
     -e REGISTRY_STORAGE_S3_SECRETKEY="${S3_SECRET_KEY}" \
     "${name}:${version}"`
 
