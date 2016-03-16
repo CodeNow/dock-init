@@ -41,8 +41,8 @@ vault::set_s3_keys() {
   local out="$(vault read aws/creds/s3-${ORG_ID})"
   log::trace "vault out: ${out}"
 
-  export S3_ACCESS_KEY="$(echo ${out} | awk '/access_key/ { print $2 }')"
-  export S3_SECRET_KEY="$(echo ${out} | awk '/secret_key/ { print $2 }')"
+  export S3_ACCESS_KEY="$(echo ${out} | grep -o access_key.* | awk '{print $2}')"
+  export S3_SECRET_KEY="$(echo ${out} | grep -o secret_key.* | awk '{print $2}')"
   log::trace "access_key: ${S3_ACCESS_KEY} secret_key: ${S3_SECRET_KEY} "
   rollbar::clear_trap
 }
