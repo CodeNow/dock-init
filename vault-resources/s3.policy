@@ -4,12 +4,19 @@
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*"
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
             ],
-            "Resource": [
-                "arn:aws:s3:::X_BUCKET",
-                "arn:aws:s3:::X_BUCKET/*"
-            ]
+            "Resource": "arn:aws:s3:::X_BUCKET"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::X_BUCKET/X_ORG_ID/*"
         }
     ]
 }
