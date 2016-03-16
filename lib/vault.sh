@@ -10,11 +10,12 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # create s3 policy for this org
 # $1 s3 bucket name
 vault::create_s3_policy() {
-  log::info "Attempting to create s3 policy template"
+  local bucket="${1}"
+  log::info "Attempting to create s3 policy template for bucket ${bucket}"
 
   local policy_template="${DOCK_INIT_BASE}/vault-resources/s3.policy"
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
-  sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" | sed s/X_BUCKET/"${X_BUCKET}"/g > "${policy_location}"
+  sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" | sed s/X_BUCKET/"${bucket}"/g > "${policy_location}"
 
   local output = "$(vault write aws/roles/s3-${ORG_ID} policy=@${policy_location})"
   if [[ "$?" -gt "0" ]]; then
