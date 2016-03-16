@@ -89,8 +89,8 @@ dock::generate_etc_hosts() {
 
 # Sets the correct registry.runnable.com host
 dock::set_registry_host() {
-  local registry_host=$(cat "$DOCK_INIT_BASE/hosts-registry.txt")
-  log::info "Set registry host: $registry_host"
+  local registry_host="registry.runnable.com 127.0.0.1"
+  log::info "Set registry host: ${registry_host}"
   echo "$registry_host" >> /etc/hosts
 }
 
