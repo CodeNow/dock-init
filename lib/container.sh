@@ -12,7 +12,7 @@ source "${DOCK_INIT_BASE}/lib/vault.sh"
 # Starts the docker swarm container
 container::_start_swarm_container() {
   local name="swarm"
-  local version="$(consul::service_version $name)"
+  local version="$(consul::get ${name}/version)"
 
   log::info "Starting swarm:${version} container"
 
@@ -35,11 +35,11 @@ container::_start_swarm_container() {
 # Starts the docker registry container
 container::_start_registry_container() {
   local name="registry"
-  local version="$(consul::service_version $name)"
+  local version="$(consul::get ${name}/version)"
   log::info "Starting registry:${version} container"
 
-  local region="$(consul::s3_info region)"
-  local bucket="$(consul::s3_info bucket)"
+  local region="$(consul::get s3/region)"
+  local bucket="$(consul::get s3/bucket)"
   log::trace "region: ${region} bucket: ${bucket}"
 
   vault::create_s3_policy "${bucket}"

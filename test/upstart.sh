@@ -50,11 +50,12 @@ describe 'upstart.sh'
     local image_builder_version='v1.2.3'
     stub rollbar::report_warning
     stub docker
-    stub::returns consul::service_version "$image_builder_version"
+    stub::returns consul::get "$image_builder_version"
 
     it 'should attempt to pull image builder'
       local registry="registry.runnable.com/runnable/image-builder"
       upstart::pull_image_builder 1
+      consul::get::called_with "image-builder/version"
       docker::called_with "pull $registry:$image_builder_version"
     end
 
@@ -75,7 +76,7 @@ describe 'upstart.sh'
 
     # docker::restore
     rollbar::report_warning::restore
-    consul::service_version::restore
+    consul::get::restore
   end
 
   log::info::restore

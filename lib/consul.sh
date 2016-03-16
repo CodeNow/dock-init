@@ -67,23 +67,3 @@ consul::configure_consul_template() {
 
   rollbar::clear_trap
 }
-
-# Gets the version for a particular service from consul
-# @param $1 name Name of the service
-consul::service_version() {
-  local name="${1}"
-  local consul_kv_host="$CONSUL_HOSTNAME:$CONSUL_PORT/v1/kv"
-  curl --silent "$consul_kv_host/$name/version" | \
-    jq --raw-output ".[0].Value" | \
-    base64 --decode
-}
-
-# Gets key values from s3 keypath
-# @param $1 key Key from s3 info to lookup
-consul::s3_info() {
-  local key="${1}"
-  local consul_kv_host="$CONSUL_HOSTNAME:$CONSUL_PORT/v1/kv"
-  curl --silent "${consul_kv_host}/s3/${key}" | \
-    jq --raw-output ".[0].Value" | \
-    base64 --decode
-}

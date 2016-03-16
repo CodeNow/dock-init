@@ -57,7 +57,7 @@ upstart::upstart_named_service() {
   local name="${1}"
   local attempt="${2}"
   local data='{"attempt":'"${attempt}"'}'
-  local version=$(consul::service_version "$name")
+  local version="$(consul::get ${name}/version)"
   local key_path="$DOCK_INIT_BASE/key/id_rsa_runnabledock"
 
   rollbar::warning_trap \
@@ -134,7 +134,7 @@ upstart::upstart_services_with_backoff_params() {
 upstart::pull_image_builder() {
   local attempt="${1}"
   local name="image-builder"
-  local version="$(consul::service_version $name)"
+  local version="$(consul::get $name/version)"
 
   log::info "Pulling image-builder:$version (${attempt})"
   docker pull "registry.runnable.com/runnable/image-builder:$version"
