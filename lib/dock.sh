@@ -12,12 +12,11 @@
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/cert.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
-source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/upstart.sh"
 
-source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 
 # An "on exit" trap to clean up sensitive keys and files on the dock itself.
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
@@ -89,8 +88,8 @@ dock::generate_etc_hosts() {
 
 # Sets the correct registry.runnable.com host
 dock::set_registry_host() {
-  local registry_host="127.0.0.1 registry.runnable.com"
-  log::info "Set registry host: ${registry_host}"
+  local registry_host=$(cat "$DOCK_INIT_BASE/hosts-registry.txt")
+  log::info "Set registry host: $registry_host"
   echo "$registry_host" >> /etc/hosts
 }
 
@@ -120,7 +119,7 @@ dock::init() {
   dock::set_registry_host
   dock::remove_docker_key_file
   upstart::start
-  container::start
+
   # Give the all clear message!
   log::info "Init Done!"
 }
