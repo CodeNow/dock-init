@@ -48,6 +48,7 @@ container::_start_registry_container() {
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     -p 5000:5000 \
+    -e REGISTRY_STORAGE="s3" \
     -e REGISTRY_STORAGE_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
     -e REGISTRY_STORAGE_STORAGE_S3_SECRETKEY="${S3_SECRET_KEY}" \
     -e REGISTRY_STORAGE_STORAGE_S3_REGION="${region}" \
