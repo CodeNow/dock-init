@@ -19,7 +19,7 @@ vault::create_s3_policy() {
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
   sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" > "${policy_location}"
 
-  vault write "aws/roles/s3/${ORG_ID}" policy=@"${policy_location}"
+  vault write "aws/roles/s3-${ORG_ID}" policy=@"${policy_location}"
 
   rollbar::clear_trap
 }
@@ -37,7 +37,7 @@ vault::get_s3_keys() {
     "failed get s3 creds"
 
   log::info "Attempting get s3 creds"
-  vault read "aws/creds/s3/${ORG_ID}"
+  vault read "aws/creds/s3-${ORG_ID}"
 
   rollbar::clear_trap
 }
