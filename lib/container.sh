@@ -15,7 +15,7 @@ container::_start_swarm_container() {
   local version="$(consul::get ${name}/version)"
 
   log::info "Starting swarm:${version} container"
-
+  local docker_logs
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     "${name}:${version}" \
@@ -44,7 +44,7 @@ container::_start_registry_container() {
 
   vault::create_s3_policy "${bucket}"
   vault::set_s3_keys
-
+  local docker_logs
   docker_logs=`docker run \
     -d --restart=always --name "${image_name}" \
     -p 80:5000 \
