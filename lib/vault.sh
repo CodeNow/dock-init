@@ -38,9 +38,11 @@ vault::set_s3_keys() {
   # access_key      AKIAIOMYUTSLGJOGLHTQ
   # secret_key      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
   # security_token  <nil>
-  local keys="$(vault read aws/creds/s3-${ORG_ID})"
-  export S3_ACCESS_KEY="$(echo ${keys} | awk '/access_key/ { print $2 }')"
-  export S3_SECRET_KEY="$(echo ${keys} | awk '/secret_key/ { print $2 }')"
-  log::trace "keys: ${keys} access_key: ${S3_ACCESS_KEY} secret_key: ${S3_SECRET_KEY} "
+  local out="$(vault read aws/creds/s3-${ORG_ID})"
+  log::trace "vault out: ${out}"
+
+  export S3_ACCESS_KEY="$(echo ${out} | awk '/access_key/ { print $2 }')"
+  export S3_SECRET_KEY="$(echo ${out} | awk '/secret_key/ { print $2 }')"
+  log::trace "access_key: ${S3_ACCESS_KEY} secret_key: ${S3_SECRET_KEY} "
   rollbar::clear_trap
 }
