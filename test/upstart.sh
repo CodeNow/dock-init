@@ -3,49 +3,12 @@
 # Unit tests for the `lib/upstart.sh` module.
 # @author Anandkumar Patel
 
+source "$DOCK_INIT_BASE/lib/container.sh"
 source "$DOCK_INIT_BASE/lib/upstart.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
 describe 'upstart.sh'
   stub log::info
-
-  describe 'upstart::start_swarm_container'
-    local swarm_version='1.0.0'
-    export CONSUL_HOSTNAME='consul_hostname'
-    export CONSUL_PORT='consul_port'
-    export HOST_IP='host_ip'
-    stub::returns 'upstart::service_version' "$swarm_version"
-    stub docker
-    stub rollbar::report_error
-
-    it 'should run docker container'
-      local expectedArgs="run -d --restart=always --name swarm"
-      expectedArgs+=" swarm:${swarm_version}"
-      expectedArgs+=" join --addr=host_ip:4242"
-      expectedArgs+=" consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/swarm"
-      upstart::start_swarm_container
-      docker::called_with "$dockerArgs"
-    end
-
-    it 'should report errors on failure'
-      docker::errors
-      upstart::start_swarm_container
-      rollbar::report_error::called
-    end
-
-    it 'should return 1 on failure'
-      docker::errors
-      upstart::start_swarm_container
-      assert equal "$?" "1"
-    end
-
-    unset CONSUL_HOSTNAME
-    unset CONSUL_PORT
-    unset HOST_IP
-    docker::restore
-    upstart::service_version::restore
-    rollbar::report_error::restore
-  end
 
   describe 'upstart::upstart_service'
     stub rollbar::warning_trap
@@ -87,11 +50,12 @@ describe 'upstart.sh'
     local image_builder_version='v1.2.3'
     stub rollbar::report_warning
     stub docker
-    stub::returns upstart::service_version "$image_builder_version"
+    stub::returns consul::get "$image_builder_version"
 
     it 'should attempt to pull image builder'
       local registry="registry.runnable.com/runnable/image-builder"
       upstart::pull_image_builder 1
+      consul::get::called_with "image-builder/version"
       docker::called_with "pull $registry:$image_builder_version"
     end
 
@@ -112,7 +76,7 @@ describe 'upstart.sh'
 
     # docker::restore
     rollbar::report_warning::restore
-    upstart::service_version::restore
+    consul::get::restore
   end
 
   log::info::restore

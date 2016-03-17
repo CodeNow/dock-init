@@ -5,9 +5,10 @@
 # @author Ryan Sandor Richards
 # @author Bryan Kendall
 
-source "$DOCK_INIT_BASE/lib/util/log.sh"
+source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
-source "$DOCK_INIT_BASE/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/log.sh"
+source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
 # Generates upstart scripts for the dock
 upstart::generate_scripts() {
@@ -50,23 +51,13 @@ upstart::generate_scripts() {
   log::trace "Done Generating Upstart Scripts"
 }
 
-# Gets the version for a particular service from consul
-# @param $1 name Name of the service
-upstart::service_version() {
-  local name="${1}"
-  local consul_kv_host="$CONSUL_HOSTNAME:$CONSUL_PORT/v1/kv"
-  curl --silent "$consul_kv_host/$name/version" | \
-    jq --raw-output ".[0].Value" | \
-    base64 --decode
-}
-
 # Updates a service to the consul version, installs packages, then restarts it.
 # @param $1 Name of the service
 upstart::upstart_named_service() {
   local name="${1}"
   local attempt="${2}"
   local data='{"attempt":'"${attempt}"'}'
-  local version=$(upstart::service_version "$name")
+  local version="$(consul::get ${name}/version)"
   local key_path="$DOCK_INIT_BASE/key/id_rsa_runnabledock"
 
   rollbar::warning_trap \
@@ -143,7 +134,7 @@ upstart::upstart_services_with_backoff_params() {
 upstart::pull_image_builder() {
   local attempt="${1}"
   local name="image-builder"
-  local version="$(upstart::service_version $name)"
+  local version="$(consul::get $name/version)"
 
   log::info "Pulling image-builder:$version (${attempt})"
   docker pull "registry.runnable.com/runnable/image-builder:$version"
@@ -158,27 +149,6 @@ upstart::pull_image_builder() {
   fi
 }
 
-# Starts the docker swarm container
-upstart::start_swarm_container() {
-  local name="swarm"
-  local version="$(upstart::service_version $name)"
-
-  log::info "Starting swarm:$version"
-  docker run -d --restart=always --name "${name}" \
-    "${name}:${version}" \
-    join --addr="$HOST_IP:4242" \
-    "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"
-
-  if [[ "$?" -gt "0" ]]; then
-    local data='{"version":'"${version}"'}'
-    rollbar::report_error \
-      "Dock-Init: Cannot Start Swarm Container" \
-      "Starting Swarm Container is failing." \
-      "${data}"
-    return 1
-  fi
-}
-
 # Starts all services needed for the dock
 upstart::start() {
   log::info "Upstarting dock"
@@ -186,15 +156,13 @@ upstart::start() {
   upstart::start_docker
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services_with_backoff_params
-  backoff upstart::start_swarm_container
 }
 
 # Stops all dock services
 upstart::stop() {
-  log::info "Stopping all dock services"
+  log::info "Stopping all dock upstart services"
   service filibuster stop
   service krain stop
   service charon stop
   service docker stop
-  docker ps | awk '/swarm/ { print $1 }' | xargs docker kill
 }

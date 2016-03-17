@@ -9,3 +9,4 @@ consul-resources/vault/**/token-02
 consul-resources/vault/**/token-03
 key/rollbar.token
 .stubdata
+vault-resources/s3.policy.json
