@@ -33,6 +33,12 @@ describe 'vault.sh'
       assert equal "0" "$?"
     end
 
+    it 'should report errors on failure'
+      vault::errors
+      vault::create_s3_policy
+      rollbar::report_error::called
+    end
+
     it 'should exit 1 on failure'
       vault::errors
       vault::create_s3_policy
@@ -69,6 +75,12 @@ describe 'vault.sh'
       vault::returns "lease_duration 3600 secret_key ${key}"
       vault::set_s3_keys
       assert equal "${key}" "$S3_SECRET_KEY"
+    end
+
+    it 'should report errors on failure'
+      vault::errors
+      vault::set_s3_keys
+      rollbar::report_error::called
     end
 
     it 'should exit 1 failure'

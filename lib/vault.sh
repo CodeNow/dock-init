@@ -43,7 +43,8 @@ vault::set_s3_keys() {
   # access_key      AKIAIOMYUTSLGJOGLHTQ
   # secret_key      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
   # security_token  <nil>
-  export OUTPUT="$(vault read aws/creds/s3-${ORG_ID})"
+  OUTPUT="$(vault read aws/creds/s3-${ORG_ID})"
+  export OUTPUT
 
   S3_ACCESS_KEY="$(echo ${OUTPUT} | grep -o access_key.* | awk '{print $2}')"
   export S3_ACCESS_KEY
