@@ -8,6 +8,7 @@ source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
 describe 'vault.sh'
   stub log::info
+  stub exit
 
   describe 'vault::create_s3_policy'
     local bucket='ice'
@@ -32,16 +33,10 @@ describe 'vault.sh'
       assert equal "0" "$?"
     end
 
-    it 'should report errors on failure'
+    it 'should exit 1 on failure'
       vault::errors
       vault::create_s3_policy
-      rollbar::report_error::called
-    end
-
-    it 'should return 1 on failure'
-      vault::errors
-      vault::create_s3_policy
-      assert equal "$?" "1"
+      exit::called_with "1"
     end
 
     unset ORG_ID
@@ -76,16 +71,10 @@ describe 'vault.sh'
       assert equal "${key}" "$S3_SECRET_KEY"
     end
 
-    it 'should report errors on failure'
+    it 'should exit 1 failure'
       vault::errors
       vault::set_s3_keys
-      rollbar::report_error::called
-    end
-
-    it 'should return 1 on failure'
-      vault::errors
-      vault::set_s3_keys
-      assert equal "$?" "1"
+      exit::called_with "1"
     end
 
     unset ORG_ID
@@ -94,4 +83,6 @@ describe 'vault.sh'
     vault::restore
     rollbar::report_error::restore
   end # end vault::set_s3_keys
+
+  exit::restore
 end # upstart.sh

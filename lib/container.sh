@@ -16,11 +16,11 @@ container::_start_swarm_container() {
 
   log::info "Starting swarm:${version} container"
   local docker_logs
-  docker_logs=`docker run \
+  docker_logs=$(docker run \
     -d --restart=always --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
-    "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"`
+    "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}")
 
   if [[ "$?" -gt "0" ]]; then
     local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
@@ -45,7 +45,7 @@ container::_start_registry_container() {
   vault::create_s3_policy "${bucket}"
   vault::set_s3_keys
   local docker_logs
-  docker_logs=`docker run \
+  docker_logs=$(docker run \
     -d --restart=always --name "${name}" \
     -p 80:5000 \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
@@ -55,7 +55,7 @@ container::_start_registry_container() {
     -e REGISTRY_STORAGE_S3_REGION="${region}" \
     -e REGISTRY_STORAGE_S3_ROOTDIRECTORY="/${ORG_ID}" \
     -e REGISTRY_STORAGE_S3_SECRETKEY="${S3_SECRET_KEY}" \
-    "${name}:${version}"`
+    "${name}:${version}")
 
 
   if [[ "$?" -gt "0" ]]; then

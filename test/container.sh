@@ -19,12 +19,8 @@ describe 'container.sh'
     stub rollbar::report_error
 
     it 'should run docker container'
-      local expectedArgs="run -d --restart=always --name swarm"
-      expectedArgs+=" swarm:${swarm_version}"
-      expectedArgs+=" join --addr=host_ip:4242"
-      expectedArgs+=" consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/swarm"
       container::_start_swarm_container
-      docker::called_with "$dockerArgs"
+      docker::called
     end
 
     it 'should report errors on failure'
@@ -61,22 +57,8 @@ describe 'container.sh'
     stub rollbar::report_error
 
     it 'should run docker container'
-      local expectedArgs="docker run"
-      expectedArgs+=" swarm:${registry_version}"
-      expectedArgs+="-d --restart=always --name ${image_name}"
-      expectedArgs+="-p 80:5000"
-      expectedArgs+="-e REGISTRY_HTTP_SECRET=${ORG_ID}"
-      expectedArgs+="-e REGISTRY_STORAGE=s3"
-      expectedArgs+="-e REGISTRY_STORAGE_S3_ACCESSKEY=${S3_ACCESS_KEY}"
-      expectedArgs+="-e REGISTRY_STORAGE_S3_BUCKET=${bucket}"
-      expectedArgs+="-e REGISTRY_STORAGE_S3_REGION=${region}"
-      expectedArgs+="-e REGISTRY_STORAGE_S3_ROOTDIRECTORY=/${ORG_ID}"
-      expectedArgs+="-e REGISTRY_STORAGE_S3_SECRETKEY=${S3_SECRET_KEY}"
-      expectedArgs+="${name}:${version}"
       container::_start_registry_container
-
-      docker::called_with "$dockerArgs"
-
+      docker::called
       vault::create_s3_policy::called_with "$bucket"
       vault::set_s3_keys::called
     end
