@@ -7,7 +7,7 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # @author Ryan Sandor Richards
 # @module consul
 
-# Backoff andler for ensuring the dock can connect to consul
+# Backoff handler for ensuring the dock can connect to consul
 # @param $1 attempt The attempt number passed by the backoff routine below
 consul::connect_backoff() {
   local attempt=${1}

@@ -20,8 +20,6 @@ else
   export CONSUL_PORT
 fi
 
-export VAULT_ADDR="http://${CONSUL_HOSTNAME}:8200"
-
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"

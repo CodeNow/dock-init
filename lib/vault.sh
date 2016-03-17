@@ -11,27 +11,30 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # $1 s3 bucket name
 vault::create_s3_policy() {
   local bucket="${1}"
+
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot create policy template for ${bucket}" \
+    "Attempting to create s3 policy template. ${OUTPUT}"
+
+  export VAULT_ADDR="http://${CONSUL_HOSTNAME}:8200"
   log::info "Attempting to create s3 policy template for bucket ${bucket}"
 
   local policy_template="${DOCK_INIT_BASE}/vault-resources/s3.policy"
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
   sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" | sed s/X_BUCKET/"${bucket}"/g > "${policy_location}"
 
-  local output
-  output="$(vault write aws/roles/s3-${ORG_ID} policy=@${policy_location})"
-  if [[ "$?" -gt "0" ]]; then
-    local data='{"output":'"${output}"'}'
-    rollbar::report_error \
-      "Dock-Init: Cannot create policy template" \
-      "failed to create s3 policy template" \
-      "${data}"
-    return 1
-  fi
-  log::trace "vault output: ${output}"
+  export OUTPUT="$(vault write aws/roles/s3-${ORG_ID} policy=@${policy_location})"
+  log::trace "vault output: ${OUTPUT}"
+  rollbar::clear_trap
 }
 
 # set S3_ACCESS_KEY and S3_SECRET_KEY
 vault::set_s3_keys() {
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot create policy template" \
+    "Attempting to create s3 policy template. ${OUTPUT}"
+
+  export VAULT_ADDR="http://${CONSUL_HOSTNAME}:8200"
   log::info "Attempting get s3 creds"
   # Key             Value
   # lease_id        aws/creds/deploy/7cb8df71-782f-3de1-79dd-251778e49f58
@@ -39,19 +42,9 @@ vault::set_s3_keys() {
   # access_key      AKIAIOMYUTSLGJOGLHTQ
   # secret_key      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
   # security_token  <nil>
-  local output
-  output="$(vault read aws/creds/s3-${ORG_ID})"
-  if [[ "$?" -gt "0" ]]; then
-    local data='{"output":'"${output}"'}'
-    rollbar::report_error \
-      "Dock-Init: Cannot create policy template" \
-      "failed get s3 credentials" \
-      "${data}"
-    return 1
-  fi
-  log::trace "vault output: ${output}"
+  export OUTPUT="$(vault read aws/creds/s3-${ORG_ID})"
 
-  export S3_ACCESS_KEY="$(echo ${output} | grep -o access_key.* | awk '{print $2}')"
-  export S3_SECRET_KEY="$(echo ${output} | grep -o secret_key.* | awk '{print $2}')"
-  log::trace "access_key: ${S3_ACCESS_KEY} secret_key: ${S3_SECRET_KEY} "
+  export S3_ACCESS_KEY="$(echo ${OUTPUT} | grep -o access_key.* | awk '{print $2}')"
+  export S3_SECRET_KEY="$(echo ${OUTPUT} | grep -o secret_key.* | awk '{print $2}')"
+  rollbar::clear_trap
 }
