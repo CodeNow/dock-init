@@ -17,7 +17,7 @@ container::_start_swarm_container() {
   log::info "Starting swarm:${version} container"
   local docker_logs
   docker_logs=`docker run \
-    -d --restart=always --name "${image_name}" \
+    -d --restart=always --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
     "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}"`
@@ -25,8 +25,8 @@ container::_start_swarm_container() {
   if [[ "$?" -gt "0" ]]; then
     local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
     rollbar::report_error \
-      "Dock-Init: Cannot Run ${image_name} Container" \
-      "Starting ${image_name} Container is failing." \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
       "${data}"
     return 1
   fi
@@ -46,7 +46,7 @@ container::_start_registry_container() {
   vault::set_s3_keys
   local docker_logs
   docker_logs=`docker run \
-    -d --restart=always --name "${image_name}" \
+    -d --restart=always --name "${name}" \
     -p 80:5000 \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
     -e REGISTRY_STORAGE=s3 \
@@ -61,8 +61,8 @@ container::_start_registry_container() {
   if [[ "$?" -gt "0" ]]; then
     local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
     rollbar::report_error \
-      "Dock-Init: Cannot Run ${image_name} Container" \
-      "Starting ${image_name} Container is failing." \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
       "${data}"
     return 1
   fi
