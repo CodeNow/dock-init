@@ -23,7 +23,7 @@ env API_URL={{ key "api/url" }}
 env DATADOG_HOST=localhost
 env DATADOG_PORT=8125
 
-env LOG_LEVEL=warning
+env LOG_LEVEL=warn
 
 start on (local-filesystems and net-device-up IFACE=eth0)
 stop on shutdown
