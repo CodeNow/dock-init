@@ -20,7 +20,7 @@ describe 'vault.sh'
       local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
 
       vault::create_s3_policy "${bucket}"
-      vault::called_with "write aws/roles/s3-${ORG_ID} policy"
+      vault::called_with "write aws_1yr/roles/s3-${ORG_ID} policy"
     end
 
     it 'should create policy'
@@ -60,7 +60,7 @@ describe 'vault.sh'
 
     it 'should run vault'
       vault::set_s3_keys
-      vault::called_with "read aws/creds/s3-${ORG_ID}"
+      vault::called_with "read aws_1yr/creds/s3-${ORG_ID}"
     end
 
     it 'should set S3_ACCESS_KEY'

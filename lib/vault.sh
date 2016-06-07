@@ -23,7 +23,7 @@ vault::create_s3_policy() {
   local policy_location="${DOCK_INIT_BASE}/vault-resources/s3.policy.json"
   sed s/X_ORG_ID/"${ORG_ID}"/g "${policy_template}" | sed s/X_BUCKET/"${bucket}"/g > "${policy_location}"
 
-  OUTPUT="$(vault write aws/roles/s3-${ORG_ID} policy=@${policy_location})"
+  OUTPUT="$(vault write aws_1yr/roles/s3-${ORG_ID} policy=@${policy_location})"
   export OUTPUT
   log::trace "vault output: ${OUTPUT}"
   rollbar::clear_trap
@@ -43,7 +43,7 @@ vault::set_s3_keys() {
   # access_key      AKIAIOMYUTSLGJOGLHTQ
   # secret_key      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
   # security_token  <nil>
-  OUTPUT="$(vault read aws/creds/s3-${ORG_ID})"
+  OUTPUT="$(vault read aws_1yr/creds/s3-${ORG_ID})"
   export OUTPUT
 
   S3_ACCESS_KEY="$(echo ${OUTPUT} | grep -o access_key.* | awk '{print $2}')"
