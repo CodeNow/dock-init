@@ -71,8 +71,9 @@ container::_start_registry_container() {
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
-  backoff container::_start_swarm_container
   backoff container::_start_registry_container
+  # swarm should be started last so we know everything is up
+  backoff container::_start_swarm_container
 }
 
 # Stops all dock container services
