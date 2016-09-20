@@ -73,8 +73,8 @@ dock::generate_etc_hosts() {
   log::info "Generating /etc/hosts"
 
   rollbar::fatal_trap \
-    "Dock-Init: Failed to Host Registry Entry" \
-    "Consule-Template was unable to realize the given template."
+    "Dock-Init: Failed to Add Host Registry Entry" \
+    "Consul-Template was unable to realize the registry template."
 
   local template=''
   template+="$DOCK_INIT_BASE/consul-resources/templates/hosts-registry.ctmpl"
