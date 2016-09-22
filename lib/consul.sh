@@ -7,6 +7,17 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # @author Ryan Sandor Richards
 # @module consul
 
+# Shoot yourself in the head if `jq` does not work.
+consul::test_jq() {
+  jq > /dev/null 2>&1 
+  if [ "0" -ne "${?}" ] ; then
+      log::fatal "This server does not have a functioning `jq`, dying."
+  fi
+  rollbar::fatal_trap "Dock-Init: Host has non-working jq executable."
+  rollbar::clear_trap
+  return 1
+}
+
 # Backoff handler for ensuring the dock can connect to consul
 # @param $1 attempt The attempt number passed by the backoff routine below
 consul::connect_backoff() {

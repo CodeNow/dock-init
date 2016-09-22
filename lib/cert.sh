@@ -42,7 +42,11 @@ cert::generate() {
     -new \
     -key "$CERT_PATH/key.pem" \
     -out "$CERT_PATH/server-$HOST_IP.csr"
-  chmod 400 "$CERT_PATH/server-$HOST_IP.csr"
+  if [ "0" -ne "${?}" ] ; then
+    return 1
+  else
+    chmod 400 "$CERT_PATH/server-$HOST_IP.csr"
+  fi
 
   # put host IP in alternate names
   echo "subjectAltName = IP:$HOST_IP,IP:127.0.0.1,DNS:localhost" > \
@@ -59,7 +63,11 @@ cert::generate() {
     -out "$CERT_PATH/cert.pem" \
     -extfile "$CERT_PATH/extfile-$HOST_IP.cnf" \
     -passin file:$CERT_PATH/pass
-  chmod 400 "$CERT_PATH/cert.pem"
+  if [ "0" -ne "${?}" ] ; then
+    return 1
+  else
+    chmod 400 "$CERT_PATH/cert.pem"
+  fi
 
   # Explicitly return success
   return 0
