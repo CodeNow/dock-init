@@ -177,7 +177,7 @@ describe 'util/rollbar.sh'
       it 'should set the correct trap'
         rollbar::fatal_trap 'title' 'message' 'data'
         local cmd="rollbar::report_error 'title' 'message' 'data'"
-        trap::called_with "$cmd; exit 1 ERR"
+        trap::called_with "$cmd; halter::halt ERR"
       end
     end # rollbar::fatal_trap
 

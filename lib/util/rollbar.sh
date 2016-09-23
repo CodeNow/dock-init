@@ -154,7 +154,7 @@ rollbar::fatal_trap() {
   local data=${3}
   local report_cmd="rollbar::report_error '${title}' '${message}' '${data}'"
 
-  trap "$report_cmd; halter:halt" ERR
+  trap "$report_cmd; halter::halt" ERR
 }
 
 

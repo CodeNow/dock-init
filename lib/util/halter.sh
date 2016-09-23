@@ -1,7 +1,9 @@
 #!/bin/bash
 
 halter::halt() {
-  if [[ "${DONT_HALT}" == "" ]]; then
+  if [[ "${HALT}" == "true" ]]; then
     halt
+  else
+    exit 1
   fi
 }
