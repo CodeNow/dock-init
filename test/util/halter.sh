@@ -9,21 +9,27 @@ describe 'halter.sh'
   describe 'halt'
     stub halt
     stub exit
-    unset HALT
+    unset USE_EXIT
 
-    it 'should halt if halt==true'
-      export HALT="true"
-      halter::halt
-      halt::called_once
-    end
-
-    it 'should exit if HALT not set'
-    unset HALT
+    it 'should exit if USE_EXIT is defined'
+      export USE_EXIT=true
       halter::halt
       exit::called_with 1
+      halt::not_called
     end
 
-    unset HALT
+    # reset stubs
+    exit::restore
+    stub exit
+
+    it 'should halt if USE_EXIT is not defined'
+      unset USE_EXIT
+      halter::halt
+      halt::called_once
+      exit::not_called
+    end
+
+    unset USE_EXIT
     halt::restore
     exit::restore
   end # halt

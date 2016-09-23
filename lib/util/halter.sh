@@ -1,9 +1,9 @@
 #!/bin/bash
 
 halter::halt() {
-  if [[ "${HALT}" == "true" ]]; then
-    halt
-  else
+  if [[ "${USE_EXIT}" == "true" ]]; then
     exit 1
+  else
+    halt
   fi
 }
