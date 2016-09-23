@@ -36,8 +36,7 @@ describe 'upstart.sh'
       local attempt=8
       upstart::upstart_services_with_backoff_params $attempt
 
-      local expected="filibuster 8 "
-      expected+="krain 8 charon 8 datadog-agent 8 "
+      local expected="krain 8 charon 8 datadog-agent 8 "
 
       assert equal "$expected" "$storage"
 
