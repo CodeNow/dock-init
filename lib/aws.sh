@@ -2,6 +2,7 @@
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/util/halter.sh"
 
 # AWS utility methods for the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
@@ -66,10 +67,9 @@ aws::get_org_id() {
     rollbar::report_error \
       "Dock-Init: Org ID is Empty After cut" \
       "Evidently the Org ID was bad, and we have an empty ORG_ID."
-    # we've failed, so just exit
-    exit 1
+    # we can not continue, halt
+    halter::halt
   fi
 
-  # Got it! Let's log it an gtfo
   log::info "Got Org ID: $ORG_ID"
 }

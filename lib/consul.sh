@@ -51,7 +51,7 @@ consul::configure_consul_template() {
   log::info "configuring consul-template"
   rollbar::fatal_trap \
     "Dock-Init: Failed to Render Template Config" \
-    "Consul-Template was unable to realize the given template."
+    "Consul-Template was unable to realize the config template."
 
   # expose VAULT_TOKEN for consul-template config
   local NODE_ENV=$(consul::get node/env)

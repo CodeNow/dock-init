@@ -21,6 +21,7 @@
 export LOG_LEVEL=none
 export DOCK_INIT_BASE=$(pwd)
 export HOST_IP='127.0.0.1'
+export USE_EXIT=true
 
 # See if the user passed a spcific test path
 test_path="$1"

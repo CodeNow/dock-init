@@ -82,7 +82,7 @@ describe 'util/rollbar.sh'
       stub log::info
       stub log::fatal
       stub log::warn
-      stub exit
+      stub halter::halt
     # end
 
     it 'should set default data when it is empty'
@@ -107,10 +107,10 @@ describe 'util/rollbar.sh'
         "https://api.rollbar.com/api/1/item/"
     end
 
-    it 'should exit if curl fails'
+    it 'should halter if curl fails'
       curl::errors
       rollbar::report 'level' 'title' 'message'
-      exit::called_once
+      halter::halt::called_once
     end
 
     it 'should log if curl fails'
@@ -126,7 +126,7 @@ describe 'util/rollbar.sh'
     end
 
     # after
-      exit::restore
+      halter::halt::restore
       log::info::restore
       log::fatal::restore
       log::warn::restore
@@ -177,7 +177,7 @@ describe 'util/rollbar.sh'
       it 'should set the correct trap'
         rollbar::fatal_trap 'title' 'message' 'data'
         local cmd="rollbar::report_error 'title' 'message' 'data'"
-        trap::called_with "$cmd; exit 1 ERR"
+        trap::called_with "$cmd; halter::halt ERR"
       end
     end # rollbar::fatal_trap
 

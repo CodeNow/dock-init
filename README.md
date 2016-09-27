@@ -138,13 +138,10 @@ NOTE: we should turn this into ansible script so we can auto generate AMIs.
   * `ca.pem`
 5. Download the following repositories to `/opt/runnable`:
   * `/opt/runnable/dock-init`
-  * `/opt/runnable/filibuster`
   * `/opt/runnable/krain`
 6. Place the service upstart scripts:
-  * `/etc/init/filibuster.conf`
   * `/etc/init/krain.conf`
 7. Place the upstart override "manual" files to prevent start on boot:
-  * `echo "manual" > /etc/init/filibuster.override`
   * `echo "manual" > /etc/init/krain.override`
   * `echo "manual" > /etc/init/docker.override`
 8. Save an AMI of the Instance via the [AWS Web Admin Panel](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)

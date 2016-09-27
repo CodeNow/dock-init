@@ -123,7 +123,6 @@ upstart::start_docker() {
 # @param $1 attempt Attempt number.
 upstart::upstart_services_with_backoff_params() {
   local attempt="${1}"
-  upstart::upstart_named_service "filibuster" $attempt
   upstart::upstart_named_service "krain" $attempt
   upstart::upstart_named_service "charon" $attempt
   upstart::upstart_service "datadog-agent" $attempt
@@ -161,7 +160,6 @@ upstart::start() {
 # Stops all dock services
 upstart::stop() {
   log::info "Stopping all dock upstart services"
-  service filibuster stop
   service krain stop
   service charon stop
   service docker stop

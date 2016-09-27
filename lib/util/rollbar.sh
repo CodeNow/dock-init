@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
+source "${DOCK_INIT_BASE}/lib/util/halter.sh"
 
 # Module for handling reporting to rollbar within dock-init bash scripts. This
 # module exposes various report_* and trap_* methods that can be used to easily
@@ -72,7 +73,7 @@ rollbar::report () {
   fi
 
   # trap a curl error here to print a fatal error.
-  trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; exit 1' ERR
+  trap 'log::fatal "COULD NOT REPORT TO ROLLBAR"; halter::halt' ERR
   local json
   json=$(rollbar::_get_payload "$level" "$title" "$message" "$data")
   curl -s -q -H "Content-Type: application/json" \
@@ -152,8 +153,10 @@ rollbar::fatal_trap() {
   local message=${2}
   local data=${3}
   local report_cmd="rollbar::report_error '${title}' '${message}' '${data}'"
-  trap "$report_cmd; exit 1" ERR
+
+  trap "$report_cmd; halter::halt" ERR
 }
+
 
 # Clears the previously set rollbar reporting error trap. See the example in the
 # `rollbar::error_trap` function for usage.
