@@ -17,7 +17,9 @@ container::_start_swarm_container() {
   log::info "Starting swarm:${version} container"
   local docker_logs
   docker_logs=$(docker run \
-    -d --restart=always --name "${name}" \
+    --detach=true \
+    --restart=always \
+    --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
     "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}")
@@ -36,7 +38,7 @@ container::_start_swarm_container() {
 container::_start_registry_container() {
   local name="registry"
   local version="$(consul::get ${name}/version)"
-  log::info "Starting registry:${version} container"
+  log::info "Starting ${name}:${version} container"
 
   local region="$(consul::get s3/region)"
   local bucket="$(consul::get s3/bucket)"
@@ -46,8 +48,10 @@ container::_start_registry_container() {
   vault::set_s3_keys
   local docker_logs
   docker_logs=$(docker run \
-    -d --restart=always --name "${name}" \
-    -p 80:5000 \
+    --detach=true \
+    --name "${name}" \
+    --restart=always \
+    --publish=80:5000 \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
     -e REGISTRY_STORAGE=s3 \
     -e REGISTRY_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
@@ -68,10 +72,38 @@ container::_start_registry_container() {
   fi
 }
 
+container::_start_cadvisor_container() {
+  local name="google/cadvisor"
+  local version="v0.24.1"
+
+  log::info "Starting ${name}:${version} container"
+  local docker_logs
+  docker_logs=$(docker run \
+    --name "${name}" \
+    --detach=true \
+    --restart=always \
+    --volume=/:/rootfs:ro \
+    --volume=/var/run:/var/run:rw \
+    --volume=/sys:/sys:ro \
+    --volume=/var/lib/docker/:/var/lib/docker:ro \
+    --publish=29007:29007 \
+    "${name}:${version}")
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
+    rollbar::report_error \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
+      "${data}"
+    return 1
+  fi
+}
+
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
   backoff container::_start_registry_container
+  backoff container::_start_cadvisor_container
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
 }
@@ -81,4 +113,5 @@ container::stop() {
   log::info "Stopping all dock container services"
   docker ps | awk '/swarm/ { print $1 }' | xargs docker kill
   docker ps | awk '/registry/ { print $1 }' | xargs docker kill
+  docker ps | awk '/cadvisor/ { print $1 }' | xargs docker kill
 }

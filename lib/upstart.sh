@@ -125,7 +125,6 @@ upstart::upstart_services_with_backoff_params() {
   local attempt="${1}"
   upstart::upstart_named_service "krain" $attempt
   upstart::upstart_named_service "charon" $attempt
-  upstart::upstart_service "datadog-agent" $attempt
 }
 
 # Pulls the latest docker image for the runnable image builder
