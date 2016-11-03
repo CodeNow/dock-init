@@ -79,14 +79,16 @@ container::_start_cadvisor_container() {
   log::info "Starting ${name}:${version} container"
   local docker_logs
   docker_logs=$(docker run \
-    --name "${name}" \
+    --name=cadvisor \
     --detach=true \
     --restart=always \
     --volume=/:/rootfs:ro \
     --volume=/var/run:/var/run:rw \
     --volume=/sys:/sys:ro \
     --volume=/var/lib/docker/:/var/lib/docker:ro \
-    --publish=29007:29007 \
+    --publish=29007:8080 \
+    --memory=100mb \
+    --memory-reservation=50mb \
     "${name}:${version}")
 
   if [[ "$?" -gt "0" ]]; then
