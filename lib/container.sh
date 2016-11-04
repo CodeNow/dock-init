@@ -101,11 +101,39 @@ container::_start_cadvisor_container() {
   fi
 }
 
+container::_start_node_exporter_container() {
+  local name="prom/node-exporter"
+  local version="0.12.0"
+
+  log::info "Starting ${name}:${version} container"
+  local docker_logs
+  docker_logs=$(docker run \
+    --name=node-exporter \
+    --detach=true \
+    --restart=always \
+    --net=host
+    --publish=29006:9100 \
+    --memory=100mb \
+    --memory-reservation=50mb \
+    "${name}:${version}")
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
+    rollbar::report_error \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
+      "${data}"
+    return 1
+  fi
+}
+
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container
+  backoff container::_start_node_exporter_container
+
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
 }
