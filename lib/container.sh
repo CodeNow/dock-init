@@ -111,7 +111,7 @@ container::_start_node_exporter_container() {
     --name=node-exporter \
     --detach=true \
     --restart=always \
-    --net=host
+    --net=host \
     --publish=29006:9100 \
     --memory=100mb \
     --memory-reservation=50mb \
