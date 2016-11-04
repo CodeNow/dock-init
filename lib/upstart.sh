@@ -10,6 +10,9 @@ source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
+export SWARM_VERSION="latest"
+export REGISTRY_VERSION="latest"
+
 # Generates upstart scripts for the dock
 upstart::generate_scripts() {
   log::info "Generating Upstart Scripts"
@@ -148,6 +151,20 @@ upstart::pull_image_builder() {
   fi
 }
 
+# Pulls the docker registry container
+upstart::pull_registry_container() {
+  local version="${REGISTRY_VERSION}"
+  log::info "Pull registry:latest container"
+  docker pull "registry:${latest}"
+}
+
+# Pulls the docker swarm container
+upstart::pull_swarm_container() {
+  local version="${SWARM_VERSION}"
+  log::info "Pull swarm:${version} container"
+  docker pull "swarm:${version}"
+}
+
 # Starts all services needed for the dock
 upstart::start() {
   log::info "Upstarting dock"
@@ -155,6 +172,8 @@ upstart::start() {
   upstart::start_docker
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services_with_backoff_params
+  upstart::pull_registry_container
+  upstart::pull_swarm_container
 }
 
 # Stops all dock services

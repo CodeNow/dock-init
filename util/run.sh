@@ -12,8 +12,8 @@ export LOG_LEVEL=trace
 export FETCH_ORIGIN_ALL=true
 
 # Stop any already running services from a previous test
-source ./lib/upstart.sh
-upstart::stop
+# source ./lib/upstart.sh
+# upstart::stop
 
 # Run the dock start script
-bash /opt/runnable/dock-init/init.sh
+# bash /opt/runnable/dock-init/init.sh
