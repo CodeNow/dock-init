@@ -112,10 +112,11 @@ container::_start_node_exporter_container() {
     --detach=true \
     --restart=always \
     --net=host \
-    --publish=29006:9100 \
     --memory=100mb \
     --memory-reservation=50mb \
-    "${name}:${version}")
+    "${name}:${version}" \
+    --collectors.enabled=conntrack,diskstats,filefd,filesystem,loadavg,meminfo,netdev,netstat,stat,time \
+    --web.listen-address=:29006)
 
   if [[ "$?" -gt "0" ]]; then
     local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
