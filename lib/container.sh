@@ -9,10 +9,13 @@ source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 
+export REGISTRY_VERSION=2.3.1
+export SWARM_VERSION=1.2.0
+
 # Starts the docker swarm container
 container::_start_swarm_container() {
   local name="swarm"
-  local version="$(consul::get ${name}/version)"
+  local version="${SWARM_VERSION}"
 
   log::info "Starting swarm:${version} container"
   local docker_logs
@@ -35,7 +38,7 @@ container::_start_swarm_container() {
 # Starts the docker registry container
 container::_start_registry_container() {
   local name="registry"
-  local version="$(consul::get ${name}/version)"
+  local version="${REGISTRY_VERSION}"
   log::info "Starting registry:${version} container"
 
   local region="$(consul::get s3/region)"

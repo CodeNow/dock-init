@@ -10,8 +10,8 @@ source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
-export SWARM_VERSION="latest"
-export REGISTRY_VERSION="latest"
+export REGISTRY_VERSION=2.3.1
+export SWARM_VERSION=1.2.0
 
 # Generates upstart scripts for the dock
 upstart::generate_scripts() {
@@ -155,7 +155,7 @@ upstart::pull_image_builder() {
 upstart::pull_registry_container() {
   local version="${REGISTRY_VERSION}"
   log::info "Pull registry:latest container"
-  docker pull "registry:${latest}"
+  docker pull "registry:${version}"
 }
 
 # Pulls the docker swarm container
