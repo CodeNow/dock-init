@@ -109,19 +109,48 @@ describe 'container.sh'
     rollbar::report_error::restore
   end # end container::_start_cadvisor_container
 
+  describe 'container::_start_node_exporter_container'
+    local cadvisor_version='v0.24.1'
+    stub docker
+    stub rollbar::report_error
+
+    it 'should run docker container'
+      container::_start_node_exporter_container
+      docker::called
+    end
+
+    it 'should report errors on failure'
+      docker::errors
+      container::_start_node_exporter_container
+      rollbar::report_error::called
+    end
+
+    it 'should return 1 on failure'
+      docker::errors
+      container::_start_node_exporter_container
+      assert equal "$?" "1"
+    end
+
+    docker::restore
+    rollbar::report_error::restore
+  end # end container::_start_node_exporter_container
+
   describe 'container::start'
     stub container::_start_registry_container
     stub container::_start_cadvisor_container
+    stub container::_start_node_exporter_container
     stub container::_start_swarm_container
 
     it 'should start all required containers'
     container::start
     container::_start_registry_container::called
     container::_start_cadvisor_container::called
+    container::_start_node_exporter_container::called
     container::_start_swarm_container::called
 
     container::_start_registry_container::restore
     container::_start_cadvisor_container::restore
+    container::_start_node_exporter_container::restore
     container::_start_swarm_container::restore
   end # end container::start
 end # container.sh
