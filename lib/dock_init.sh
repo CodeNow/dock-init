@@ -2,6 +2,7 @@
 # new bash first init script
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
+export HOST_IP=$(hostname -i)
 source "${DOCK_INIT_BASE}/util/run.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
@@ -14,5 +15,6 @@ rollbar::init
 consul::connect
 consul::get_environment
 consul::configure_consul_template
-
+dock::remove_docker_key_file
+dock::generate_certs
 upstart::start

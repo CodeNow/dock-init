@@ -32,10 +32,6 @@ main() {
   aws::get_org_id
   dock::set_hostname
   dock::set_config_org
-  dock::generate_certs
-  dock::generate_etc_hosts
-  dock::set_registry_host
-  dock::remove_docker_key_file
   container::start
   log::info "Init Done!"
 }
