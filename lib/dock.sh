@@ -110,18 +110,14 @@ dock::init() {
   consul::connect
   consul::get_environment
   consul::configure_consul_template
-  aws::get_org_id
 
   # Now that we have everything we need and consul is ready, initialize the dock
-  dock::set_hostname
-  dock::set_config_org
-  dock::generate_certs
   dock::generate_etc_hosts
   dock::set_registry_host
   dock::remove_docker_key_file
+  dock::generate_certs
   upstart::start
-  container::start
 
   # Give the all clear message!
-  log::info "Init Done!"
+  log::info "Dock Pool Init Done!"
 }
