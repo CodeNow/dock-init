@@ -9,13 +9,10 @@ source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 
-export REGISTRY_VERSION=2.3.1
-export SWARM_VERSION=1.2.0
-
 # Starts the docker swarm container
 container::_start_swarm_container() {
   local name="swarm"
-  local version="${SWARM_VERSION}"
+  local version="$(consul::get ${name}/version)"
 
   log::info "Starting swarm:${version} container"
   local docker_logs
@@ -38,7 +35,7 @@ container::_start_swarm_container() {
 # Starts the docker registry container
 container::_start_registry_container() {
   local name="registry"
-  local version="${REGISTRY_VERSION}"
+  local version="$(consul::get ${name}/version)"
   log::info "Starting registry:${version} container"
 
   local region="$(consul::get s3/region)"
@@ -71,6 +68,62 @@ container::_start_registry_container() {
   fi
 }
 
+container::_start_cadvisor_container() {
+  local name="google/cadvisor"
+  local version="$(consul::get ${name}/version)"
+
+  log::info "Starting ${name}:${version} container"
+  local docker_logs
+  docker_logs=$(docker run \
+    --name=cadvisor \
+    --detach=true \
+    --restart=always \
+    --volume=/:/rootfs:ro \
+    --volume=/var/run:/var/run:rw \
+    --volume=/sys:/sys:ro \
+    --volume=/var/lib/docker/:/var/lib/docker:ro \
+    --publish=29007:8080 \
+    --memory=100mb \
+    --memory-reservation=50mb \
+    "${name}:${version}")
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
+    rollbar::report_error \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
+      "${data}"
+    return 1
+  fi
+}
+
+container::_start_node_exporter_container() {
+  local name="prom/node-exporter"
+  local version="$(consul::get ${name}/version)"
+
+  log::info "Starting ${name}:${version} container"
+  local docker_logs
+  docker_logs=$(docker run \
+    --name=node-exporter \
+    --detach=true \
+    --restart=always \
+    --net=host \
+    --memory=100mb \
+    --memory-reservation=50mb \
+    "${name}:${version}" \
+    --collectors.enabled=conntrack,diskstats,filefd,filesystem,loadavg,meminfo,netdev,netstat,stat,time \
+    --web.listen-address=:29006)
+
+  if [[ "$?" -gt "0" ]]; then
+    local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
+    rollbar::report_error \
+      "Dock-Init: Cannot Run ${name} Container" \
+      "Starting ${name} Container is failing." \
+      "${data}"
+    return 1
+  fi
+}
+
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
@@ -78,6 +131,9 @@ container::start() {
   rm /var/run/docker.pid
   service docker start
   backoff container::_start_registry_container
+  backoff container::_start_cadvisor_container
+  backoff container::_start_node_exporter_container
+
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
 }
@@ -87,4 +143,5 @@ container::stop() {
   log::info "Stopping all dock container services"
   docker ps | awk '/swarm/ { print $1 }' | xargs docker kill
   docker ps | awk '/registry/ { print $1 }' | xargs docker kill
+  docker ps | awk '/cadvisor/ { print $1 }' | xargs docker kill
 }
