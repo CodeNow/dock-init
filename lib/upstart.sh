@@ -162,10 +162,10 @@ upstart::start() {
   upstart::start_docker
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services_with_backoff_params
-  upstart::pull_docker_container registry
-  upstart::pull_docker_container swarm
-  upstart::pull_docker_container google/cadvisor
-  upstart::pull_docker_container prom/node-exporter
+  upstart::pull_docker_image registry
+  upstart::pull_docker_image swarm
+  upstart::pull_docker_image google/cadvisor
+  upstart::pull_docker_image prom/node-exporter
 }
 
 # Stops all dock services
