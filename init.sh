@@ -10,7 +10,13 @@
 # @author Ryan Sandor Richards
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
+export CONSUL_HOSTNAME=10.4.5.144
 export HOST_IP=$(hostname -i)
+export CONSUL_PORT=8500
+export DONT_DELETE_KEYS=true
+export USE_EXIT=true
+export LOG_LEVEL=trace
+export FETCH_ORIGIN_ALL=true
 
 if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
