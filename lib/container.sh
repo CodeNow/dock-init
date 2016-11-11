@@ -127,8 +127,6 @@ container::_start_node_exporter_container() {
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
-  service docker stop
-  rm /var/run/docker.pid
   service docker start
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container

@@ -29,6 +29,7 @@ main() {
   consul::connect
   consul::get_environment
   consul::configure_consul_template
+  dock::generate_certs
   aws::get_org_id
   dock::set_hostname
   dock::set_config_org
