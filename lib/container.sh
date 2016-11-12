@@ -128,6 +128,7 @@ container::_start_node_exporter_container() {
 container::start() {
   log::info "Starting container services"
   service docker start
+  sleep 5
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container
   backoff container::_start_node_exporter_container
