@@ -128,13 +128,14 @@ container::_start_node_exporter_container() {
 container::start() {
   log::info "Starting container services"
   service docker start
-  sleep 5
+  sleep 10
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container
   backoff container::_start_node_exporter_container
 
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
+  docker ps | awk '/swarm/ { print $1 }' | xargs docker restart
 }
 
 # Stops all dock container services
