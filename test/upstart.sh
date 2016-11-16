@@ -26,25 +26,6 @@ describe 'upstart.sh'
     rollbar::clear_trap::restore
   end
 
-  describe 'upstart::upstart_services_with_backoff_params'
-    it 'should start all our services'
-      local storage=""
-      serviceStub() { storage+="$@ "; }
-      stub::exec upstart::upstart_named_service serviceStub
-      stub::exec upstart::upstart_service serviceStub
-
-      local attempt=8
-      upstart::upstart_services_with_backoff_params $attempt
-
-      local expected="krain 8 charon 8 datadog-agent 8 "
-
-      assert equal "$expected" "$storage"
-
-      upstart::upstart_named_service::restore
-      upstart::upstart_service::restore
-    end
-  end
-
   describe 'upstart::pull_image_builder'
     local image_builder_version='v1.2.3'
     stub rollbar::report_warning

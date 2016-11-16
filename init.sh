@@ -39,7 +39,6 @@ main() {
   consul::connect
   consul::get_environment
   consul::configure_consul_template
-  backoff upstart::upstart_services_with_backoff_params
   dock::generate_certs
   aws::get_org_id
   dock::set_hostname
