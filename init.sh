@@ -10,9 +10,7 @@
 # @author Ryan Sandor Richards
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
-export CONSUL_HOSTNAME=10.4.5.144
 export HOST_IP=$(hostname -i)
-export CONSUL_PORT=8500
 export DONT_DELETE_KEYS=true
 export USE_EXIT=true
 export LOG_LEVEL=trace
@@ -22,6 +20,12 @@ if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
 else
   export CONSUL_PORT
+fi
+
+if [ -z "${CONSUL_HOSTNAME+x}" ]; then
+  export CONSUL_HOSTNAME=10.4.5.144
+else
+  export CONSUL_HOSTNAME
 fi
 
 source "${DOCK_INIT_BASE}/lib/consul.sh"
@@ -35,6 +39,7 @@ main() {
   consul::connect
   consul::get_environment
   consul::configure_consul_template
+  backoff upstart::upstart_services_with_backoff_params
   dock::generate_certs
   aws::get_org_id
   dock::set_hostname

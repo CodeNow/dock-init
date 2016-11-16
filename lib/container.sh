@@ -7,6 +7,7 @@ source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/upstart.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 # Starts the docker swarm container
@@ -127,8 +128,7 @@ container::_start_node_exporter_container() {
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
-  service docker start
-  sleep 10
+  upstart::start_docker
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container
   backoff container::_start_node_exporter_container

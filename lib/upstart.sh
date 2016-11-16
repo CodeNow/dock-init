@@ -105,7 +105,7 @@ upstart::start_docker() {
 
   log::info "Waiting for Docker"
   local attempt=1
-  local timeout=1
+  local timeout=.5
   while [ ! -e /var/run/docker.sock ]
   do
     log::info "Docker Sock N/A ($attempt)"
@@ -115,7 +115,6 @@ upstart::start_docker() {
     rollbar::report_warning "${title}" "${message}" "$data"
     sleep $timeout
     attempt=$(( attempt + 1 ))
-    timeout=$(( timeout * 2 ))
   done
 }
 
@@ -126,6 +125,7 @@ upstart::upstart_services_with_backoff_params() {
   upstart::upstart_named_service "krain" $attempt
   upstart::upstart_named_service "charon" $attempt
   upstart::upstart_service "datadog-agent" $attempt
+  upstart::upstart_service "docker" $attempt
 }
 
 # Pulls the latest docker image for the runnable image builder
