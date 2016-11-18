@@ -18,7 +18,9 @@ container::_start_swarm_container() {
   log::info "Starting swarm:${version} container"
   local docker_logs
   docker_logs=$(docker run \
-    -d --restart=always --name "${name}" \
+    --detach=true \
+    --restart=always \
+    --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
     "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}")
@@ -37,7 +39,7 @@ container::_start_swarm_container() {
 container::_start_registry_container() {
   local name="registry"
   local version="$(consul::get ${name}/version)"
-  log::info "Starting registry:${version} container"
+  log::info "Starting ${name}:${version} container"
 
   local region="$(consul::get s3/region)"
   local bucket="$(consul::get s3/bucket)"
@@ -47,8 +49,10 @@ container::_start_registry_container() {
   vault::set_s3_keys
   local docker_logs
   docker_logs=$(docker run \
-    -d --restart=always --name "${name}" \
-    -p 80:5000 \
+    --detach=true \
+    --name "${name}" \
+    --restart=always \
+    --publish=80:5000 \
     -e REGISTRY_HTTP_SECRET="${ORG_ID}" \
     -e REGISTRY_STORAGE=s3 \
     -e REGISTRY_STORAGE_S3_ACCESSKEY="${S3_ACCESS_KEY}" \
