@@ -125,7 +125,6 @@ upstart::upstart_services_with_backoff_params() {
   upstart::upstart_named_service "krain" $attempt
   upstart::upstart_named_service "charon" $attempt
   upstart::upstart_service "datadog-agent" $attempt
-  upstart::upstart_service "docker" $attempt
 }
 
 # Pulls the latest docker image for the runnable image builder
@@ -148,13 +147,6 @@ upstart::pull_image_builder() {
   fi
 }
 
-upstart::pull_docker_image() {
-  local name="${1}"
-  local version="$(consul::get $name/version)"
-  log::info "Pull ${name}:latest container"
-  docker pull "${name}:${version}"
-}
-
 # Starts all services needed for the dock
 upstart::start() {
   log::info "Upstarting dock"
@@ -162,10 +154,6 @@ upstart::start() {
   upstart::start_docker
   backoff upstart::pull_image_builder
   backoff upstart::upstart_services_with_backoff_params
-  upstart::pull_docker_image registry
-  upstart::pull_docker_image swarm
-  upstart::pull_docker_image google/cadvisor
-  upstart::pull_docker_image prom/node-exporter
 }
 
 # Stops all dock services
