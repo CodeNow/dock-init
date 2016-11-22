@@ -10,16 +10,6 @@ source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
-# Generates upstart scripts for the dock
-upstart::generate_scripts() {
-  log::info "Generating Upstart Scripts"
-  rollbar::fatal_trap \
-    "Dock-Init: Failed to Generate Upstart Script" \
-    "Failed to generate the upstart scripts."
-  upstart::generate_scripts
-  rollbar::clear_trap
-}
-
 # Configures the template for a given service
 # @param $1 name Name of the service
 # @param $2 path Path to the servic
