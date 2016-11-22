@@ -128,9 +128,9 @@ upstart::upstart_services_with_backoff_params() {
   upstart::upstart_service "datadog-agent" $attempt
 }
 
-# Pulls the latest docker image for the runnable image builder
+# Backoff handler for pulling the latest image builder
 # @param $1 attempt The current attempt for pulling image builder
-upstart::pull_image_builder() {
+upstart::pull_image_builder_backoff() {
   local attempt="${1}"
   local name="image-builder"
   local version="$(consul::get $name/version)"
@@ -153,7 +153,7 @@ upstart::start() {
   log::info "Upstarting dock"
   upstart::generate_scripts
   upstart::start_docker
-  backoff upstart::pull_image_builder
+  backoff upstart::pull_image_builder_backoff
   backoff upstart::upstart_services_with_backoff_params
 }
 
