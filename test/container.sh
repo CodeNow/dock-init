@@ -140,6 +140,8 @@ describe 'container.sh'
     stub container::_start_cadvisor_container
     stub container::_start_node_exporter_container
     stub container::_start_swarm_container
+    stub upstart::start_docker
+    stub docker
 
     it 'should start all required containers'
     container::start
@@ -147,6 +149,7 @@ describe 'container.sh'
     container::_start_cadvisor_container::called
     container::_start_node_exporter_container::called
     container::_start_swarm_container::called
+    upstart::start_docker::called
 
     container::_start_registry_container::restore
     container::_start_cadvisor_container::restore
