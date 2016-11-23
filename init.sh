@@ -2,19 +2,10 @@
 
 # Entry-point script for dock initialization. Simply includes the `lib/dock.sh`
 # library and calls the master initialization function.
-#
-# NOTE This script will automatically update the `lib/` directory before
-#      the dock is initialized. This means that this script itself will not be
-#      automatically updated. To do so a new AMI must be baked.
-#
 # @author Ryan Sandor Richards
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export HOST_IP=$(hostname -i)
-export DONT_DELETE_KEYS=true
-export USE_EXIT=true
-export LOG_LEVEL=trace
-export FETCH_ORIGIN_ALL=true
 
 if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
