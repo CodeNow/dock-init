@@ -139,7 +139,10 @@ container::start() {
 
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
-  docker ps | awk '/swarm/ { print $1 }' | xargs docker restart
+  # currently @henrymollman does not understand why restarting swarm works
+  # but without this line docker-listener will time out getting events
+  # and the stream will close. this is an intermittent error however
+  docker restart swarm
 }
 
 # Stops all dock container services
