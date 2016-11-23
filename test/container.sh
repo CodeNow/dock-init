@@ -155,5 +155,6 @@ describe 'container.sh'
     container::_start_cadvisor_container::restore
     container::_start_node_exporter_container::restore
     container::_start_swarm_container::restore
+    upstart::start_docker::restore
   end # end container::start
 end # container.sh

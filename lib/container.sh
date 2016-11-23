@@ -13,7 +13,7 @@ source "${DOCK_INIT_BASE}/lib/vault.sh"
 # Starts the docker swarm container
 container::_start_swarm_container() {
   local name="swarm"
-  local version="$(consul::get ${name}/version)"
+  local version="1.2.5"
 
   log::info "Starting swarm:${version} container"
   local docker_logs
@@ -38,7 +38,7 @@ container::_start_swarm_container() {
 # Starts the docker registry container
 container::_start_registry_container() {
   local name="registry"
-  local version="$(consul::get ${name}/version)"
+  local version="2.3.1"
   log::info "Starting ${name}:${version} container"
 
   local region="$(consul::get s3/region)"
@@ -75,7 +75,7 @@ container::_start_registry_container() {
 
 container::_start_cadvisor_container() {
   local name="google/cadvisor"
-  local version="$(consul::get ${name}/version)"
+  local version="v0.24.1"
 
   log::info "Starting ${name}:${version} container"
   local docker_logs
@@ -104,7 +104,7 @@ container::_start_cadvisor_container() {
 
 container::_start_node_exporter_container() {
   local name="prom/node-exporter"
-  local version="$(consul::get ${name}/version)"
+  local version="0.12.0"
 
   log::info "Starting ${name}:${version} container"
   local docker_logs
