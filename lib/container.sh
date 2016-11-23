@@ -7,12 +7,13 @@ source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
+source "${DOCK_INIT_BASE}/lib/upstart.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 
 # Starts the docker swarm container
 container::_start_swarm_container() {
   local name="swarm"
-  local version="$(consul::get ${name}/version)"
+  local version="1.2.5"
 
   log::info "Starting swarm:${version} container"
   local docker_logs
@@ -37,7 +38,7 @@ container::_start_swarm_container() {
 # Starts the docker registry container
 container::_start_registry_container() {
   local name="registry"
-  local version="$(consul::get ${name}/version)"
+  local version="2.3.1"
   log::info "Starting ${name}:${version} container"
 
   local region="$(consul::get s3/region)"
@@ -131,12 +132,17 @@ container::_start_node_exporter_container() {
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
+  upstart::start_docker
   backoff container::_start_registry_container
   backoff container::_start_cadvisor_container
   backoff container::_start_node_exporter_container
 
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
+  # currently @henrymollman does not understand why restarting swarm works
+  # but without this line docker-listener will time out getting events
+  # and the stream will close. this is an intermittent error however
+  docker restart swarm
 }
 
 # Stops all dock container services
