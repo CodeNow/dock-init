@@ -120,8 +120,9 @@ container::_start_node_exporter_container() {
     --memory-reservation=50mb \
     "${name}:${version}" \
     --collectors.enabled=conntrack,diskstats,filefd,filesystem,loadavg,meminfo,netdev,netstat,stat,time \
-    --collector.procfs /host/proc \
-    --collector.sysfs /host/sys \
+    --collector.procfs=/host/proc \
+    --collector.sysfs=/host/sys \
+    --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)" \
     --web.listen-address=:29006)
 
   if [[ "$?" -gt "0" ]]; then
