@@ -104,7 +104,7 @@ container::_start_cadvisor_container() {
 
 container::_start_node_exporter_container() {
   local name="prom/node-exporter"
-  local version="0.12.0"
+  local version="v0.13.0"
 
   log::info "Starting ${name}:${version} container"
   local docker_logs
@@ -122,7 +122,7 @@ container::_start_node_exporter_container() {
     --collectors.enabled=conntrack,diskstats,filefd,filesystem,loadavg,meminfo,netdev,netstat,stat,time \
     --collector.procfs=/host/proc \
     --collector.sysfs=/host/sys \
-    --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)" \
+    --collector.filesystem.ignored-mount-points="/rootfs/docker/aufs|/sys|/etc|/proc|/dev|/rootfs/run|/$" \
     --web.listen-address=:29006)
 
   if [[ "$?" -gt "0" ]]; then
