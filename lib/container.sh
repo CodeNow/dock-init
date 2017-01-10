@@ -113,10 +113,15 @@ container::_start_node_exporter_container() {
     --detach=true \
     --restart=always \
     --net=host \
+    --volume=/proc:/host/proc \
+    --volume=/sys:/host/sys \
+    --volume=/:/rootfs \
     --memory=100mb \
     --memory-reservation=50mb \
     "${name}:${version}" \
     --collectors.enabled=conntrack,diskstats,filefd,filesystem,loadavg,meminfo,netdev,netstat,stat,time \
+    --collector.procfs /host/proc \
+    --collector.sysfs /host/sys \
     --web.listen-address=:29006)
 
   if [[ "$?" -gt "0" ]]; then

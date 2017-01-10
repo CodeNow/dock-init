@@ -19,10 +19,13 @@ else
   export CONSUL_HOSTNAME
 fi
 
+export DOCKER_NETWORK=172.17.0.0/16
+
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
+source "${DOCK_INIT_BASE}/lib/iptables.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 # Initializes the dock
@@ -35,6 +38,8 @@ main() {
   dock::set_hostname
   dock::set_config_org
   container::start
+  # rules must be run after docker has started
+  iptables::run_rules
   log::info "Init Done!"
 }
 
