@@ -26,7 +26,7 @@ else
 fi
 
 if [ -z "${VAULT_HOSTNAME+x}" ]; then
-  export VAULT_HOSTNAME=CONSUL_HOSTNAME
+  export VAULT_HOSTNAME=$CONSUL_HOSTNAME
 else
   export VAULT_HOSTNAME
 fi
