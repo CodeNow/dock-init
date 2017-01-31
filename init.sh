@@ -19,6 +19,18 @@ else
   export CONSUL_HOSTNAME
 fi
 
+if [ -z "${VAULT_PORT+x}" ]; then
+  export VAULT_PORT=8200
+else
+  export VAULT_PORT
+fi
+
+if [ -z "${VAULT_HOSTNAME+x}" ]; then
+  export VAULT_HOSTNAME=CONSUL_HOSTNAME
+else
+  export VAULT_HOSTNAME
+fi
+
 export DOCKER_NETWORK=172.17.0.0/16
 
 source "${DOCK_INIT_BASE}/lib/consul.sh"

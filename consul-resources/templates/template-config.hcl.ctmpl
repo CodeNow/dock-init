@@ -1,7 +1,7 @@
 consul = "{{ env "CONSUL_HOSTNAME" }}:{{ env "CONSUL_PORT" }}"
 
 vault {
-	address = "http://{{ env "CONSUL_HOSTNAME" }}:8200"
+	address = "http://{{ env "VAULT_HOSTNAME" }}:{{ VAULT_PORT }}"
 	token = "{{ env "VAULT_TOKEN" }}"
 	renew = false
 }
