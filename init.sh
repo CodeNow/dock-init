@@ -6,6 +6,7 @@
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export HOST_IP=$(hostname -i)
+source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
@@ -39,7 +40,6 @@ source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
-source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 # Initializes the dock
 main() {
