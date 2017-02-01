@@ -14,7 +14,8 @@ else
 fi
 
 if [ -z "${CONSUL_HOSTNAME+x}" ]; then
-  export CONSUL_HOSTNAME=10.4.5.144
+  log::fatal "CONSUL_HOSTNAME is not defined"
+  exit 1
 else
   export CONSUL_HOSTNAME
 fi
