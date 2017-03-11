@@ -12,10 +12,10 @@ iptables::run_rules() {
 
   # drop all new traffic from container ip to runnable infra
   iptables -I FORWARD -s ${DOCKER_NETWORK} -d 10.0.0.0/8 -m state --state NEW -j DROP
-  # log container traffic for PSAD
-  iptables -I FORWARD -s ${DOCKER_NETWORK} -j LOG
+
   # drop all local container to container traffic
   iptables -I FORWARD -s ${DOCKER_NETWORK} -d ${DOCKER_NETWORK} -j DROP
+
   # allow consul access (should be before drop)
   iptables -I FORWARD -s ${DOCKER_NETWORK} -d ${CONSUL_HOSTNAME} -j ACCEPT
 
