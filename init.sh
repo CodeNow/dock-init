@@ -6,6 +6,7 @@
 
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export HOST_IP=$(hostname -i)
+source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 if [ -z "${CONSUL_PORT+x}" ]; then
   export CONSUL_PORT=8500
@@ -14,9 +15,22 @@ else
 fi
 
 if [ -z "${CONSUL_HOSTNAME+x}" ]; then
-  export CONSUL_HOSTNAME=10.4.5.144
+  log::fatal "CONSUL_HOSTNAME is not defined"
+  exit 1
 else
   export CONSUL_HOSTNAME
+fi
+
+if [ -z "${VAULT_PORT+x}" ]; then
+  export VAULT_PORT=8200
+else
+  export VAULT_PORT
+fi
+
+if [ -z "${VAULT_HOSTNAME+x}" ]; then
+  export VAULT_HOSTNAME=$CONSUL_HOSTNAME
+else
+  export VAULT_HOSTNAME
 fi
 
 export DOCKER_NETWORK=172.17.0.0/16
@@ -26,7 +40,6 @@ source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
-source "${DOCK_INIT_BASE}/lib/util/log.sh"
 
 # Initializes the dock
 main() {
