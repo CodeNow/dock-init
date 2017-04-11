@@ -45,8 +45,11 @@ container::_start_registry_container() {
   local bucket="$(consul::get s3/bucket)"
   log::trace "region: ${region} bucket: ${bucket}"
 
-  vault::create_s3_policy "${bucket}"
-  vault::set_s3_keys
+  if [ -z ${S3_ACCESS_KEY+x} ] || [ -z ${S3_SECRET_KEY+x} ]; then
+    vault::create_s3_policy "${bucket}"
+    vault::set_s3_keys
+  fi
+
   local docker_logs
   docker_logs=$(docker run \
     --detach=true \
