@@ -46,6 +46,7 @@ container::_start_registry_container() {
   log::trace "region: ${region} bucket: ${bucket}"
 
   if [ -z ${S3_ACCESS_KEY+x} ] || [ -z ${S3_SECRET_KEY+x} ]; then
+    log::info "Creating S3 credentials"
     vault::create_s3_policy "${bucket}"
     vault::set_s3_keys
   fi
