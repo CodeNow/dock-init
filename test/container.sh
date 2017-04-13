@@ -48,8 +48,7 @@ describe 'container.sh'
     local region="${registry_version}"
     local bucket="${registry_version}"
     export ORG_ID='runnabear'
-    export S3_ACCESS_KEY='thatKey'
-    export S3_SECRET_KEY='datSecret'
+
     stub::returns 'consul::get' "$registry_version"
     stub docker
     stub vault::create_s3_policy
