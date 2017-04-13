@@ -45,22 +45,26 @@ aws::get_org_id() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to Render Org Script" \
     "Consule-Template was unable to realize the given template."
+  if [ -z ${AWS_ACCESS_KEY+x} ] || [ -z ${AWS_SECRET_KEY+x} ]; then
+    ORG_SCRIPT=$DOCK_INIT_BASE/util/get-org-id.sh
 
-  ORG_SCRIPT=$DOCK_INIT_BASE/util/get-org-id.sh
+    local config="$DOCK_INIT_BASE/consul-resources/template-config.hcl"
+    local template="$DOCK_INIT_BASE"
+    template+="/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT"
 
-  local config="$DOCK_INIT_BASE/consul-resources/template-config.hcl"
-  local template="$DOCK_INIT_BASE"
-  template+="/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT"
+    consul-template -config="${config}" -once -template="${template}"
 
-  consul-template -config="${config}" -once -template="${template}"
+    rollbar::clear_trap
 
-  rollbar::clear_trap
+    # give amazon a chance to get the auth
+    sleep 5
 
-  # give amazon a chance to get the auth
-  sleep 5
-
-  # Attempt to fetch the org id from the tags via the fetch script
-  backoff aws::fetch_org_id_from_tags
+    # Attempt to fetch the org id from the tags via the fetch script
+    backoff aws::fetch_org_id_from_tags
+  else
+    log::info "Taking aws creds from system"
+    backoff aws::get_org_id_onprem
+  fi
 
   if [[ "$ORG_ID" == "" ]]; then
     # this will print an error, so that's good
@@ -72,4 +76,37 @@ aws::get_org_id() {
   fi
 
   log::info "Got Org ID: $ORG_ID"
+}
+
+aws::get_org_id_onprem() {
+  local attempt=${1}
+  log::info 'Attempting to get org id on prem'
+  data='{"attempt":'"${attempt}"'}'
+
+  rollbar::warning_trap \
+    "Dock-Init: Cannot Fetch Org" \
+    "Attempting to get the Org Tag from AWS and failing." \
+    "$data"
+
+  EC2_HOME=/usr/local/ec2
+  export EC2_HOME
+
+  JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
+  export JAVA_HOME
+
+  local instance_id=$(ec2-metadata -i | awk '{print $2}')
+
+  # Note: this only works for us-.{4}-\d
+  local region=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
+
+  ORG_ID=$(bash /usr/local/ec2/bin/ec2-describe-tags \
+    --aws-access-key="${AWS_ACCESS_KEY}" \
+    --aws-secret-key="${AWS_SECRET_KEY}" \
+    --filter "resource-type=instance" \
+    --filter "resource-id=${instance_id}" \
+    --filter "key=org" \
+    --region "${region}" \
+    | awk '{print $5}')
+
+  export ORG_ID
 }
