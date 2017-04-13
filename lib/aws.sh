@@ -63,7 +63,6 @@ aws::get_org_id() {
     backoff aws::fetch_org_id_from_tags
   else
     log::info "Taking aws creds from system"
-    sleep 5
     backoff aws::get_org_id_onprem
   fi
 

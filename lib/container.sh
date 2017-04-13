@@ -49,6 +49,8 @@ container::_start_registry_container() {
     log::info "Creating S3 credentials"
     vault::create_s3_policy "${bucket}"
     vault::set_s3_keys
+  else
+    log::info "S3 Credentials already created, setting s3 bucket for registry"
   fi
 
   local docker_logs

@@ -66,6 +66,8 @@ consul::configure_consul_template() {
       template+=":$DOCK_INIT_BASE/consul-resources/template-config.hcl"
 
       consul-template -once -template="$template"
+    else
+      log::info "AWS access key and secret already created, skipping template creation"
     fi
   rollbar::clear_trap
 }
