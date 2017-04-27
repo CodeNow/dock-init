@@ -4,7 +4,7 @@
 # Note that this will have no effect if the `DONT_DELETE_KEYS` environment has
 # been set (useful for testing)
 cleanup::exit_trap() {
-  # Delete the keys unless the `DO_NOT_DELETE` flag is set
+  # Delete the keys unless the `DONT_DELETE_KEYS` flag is set
   if [[ "${DONT_DELETE_KEYS}" == "" ]]; then
     log::info '[CLEANUP TRAP] Removing Keys'
     rm -f "${CERT_PATH}"/ca-key.pem \
