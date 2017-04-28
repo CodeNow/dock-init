@@ -40,9 +40,12 @@ source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
+source "${DOCK_INIT_BASE}/lib/cleanup.sh"
 
 # Initializes the dock
 main() {
+  # Make sure to setup the exit trap first so we never have a dock with creds hanging about
+  cleanup::set_exit_trap
   consul::connect
   consul::get_environment
   consul::configure_consul_template
