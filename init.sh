@@ -53,6 +53,7 @@ main() {
   aws::get_org_id
   dock::set_hostname
   dock::set_config_org
+  dock::store_vault_token
   container::start
   # rules must be run after docker has started
   iptables::run_rules
