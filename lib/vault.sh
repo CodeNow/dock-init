@@ -4,6 +4,7 @@
 # @author Anandkumar Patel
 # @module vault
 
+source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
@@ -51,4 +52,25 @@ vault::set_s3_keys() {
   S3_SECRET_KEY="$(echo ${OUTPUT} | grep -o secret_key.* | awk '{print $2}')"
   export S3_SECRET_KEY
   rollbar::clear_trap
+}
+
+# creates a token for a specific policy
+vault::store_private_registry_token() {
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot create private registry token" \
+    "Attempting to create private registry token. ${OUTPUT}"
+  # export VAULT_ADDR="/* new host */"
+  log::info "Storing vault token for private registry key"
+  local NODE_ENV=$(consul::get node/env)
+  export VAULT_ADDR="http://${VAULT_HOSTNAME}:${VAULT_PORT}"
+  POLICY=$(vault policies | grep "^${POPPA_ID}\b")
+  log::info "checked vault policies"
+  if [[ $POLICY ]]; then
+    log::info "Policy found for $POPPA_ID, generating token"
+  else
+    log::info "Creating new policy and token for $POPPA_ID"
+    sed "s/{{bpid}}/${POPPA_ID}/g" "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.tmpl" > "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
+    vault policy-write ${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
+  fi
+  vault token-create -policy=${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  {print $1 }' > /opt/runnable/dock-init/private-token
 }

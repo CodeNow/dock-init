@@ -42,8 +42,6 @@ aws::get_org_id() {
     aws::get_aws_creds
   fi
 
-  log::info "access key $AWS_ACCESS_KEY"
-  log::info "secret key $AWS_SECRET_KEY"
   backoff aws::get_org_id_onprem
 
   if [[ "$ORG_ID" == "" ]]; then
@@ -93,7 +91,7 @@ aws::get_org_id_onprem() {
 
 # Fetches the poppa tags from EC2 and sets it to the `POPPA_ID` environment variable
 aws::get_poppa_id() {
-  log::info "Setting Poppa ID $AWS_ACCESS_KEY $AWS_SECRET_KEY"
+  log::info "Setting Poppa ID"
 
   # Generate the org-tag fetching script
   rollbar::fatal_trap \

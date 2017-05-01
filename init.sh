@@ -54,7 +54,7 @@ main() {
   aws::get_poppa_id
   dock::set_hostname
   dock::set_config_org
-  dock::store_vault_token
+  vault::store_private_registry_token
   container::start
   # rules must be run after docker has started
   iptables::run_rules
