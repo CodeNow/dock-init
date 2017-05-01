@@ -51,6 +51,7 @@ main() {
   consul::configure_consul_template
   dock::generate_certs
   aws::get_org_id
+  aws::get_poppa_id
   dock::set_hostname
   dock::set_config_org
   dock::store_vault_token
