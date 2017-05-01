@@ -56,15 +56,15 @@ vault::set_s3_keys() {
 
 # creates a token for a specific policy
 vault::store_private_registry_token() {
-  rollbar::fatal_trap \
-    "Dock-Init: Cannot create private registry token" \
-    "Attempting to create private registry token. ${OUTPUT}"
-  # export VAULT_ADDR="/* new host */"
   log::info "Storing vault token for private registry key"
   local NODE_ENV=$(consul::get node/env)
+  # this will pull from the vault currently running (our vault)
   export VAULT_ADDR="http://${VAULT_HOSTNAME}:${VAULT_PORT}"
-  POLICY=$(vault policies | grep "^${POPPA_ID}\b")
-  log::info "checked vault policies"
+  # this might also be needed if we use a different root token
+
+  # VAULT_TOKEN=$(cat "${token_path}"/auth-token)
+  # vault auth ${VAULT_TOKEN}       vault auth ${VAULT_TOKEN}
+  local POLICY=$(vault policies | grep "^${POPPA_ID}\b")
   if [[ $POLICY ]]; then
     log::info "Policy found for $POPPA_ID, generating token"
   else
@@ -72,5 +72,6 @@ vault::store_private_registry_token() {
     sed "s/{{bpid}}/${POPPA_ID}/g" "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.tmpl" > "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
     vault policy-write ${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
   fi
+  # need to set the final directory for the token here
   vault token-create -policy=${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  {print $1 }' > /opt/runnable/dock-init/private-token
 }
