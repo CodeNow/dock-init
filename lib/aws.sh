@@ -31,7 +31,7 @@ aws::get_aws_creds() {
 }
 
 # Fetches the org tags from EC2 and sets it to the `ORG_ID` environment variable
-aws::get_org_id() {
+aws::get_org_tags() {
   log::info "Setting Github Org ID"
 
   # Generate the org-tag fetching script
@@ -42,8 +42,18 @@ aws::get_org_id() {
     backoff aws::get_aws_creds
   fi
 
-  backoff aws::get_org_id_onprem
+  EC2_HOME=/usr/local/ec2
+  export EC2_HOME
 
+  JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
+  export JAVA_HOME
+
+  export INSTANCE_ID=$(ec2-metadata -i | awk '{print $2}')
+  # Note: this only works for us-.{4}-\d
+  export REGION=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
+
+  backoff aws::fetch_org_id
+  backoff aws::fetch_poppa_id
   if [[ "$ORG_ID" == "" ]]; then
     # this will print an error, so that's good
     rollbar::report_error \
@@ -54,9 +64,10 @@ aws::get_org_id() {
   fi
 
   log::info "Got Org ID: $ORG_ID"
+  log::info "Got Poppa ID: $POPPA_ID"
 }
 
-aws::get_org_id_onprem() {
+aws::fetch_org_id() {
   local attempt=${1}
   log::info 'Attempting to get org id on prem'
   data='{"attempt":'"${attempt}"'}'
@@ -66,58 +77,35 @@ aws::get_org_id_onprem() {
     "Attempting to get the Org Tag from AWS and failing." \
     "$data"
 
-  EC2_HOME=/usr/local/ec2
-  export EC2_HOME
-
-  JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
-  export JAVA_HOME
-
-  local instance_id=$(ec2-metadata -i | awk '{print $2}')
-
-  # Note: this only works for us-.{4}-\d
-  local region=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
-
   ORG_ID=$(bash /usr/local/ec2/bin/ec2-describe-tags \
     --aws-access-key="${AWS_ACCESS_KEY}" \
     --aws-secret-key="${AWS_SECRET_KEY}" \
     --filter "resource-type=instance" \
-    --filter "resource-id=${instance_id}" \
+    --filter "resource-id=${INSTANCE_ID}" \
     --filter "key=org" \
-    --region "${region}" \
+    --region "${REGION}" \
     | awk '{print $5}')
 
   export ORG_ID
 }
 
 # Fetches the poppa tags from EC2 and sets it to the `POPPA_ID` environment variable
-aws::get_poppa_id() {
+aws::fetch_poppa_id() {
   log::info "Setting Poppa ID"
 
   # Generate the org-tag fetching script
   rollbar::fatal_trap \
     "Dock-Init: Failed to Render Org Script" \
     "Consule-Template was unable to realize the given template."
-    EC2_HOME=/usr/local/ec2
-    export EC2_HOME
 
-    JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
-    export JAVA_HOME
+  POPPA_ID=$(bash /usr/local/ec2/bin/ec2-describe-tags \
+    --aws-access-key="${AWS_ACCESS_KEY}" \
+    --aws-secret-key="${AWS_SECRET_KEY}" \
+    --filter "resource-type=instance" \
+    --filter "resource-id=${INSTANCE_ID}" \
+    --filter "key=big-poppa" \
+    --region "${REGION}" \
+    | awk '{print $5}')
 
-    local instance_id=$(ec2-metadata -i | awk '{print $2}')
-
-    # Note: this only works for us-.{4}-\d
-    local region=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
-
-    POPPA_ID=$(bash /usr/local/ec2/bin/ec2-describe-tags \
-      --aws-access-key="${AWS_ACCESS_KEY}" \
-      --aws-secret-key="${AWS_SECRET_KEY}" \
-      --filter "resource-type=instance" \
-      --filter "resource-id=${instance_id}" \
-      --filter "key=big-poppa" \
-      --region "${region}" \
-      | awk '{print $5}')
-
-    export POPPA_ID
-
-  log::info "Got POPPA_ID: $POPPA_ID"
+  export POPPA_ID
 }

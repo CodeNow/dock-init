@@ -73,5 +73,5 @@ vault::store_private_registry_token() {
     vault policy-write ${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
   fi
   # need to set the final directory for the token here
-  vault token-create -policy=${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  {print $1 }' > /opt/runnable/dock-init/private-token
+  vault token-create -policy=${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/private-token
 }
