@@ -59,7 +59,7 @@ vault::store_private_registry_token() {
   log::info "Storing vault token for private registry key"
   local NODE_ENV=$(consul::get node/env)
   # this will pull from the vault currently running (our vault)
-  export VAULT_ADDR="http://${VAULT_HOSTNAME}:${VAULT_PORT}"
+  export VAULT_ADDR="http://${USER_VAULT_HOSTNAME}:${USER_VAULT_PORT}"
   # this might also be needed if we use a different root token
 
   # VAULT_TOKEN=$(cat "${token_path}"/auth-token)
