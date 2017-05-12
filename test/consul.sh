@@ -29,7 +29,7 @@ describe 'consul.sh'
 
     it 'should read in the vault token'
       consul::configure_consul_template
-      cat::called_with "${DOCK_INIT_BASE}/consul-resources/vault/TEST-NODE-ENV/auth-token"
+      cat::called_with "${DOCK_INIT_BASE}/consul-resources/vault/TEST-NODE-ENV/user-vault-auth-token"
     end
 
     it 'generate the consul-template configuration'
