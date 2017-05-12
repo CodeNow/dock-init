@@ -51,6 +51,7 @@ export DOCKER_NETWORK=172.17.0.0/16
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
+source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
 source "${DOCK_INIT_BASE}/lib/cleanup.sh"

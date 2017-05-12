@@ -25,7 +25,7 @@ consul::connect() {
   backoff consul::connect_backoff
 }
 
-# Echos a value from consul foer the given keypath
+# Echos a value from consul for the given keypath
 # @param $1 keypath Keypath for the value to get from consul
 consul::get() {
   # Strip leading slashes so it works with both '/my/path' and 'my/path'
