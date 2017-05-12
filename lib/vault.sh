@@ -62,8 +62,8 @@ vault::store_private_registry_token() {
   export VAULT_ADDR="http://${USER_VAULT_HOSTNAME}:${USER_VAULT_PORT}"
   # this might also be needed if we use a different root token
 
-  VAULT_TOKEN=$(cat "${token_path}"/auth-token)
-  vault auth ${VAULT_TOKEN}
+  USER_VAULT_TOKEN=$(cat "${user_token_path}"/auth-token)
+  vault auth ${USER_VAULT_TOKEN}
   local POLICY=$(vault policies | grep "^dock-${POPPA_ID}\b")
   if [[ $POLICY ]]; then
     log::info "Policy found for $POPPA_ID, generating token"
@@ -73,5 +73,5 @@ vault::store_private_registry_token() {
     vault policy-write dock-${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
   fi
   # need to set the final directory for the token here
-  vault token-create -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/private-token
+  vault write -f auth/token/create/organizations-readonly -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/private-token
 }
