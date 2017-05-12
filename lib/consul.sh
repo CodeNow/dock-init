@@ -58,10 +58,10 @@ consul::configure_consul_template() {
       local NODE_ENV=$(consul::get node/env)
       local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
       log::info "$token_path"
-      # VAULT_TOKEN=$(cat "${token_path}"/auth-token)
-      # export VAULT_TOKEN
+      VAULT_TOKEN=$(cat "${token_path}"/auth-token)
+      export VAULT_TOKEN
 
-      USER_VAULT_TOKEN=$(cat "${user_token_path}"/user-vault-auth-token)
+      USER_VAULT_TOKEN=$(cat "${token_path}"/user-vault-auth-token)
       export USER_VAULT_TOKEN
 
       local template="$DOCK_INIT_BASE/consul-resources/templates/"
