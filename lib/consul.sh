@@ -60,9 +60,8 @@ consul::configure_consul_template() {
       log::info "$token_path"
       VAULT_TOKEN=$(cat "${token_path}"/auth-token)
       export VAULT_TOKEN
-      local user_token_path="${DOCK_INIT_BASE}/consul-resources/user-vault/${NODE_ENV}"
-      log::info "$user_token_path"
-      USER_VAULT_TOKEN=$(cat "${user_token_path}"/auth-token)
+
+      USER_VAULT_TOKEN=$(cat "${user_token_path}"/user-vault-auth-token)
       export USER_VAULT_TOKEN
 
       local template="$DOCK_INIT_BASE/consul-resources/templates/"

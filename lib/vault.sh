@@ -62,7 +62,7 @@ vault::store_private_registry_token() {
   export VAULT_ADDR="http://${USER_VAULT_HOSTNAME}:${USER_VAULT_PORT}"
   # this might also be needed if we use a different root token
 
-  USER_VAULT_TOKEN=$(cat "${user_token_path}"/auth-token)
+  USER_VAULT_TOKEN=$(cat "${user_token_path}"/user-vault-auth-token)
   vault auth ${USER_VAULT_TOKEN}
   local POLICY=$(vault policies | grep "^dock-${POPPA_ID}\b")
   if [[ $POLICY ]]; then
