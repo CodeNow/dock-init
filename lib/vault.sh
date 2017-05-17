@@ -69,7 +69,7 @@ vault::store_private_registry_token() {
   log::info "Creating new policy and token for dock-$POPPA_ID"
   sed "s/{{bpid}}/${POPPA_ID}/g" "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.tmpl" > "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
   vault policy-write dock-${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
-  vault token-create -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/private-token
+  vault token-create -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/user-private-registry-token
   VAULT_TOKEN=$(cat "${token_path}"/auth-token)
   export VAULT_TOKEN
 }
