@@ -31,7 +31,7 @@ aws::get_aws_creds() {
 }
 
 # Fetches the org tags from EC2 and sets it to the `ORG_ID` environment variable
-aws::get_org_tags() {
+aws::get_org_ids() {
   log::info "Setting Github Org ID"
 
   # Generate the org-tag fetching script

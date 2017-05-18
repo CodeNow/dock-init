@@ -64,7 +64,7 @@ main() {
   consul::get_environment
   consul::configure_consul_template
   dock::generate_certs
-  aws::get_org_tags
+  aws::get_org_ids
   dock::set_hostname
   dock::set_config_org
   vault::store_private_registry_token
