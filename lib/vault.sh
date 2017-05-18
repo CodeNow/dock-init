@@ -4,6 +4,7 @@
 # @author Anandkumar Patel
 # @module vault
 
+source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
@@ -51,4 +52,24 @@ vault::set_s3_keys() {
   S3_SECRET_KEY="$(echo ${OUTPUT} | grep -o secret_key.* | awk '{print $2}')"
   export S3_SECRET_KEY
   rollbar::clear_trap
+}
+
+# creates a token for a the organizations-readonly policy
+vault::store_private_registry_token() {
+  log::info "Storing vault token for private registry key"
+  local NODE_ENV=$(consul::get node/env)
+  local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
+  unset VAULT_TOKEN
+  # this will pull from the vault currently running (our vault)
+  export VAULT_ADDR="http://${USER_VAULT_HOSTNAME}:${USER_VAULT_PORT}"
+  # this might also be needed if we use a different root token
+
+  USER_VAULT_TOKEN=$(cat "${token_path}"/user-vault-auth-token)
+  vault auth ${USER_VAULT_TOKEN}
+  log::info "Creating new policy and token for dock-$POPPA_ID"
+  sed "s/{{bpid}}/${POPPA_ID}/g" "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.tmpl" > "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
+  vault policy-write dock-${POPPA_ID} "${DOCK_INIT_BASE}/consul-resources/templates/registry_policy.hcl"
+  vault token-create -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/user-private-registry-token
+  VAULT_TOKEN=$(cat "${token_path}"/auth-token)
+  export VAULT_TOKEN
 }

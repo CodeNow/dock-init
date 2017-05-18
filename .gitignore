@@ -2,7 +2,7 @@ npm-debug.log
 consul-resources/template-config.hcl
 consul-resources/vault/vault.hcl
 hosts-registry.txt
-util/get-org-id.sh
+util/get-aws-creds.sh
 consul-resources/vault/**/auth-token
 consul-resources/vault/**/token-01
 consul-resources/vault/**/token-02

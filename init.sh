@@ -33,11 +33,25 @@ else
   export VAULT_HOSTNAME
 fi
 
+if [ -z "${USER_VAULT_PORT+x}" ]; then
+  export USER_VAULT_PORT=8200
+else
+  export USER_VAULT_PORT
+fi
+
+if [ -z "${USER_VAULT_HOSTNAME+x}" ]; then
+  export USER_VAULT_HOSTNAME=$USER_VAULT_HOSTNAME
+else
+  export USER_VAULT_HOSTNAME
+fi
+
+
 export DOCKER_NETWORK=172.17.0.0/16
 
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
+source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
 source "${DOCK_INIT_BASE}/lib/cleanup.sh"
@@ -50,9 +64,10 @@ main() {
   consul::get_environment
   consul::configure_consul_template
   dock::generate_certs
-  aws::get_org_id
+  aws::get_org_ids
   dock::set_hostname
   dock::set_config_org
+  vault::store_private_registry_token
   container::start
   # rules must be run after docker has started
   iptables::run_rules

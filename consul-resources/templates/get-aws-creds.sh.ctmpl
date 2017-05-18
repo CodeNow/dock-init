@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+{{ with vault "aws_1h/creds/dock-init" }}
+export AWS_ACCESS_KEY="{{ .Data.access_key }}"
+export AWS_SECRET_KEY="{{ .Data.secret_key  }}"
+{{ end }}

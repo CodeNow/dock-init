@@ -25,7 +25,7 @@ consul::connect() {
   backoff consul::connect_backoff
 }
 
-# Echos a value from consul foer the given keypath
+# Echos a value from consul for the given keypath
 # @param $1 keypath Keypath for the value to get from consul
 consul::get() {
   # Strip leading slashes so it works with both '/my/path' and 'my/path'
@@ -54,20 +54,23 @@ consul::configure_consul_template() {
     "Consul-Template was unable to realize the config template."
 
   # expose VAULT_TOKEN for consul-template config
-    if [ -z ${AWS_ACCESS_KEY+x} ] || [ -z ${AWS_SECRET_KEY+x} ]; then
-      local NODE_ENV=$(consul::get node/env)
-      local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
-      log::info "$token_path"
-      VAULT_TOKEN=$(cat "${token_path}"/auth-token)
-      export VAULT_TOKEN
+  if [ -z ${AWS_ACCESS_KEY+x} ] || [ -z ${AWS_SECRET_KEY+x} ]; then
+    local NODE_ENV=$(consul::get node/env)
+    local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
+    log::info "$token_path"
+    VAULT_TOKEN=$(cat "${token_path}"/auth-token)
+    export VAULT_TOKEN
 
-      local template="$DOCK_INIT_BASE/consul-resources/templates/"
-      template+="template-config.hcl.ctmpl"
-      template+=":$DOCK_INIT_BASE/consul-resources/template-config.hcl"
+    USER_VAULT_TOKEN=$(cat "${token_path}"/user-vault-auth-token)
+    export USER_VAULT_TOKEN
 
-      consul-template -once -template="$template"
-    else
-      log::info "AWS access key and secret already created, skipping template creation"
-    fi
+    local template="$DOCK_INIT_BASE/consul-resources/templates/"
+    template+="template-config.hcl.ctmpl"
+    template+=":$DOCK_INIT_BASE/consul-resources/template-config.hcl"
+
+    consul-template -once -template="$template"
+  else
+    log::info "AWS access key and secret already created, skipping template creation"
+  fi
   rollbar::clear_trap
 }
