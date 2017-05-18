@@ -103,7 +103,7 @@ aws::fetch_poppa_id() {
     --aws-secret-key="${AWS_SECRET_KEY}" \
     --filter "resource-type=instance" \
     --filter "resource-id=${INSTANCE_ID}" \
-    --filter "key=big-poppa-org-id" \
+    --filter "key=runnable-org-id" \
     --region "${REGION}" \
     | awk '{print $5}')
 
