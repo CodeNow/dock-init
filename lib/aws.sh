@@ -15,11 +15,11 @@ aws::get_aws_creds() {
     "Dock-Init: Failed to Render Org Script" \
     "Consule-Template was unable to realize the given template."
 
-  ORG_SCRIPT=$DOCK_INIT_BASE/util/get-org-id.sh
+  ORG_SCRIPT=$DOCK_INIT_BASE/util/get-aws-creds.sh
 
   local config="$DOCK_INIT_BASE/consul-resources/template-config.hcl"
   local template="$DOCK_INIT_BASE"
-  template+="/consul-resources/templates/get-org-tag.sh.ctmpl:$ORG_SCRIPT"
+  template+="/consul-resources/templates/get-aws-creds.sh.ctmpl:$ORG_SCRIPT"
 
   consul-template -config="${config}" -once -template="${template}"
 
@@ -27,7 +27,7 @@ aws::get_aws_creds() {
   # give amazon a chance to get the auth
   sleep 5
 
-  source "${DOCK_INIT_BASE}/util/get-org-id.sh"
+  source "${DOCK_INIT_BASE}/util/get-aws-creds.sh"
 }
 
 # Fetches the org tags from EC2 and sets it to the `ORG_ID` environment variable
