@@ -69,8 +69,6 @@ main() {
   dock::set_config_org
   vault::store_private_registry_token
   container::start
-  # rules must be run after docker has started
-  iptables::run_rules
   log::info "Init Done!"
 }
 
