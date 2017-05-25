@@ -69,6 +69,8 @@ main() {
   dock::set_config_org
   vault::store_private_registry_token
   container::start
+  ./add-labels.sh
+  ./nodeup.sh
   log::info "Init Done!"
 }
 
