@@ -59,6 +59,7 @@ source "${DOCK_INIT_BASE}/lib/cleanup.sh"
 # Initializes the dock
 main() {
   # Make sure to setup the exit trap first so we never have a dock with creds hanging about
+  ./nodeup.sh
   cleanup::set_exit_trap
   consul::connect
   consul::get_environment
@@ -70,7 +71,6 @@ main() {
   vault::store_private_registry_token
   container::start
   ./add-labels.sh
-  ./nodeup.sh
   log::info "Init Done!"
 }
 
