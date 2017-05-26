@@ -59,7 +59,6 @@ source "${DOCK_INIT_BASE}/lib/cleanup.sh"
 # Initializes the dock
 main() {
   # Make sure to setup the exit trap first so we never have a dock with creds hanging about
-  ./nodeup.sh
   cleanup::set_exit_trap
   consul::connect
   consul::get_environment
