@@ -10,9 +10,7 @@ cleanup::exit_trap() {
     rm -f "${CERT_PATH}"/ca-key.pem \
           "${CERT_PATH}"/pass \
           "${DOCK_INIT_BASE}"/consul-resources/template-config.hcl \
-          "${DOCK_INIT_BASE}"/consul-resources/vault/**/auth-token \
-          "${DOCK_INIT_BASE}"/consul-resources/vault/**/user-vault-auth-token \
-          "${DOCK_INIT_BASE}"/consul-resources/vault/**/token-* \
+          "${DOCK_INIT_BASE}"/consul-resources/vault/token-* \
           "${DOCK_INIT_BASE}"/util/get-aws-creds.sh \
           "${DOCK_INIT_BASE}"/key/rollbar.token
   fi

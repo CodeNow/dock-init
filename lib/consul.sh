@@ -55,15 +55,6 @@ consul::configure_consul_template() {
 
   # expose VAULT_TOKEN for consul-template config
   if [ -z ${AWS_ACCESS_KEY+x} ] || [ -z ${AWS_SECRET_KEY+x} ]; then
-    local NODE_ENV=$(consul::get node/env)
-    local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
-    log::info "$token_path"
-    VAULT_TOKEN=$(cat "${token_path}"/auth-token)
-    export VAULT_TOKEN
-
-    USER_VAULT_TOKEN=$(cat "${token_path}"/user-vault-auth-token)
-    export USER_VAULT_TOKEN
-
     local template="$DOCK_INIT_BASE/consul-resources/templates/"
     template+="template-config.hcl.ctmpl"
     template+=":$DOCK_INIT_BASE/consul-resources/template-config.hcl"
