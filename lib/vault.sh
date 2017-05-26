@@ -56,6 +56,10 @@ vault::set_s3_keys() {
 
 # creates a token for a the organizations-readonly policy
 vault::store_private_registry_token() {
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot store private registry token" \
+    "The user vault token was not generated"
+
   log::info "Storing vault token for private registry key"
   local NODE_ENV=$(consul::get node/env)
   local token_path="${DOCK_INIT_BASE}/consul-resources/vault/${NODE_ENV}"
@@ -72,4 +76,5 @@ vault::store_private_registry_token() {
   vault token-create -policy=dock-${POPPA_ID} | awk '/token/ { print $2 }' | awk 'NR==1  { print $1 }' > /opt/runnable/dock-init/user-private-registry-token
   VAULT_TOKEN=$(cat "${token_path}"/auth-token)
   export VAULT_TOKEN
+  rollbar::clear_trap
 }
