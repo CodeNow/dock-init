@@ -52,16 +52,17 @@ aws::get_org_ids() {
   # Note: this only works for us-.{4}-\d
   export REGION=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
 
-  backoff aws::fetch_org_id
-  backoff aws::fetch_poppa_id
-  if [[ "$ORG_ID" == "" ]]; then
-    # this will print an error, so that's good
-    rollbar::report_error \
-      "Dock-Init: Org ID is Empty After cut" \
-      "Evidently the Org ID was bad, and we have an empty ORG_ID."
-    # we can not continue, halt
-    halter::halt
-  fi
+  while [[ "$ORG_ID" == "" ]]
+  do
+    aws::fetch_org_id
+    sleep 2
+  done
+
+  while [[ "$POPPA_ID" == "" ]]
+  do
+    aws::fetch_poppa_id
+    sleep 2
+  done
 
   log::info "Got Org ID: $ORG_ID"
   log::info "Got Poppa ID: $POPPA_ID"
@@ -69,7 +70,7 @@ aws::get_org_ids() {
 
 aws::fetch_org_id() {
   local attempt=${1}
-  log::info 'Attempting to get org id on prem'
+  log::info 'Attempting to get org id'
   data='{"attempt":'"${attempt}"'}'
 
   rollbar::warning_trap \
