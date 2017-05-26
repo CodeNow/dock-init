@@ -19,7 +19,6 @@ dock::set_config_org() {
   log::info "Setting organization id in docker configuration"
   echo DOCKER_OPTS=-H=unix:///var/run/docker.sock --tlsverify --tlskey=/etc/ssl/docker/key.pem --tlscert=/etc/ssl/docker/cert.pem --tlscacert=/etc/ssl/docker/ca.pem -H=0.0.0.0:4242 --ip-masq=false --iptables=false --log-driver=json-file --log-level=warn --log-opt=max-file=5 --log-opt=max-size=10m --storage-driver=overlay --label org=$ORG_ID > /etc/sysconfig/docker
   echo DOCKER_NOFILE=1000000 >> /etc/sysconfig/docker
-
 }
 
 # adds org to hostname
