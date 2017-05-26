@@ -50,7 +50,7 @@ aws::get_org_ids() {
 
   export INSTANCE_ID=$(ec2-metadata -i | awk '{print $2}')
   # Note: this only works for us-.{4}-\d
-  export REGION=$(ec2-metadata --availability-zone | awk '{ where = match($2, /us\-.+\-[1|2]/); print substr($2, where, 9); }')
+  export REGION=$(hostname -d | cut -f1 -d.)
 
   while [[ "$ORG_ID" == "" ]]
   do

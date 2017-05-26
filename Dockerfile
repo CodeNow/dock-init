@@ -1,8 +1,8 @@
 # run with --uts=host --privileged --cap-add SYS_ADMIN
-# -v /etc/ssl/docker/pass (docker certs and pass)
-# -v /opt/runnable/dock-init/consul-resources/vault/production-gamma/ (vault keys)
-# -v /etc/init/krain.conf (output)
-
+# -v /etc/ssl/docker
+# -v /var/run/docker.sock
+#
+#
 # ENV
 # CONSUL_PORT CONSUL_HOSTNAME VAULT_PORT USER_VAULT_PORT USER_VAULT_HOSTNAME K8_TOKEN K8_HOST
 # VAULT_TOKEN USER_VAULT_TOKEN
@@ -27,3 +27,6 @@ RUN unzip ./consul-template_0.11.1_linux_amd64.zip -d ./bin
 
 WORKDIR /
 ADD . /dock-init
+WORKDIR /dock-init
+
+CMD ./init.sh | tee /var/log/user-script-dock-init.log
