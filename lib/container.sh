@@ -84,15 +84,11 @@ container::_start_registry_container() {
 # Starts all container services needed for the dock
 container::start() {
   log::info "Starting container services"
-  upstart::start_docker
+  upstart::restart_docker
   backoff container::_start_registry_container
 
   # swarm should be started last so we know everything is up
   backoff container::_start_swarm_container
-  # currently @henrymollman does not understand why restarting swarm works
-  # but without this line docker-listener will time out getting events
-  # and the stream will close. this is an intermittent error however
-  docker restart swarm
 }
 
 # Stops all dock container services

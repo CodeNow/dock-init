@@ -12,7 +12,6 @@ source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
 source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
-source "${DOCK_INIT_BASE}/lib/iptables.sh"
 source "${DOCK_INIT_BASE}/lib/cleanup.sh"
 source "${DOCK_INIT_BASE}/lib/kubernetes.sh"
 

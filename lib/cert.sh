@@ -10,31 +10,40 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
 CERT_PATH="/etc/ssl/docker"
 
-# Remove any preloaded certs (from the original instance used to build the AMI)
-cert::remove() {
-  rm -f $CERT_PATH/cert.pem
-  rm -f $CERT_PATH/key.pem
-}
+if [ -z "${DOCKER_CERT_CA_BASE64+x}" ]; then
+  log::fatal "DOCKER_CERT_CA_BASE64 is not defined"
+  exit 1
+else
+  export DOCKER_CERT_CA_BASE64
+fi
+
+if [ -z "${DOCKER_CERT_CA_KEY_BASE64+x}" ]; then
+  log::fatal "DOCKER_CERT_CA_KEY_BASE64 is not defined"
+  exit 1
+else
+  export DOCKER_CERT_CA_KEY_BASE64
+fi
+
+if [ -z "${DOCKER_CERT_PASS+x}" ]; then
+  log::fatal "DOCKER_CERT_PASS is not defined"
+  exit 1
+else
+  export DOCKER_CERT_PASS
+fi
 
 # Generates the host certs for this dock
 cert::generate() {
-  # Remove any left-over certs from the machine
-  cert::remove
-
-  echo ${DOCKER_CERT_CA_BASE64} | base64 --decode > /etc/ssl/docker/ca.pem
-  echo ${DOCKER_CERT_CA_KEY_BASE64} | base64 --decode > /etc/ssl/docker/ca-key.pem
-  echo ${DOCKER_CERT_PASS} | base64 --decode > /etc/ssl/docker/pass
-
-  # Require that we have the correct pems
-  if [ ! -e $CERT_PATH/ca-key.pem ]; then
-    log::fatal "Missing ca-key.pem"
-    return 1
+  if [ -z "${HOST_IP+x}" ]; then
+    log::fatal "HOST_IP is not defined"
+    exit 1
+  else
+    export HOST_IP
   fi
 
-  if [ ! -e $CERT_PATH/ca.pem ]; then
-    log::fatal "Missing ca.pem"
-    return 1
-  fi
+  mkdir -p ${CERT_PATH}
+  echo ${DOCKER_CERT_CA_BASE64} | base64 --decode > ${CERT_PATH}/ca.pem
+  echo ${DOCKER_CERT_CA_KEY_BASE64} | base64 --decode > ${CERT_PATH}/ca-key.pem
+  echo ${DOCKER_CERT_PASS} | base64 --decode > ${CERT_PATH}/pass
 
   # generate server key
   openssl genrsa -out "$CERT_PATH/key.pem" 2048
