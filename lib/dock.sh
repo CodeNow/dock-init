@@ -17,10 +17,8 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 # Sets the value of `$ORG_ID` as the org label in the docker configuration
 dock::set_config_org() {
   log::info "Setting organization id in docker configuration"
-  echo DOCKER_OPTS=\"\$DOCKER_OPTS --label org="${ORG_ID}"\" >> /etc/sysconfig/docker
-  echo DOCKER_OPTS=\"\$DOCKER_OPTS -H=unix:///var/run/docker.sock -H=0.0.0.0:4242\" >> /etc/sysconfig/docker
-  echo DOCKER_OPTS=\"\$DOCKER_OPTS --tlsverify --tlscacert=/etc/ssl/docker/ca.pem\" >> /etc/sysconfig/docker
-  echo DOCKER_OPTS=\"\$DOCKER_OPTS --tlscert=/etc/ssl/docker/cert.pem --tlskey=/etc/ssl/docker/key.pem\" >> /etc/sysconfig/docker
+  echo DOCKER_OPTS=-H=unix:///var/run/docker.sock --tlsverify --tlskey=/etc/ssl/docker/key.pem --tlscert=/etc/ssl/docker/cert.pem --tlscacert=/etc/ssl/docker/ca.pem -H=0.0.0.0:4242 --ip-masq=false --iptables=false --log-driver=json-file --log-level=warn --log-opt=max-file=5 --log-opt=max-size=10m --storage-driver=overlay --label org=$ORG_ID > /etc/sysconfig/docker
+  echo DOCKER_NOFILE=1000000 >> /etc/sysconfig/docker
 
 }
 
