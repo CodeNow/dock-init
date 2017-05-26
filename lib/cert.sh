@@ -21,6 +21,10 @@ cert::generate() {
   # Remove any left-over certs from the machine
   cert::remove
 
+  echo ${DOCKER_CERT_CA_BASE64} | base64 --decode > /etc/ssl/docker/ca.pem
+  echo ${DOCKER_CERT_CA_KEY_BASE64} | base64 --decode > /etc/ssl/docker/ca-key.pem
+  echo ${DOCKER_CERT_PASS} | base64 --decode > /etc/ssl/docker/pass
+
   # Require that we have the correct pems
   if [ ! -e $CERT_PATH/ca-key.pem ]; then
     log::fatal "Missing ca-key.pem"
