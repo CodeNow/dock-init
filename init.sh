@@ -7,44 +7,6 @@
 export DOCK_INIT_BASE=/opt/runnable/dock-init
 export HOST_IP=$(hostname -i)
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
-
-if [ -z "${CONSUL_PORT+x}" ]; then
-  export CONSUL_PORT=8500
-else
-  export CONSUL_PORT
-fi
-
-if [ -z "${CONSUL_HOSTNAME+x}" ]; then
-  log::fatal "CONSUL_HOSTNAME is not defined"
-  exit 1
-else
-  export CONSUL_HOSTNAME
-fi
-
-if [ -z "${VAULT_PORT+x}" ]; then
-  export VAULT_PORT=8200
-else
-  export VAULT_PORT
-fi
-
-if [ -z "${VAULT_HOSTNAME+x}" ]; then
-  export VAULT_HOSTNAME=$CONSUL_HOSTNAME
-else
-  export VAULT_HOSTNAME
-fi
-
-if [ -z "${USER_VAULT_PORT+x}" ]; then
-  export USER_VAULT_PORT=8200
-else
-  export USER_VAULT_PORT
-fi
-
-if [ -z "${USER_VAULT_HOSTNAME+x}" ]; then
-  export USER_VAULT_HOSTNAME=$USER_VAULT_HOSTNAME
-else
-  export USER_VAULT_HOSTNAME
-fi
-
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/aws.sh"
 source "${DOCK_INIT_BASE}/lib/dock.sh"
@@ -52,8 +14,7 @@ source "${DOCK_INIT_BASE}/lib/vault.sh"
 source "${DOCK_INIT_BASE}/lib/container.sh"
 source "${DOCK_INIT_BASE}/lib/iptables.sh"
 source "${DOCK_INIT_BASE}/lib/cleanup.sh"
-
-bash ${DOCK_INIT_BASE}/nodeup.sh
+source "${DOCK_INIT_BASE}/lib/kubernetes.sh"
 
 # Initializes the dock
 main() {
@@ -64,11 +25,11 @@ main() {
   consul::configure_consul_template
   dock::generate_certs
   aws::get_org_ids
-  dock::set_hostname
   dock::set_config_org
   vault::store_private_registry_token
+  k8::set_node_lables
+  dock::set_hostname
   container::start
-  ${DOCK_INIT_BASE}/add-labels.sh
   log::info "Init Done!"
 }
 

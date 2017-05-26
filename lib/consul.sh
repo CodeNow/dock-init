@@ -3,6 +3,24 @@
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
+if [ -z "${CONSUL_PORT+x}" ]; then
+  log::fatal "CONSUL_PORT is not defined"
+  exit 1
+else
+  export CONSUL_PORT
+fi
+
+if [ -z "${CONSUL_HOSTNAME+x}" ]; then
+  log::fatal "CONSUL_HOSTNAME is not defined"
+  exit 1
+else
+  export CONSUL_HOSTNAME
+fi
+
+consul::get_connection_url() {
+  echo consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}
+}
+
 # Consul routines used by the main `init.sh` dock-init script.
 # @author Ryan Sandor Richards
 # @module consul

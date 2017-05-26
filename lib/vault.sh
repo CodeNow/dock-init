@@ -7,6 +7,34 @@
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
+if [ -z "${VAULT_PORT+x}" ]; then
+  log::fatal "VAULT_PORT is not defined"
+  exit 1
+else
+  export VAULT_PORT
+fi
+
+if [ -z "${USER_VAULT_PORT+x}" ]; then
+  log::fatal "USER_VAULT_PORT is not defined"
+  exit 1
+else
+  export USER_VAULT_PORT
+fi
+
+if [ -z "${VAULT_HOSTNAME+x}" ]; then
+  log::fatal "VAULT_HOSTNAME is not defined"
+  exit 1
+else
+  export VAULT_HOSTNAME
+fi
+
+if [ -z "${USER_VAULT_HOSTNAME+x}" ]; then
+  log::fatal "USER_VAULT_HOSTNAME is not defined"
+  exit 1
+else
+  export USER_VAULT_HOSTNAME
+fi
+
 # create s3 policy for this org
 # $1 s3 bucket name
 vault::create_s3_policy() {

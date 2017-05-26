@@ -17,13 +17,15 @@ container::_start_swarm_container() {
 
   log::info "Starting swarm:${version} container"
   local docker_logs
+  local consul_url="$(consul::get_connection_url)"
+
   docker_logs=$(docker run \
     --detach=true \
     --restart=always \
     --name "${name}" \
     "${name}:${version}" \
     join --addr="$HOST_IP:4242" \
-    "consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}/${name}")
+    "${consul_url}/${name}")
 
   if [[ "$?" -gt "0" ]]; then
     local data='{"version":'"${version}"', "output":'"${docker_logs}"'}'
