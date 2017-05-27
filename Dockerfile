@@ -10,7 +10,7 @@
 
 FROM ubuntu:14.04
 
-RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq
+RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq vim systemctl
 
 WORKDIR /usr/local
 RUN wget http://s3.amazonaws.com/ec2metadata/ec2-metadata -O ./bin/ec2-metadata
@@ -28,5 +28,6 @@ RUN unzip ./consul-template_0.11.1_linux_amd64.zip -d ./bin
 WORKDIR /
 ADD . /dock-init
 WORKDIR /dock-init
+ENV DOCK_INIT_BASE=/dock-init
 
 CMD ./init.sh | tee /var/log/user-script-dock-init.log

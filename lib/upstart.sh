@@ -8,7 +8,7 @@ upstart::restart_docker() {
   rollbar::fatal_trap \
     "Dock-Init: Failed to Start Docker" \
     "Server was unable to start service."
-  service docker restart
+  systemctl restart docker
   rollbar::clear_trap
 
   log::info "Waiting for Docker"

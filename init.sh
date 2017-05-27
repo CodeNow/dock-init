@@ -4,7 +4,6 @@
 # library and calls the master initialization function.
 # @author Ryan Sandor Richards
 
-export DOCK_INIT_BASE=/opt/runnable/dock-init
 export HOST_IP=$(hostname -i)
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/consul.sh"
@@ -19,6 +18,7 @@ source "${DOCK_INIT_BASE}/lib/kubernetes.sh"
 main() {
   # Make sure to setup the exit trap first so we never have a dock with creds hanging about
   cleanup::set_exit_trap
+
   consul::connect
   consul::get_environment
   consul::configure_consul_template
