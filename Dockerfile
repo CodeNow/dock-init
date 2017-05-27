@@ -10,7 +10,7 @@
 
 FROM ubuntu:14.04
 
-RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq vim systemctl
+RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq vim systemd
 
 WORKDIR /usr/local
 RUN wget http://s3.amazonaws.com/ec2metadata/ec2-metadata -O ./bin/ec2-metadata
