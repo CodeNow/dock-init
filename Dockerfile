@@ -8,9 +8,9 @@
 # VAULT_TOKEN USER_VAULT_TOKEN
 # DOCKER_CERT_PASS DOCKER_CERT_CA_BASE64 DOCKER_CERT_CA_KEY_BASE64
 
-FROM ubuntu
+FROM ubuntu:14.04
 
-RUN apt-get update && apt-get install -y wget make unzip jq
+RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq
 
 WORKDIR /usr/local
 RUN wget http://s3.amazonaws.com/ec2metadata/ec2-metadata -O ./bin/ec2-metadata
