@@ -25,6 +25,8 @@ RUN unzip ./vault_0.4.1_linux_amd64.zip -d ./bin
 RUN wget https://releases.hashicorp.com/consul-template/0.11.1/consul-template_0.11.1_linux_amd64.zip -O ./consul-template_0.11.1_linux_amd64.zip
 RUN unzip ./consul-template_0.11.1_linux_amd64.zip -d ./bin
 
+RUN chmod +x /usr/local/bin/ec2-metadata /usr/local/ec2/bin/ec2-describe-tags
+
 WORKDIR /
 ADD . /dock-init
 WORKDIR /dock-init
