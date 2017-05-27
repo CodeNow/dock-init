@@ -10,19 +10,19 @@
 
 FROM ubuntu:14.04
 
-RUN apt-get update && apt-get install -y openjdk-7-jdk wget make unzip jq vim systemd
+RUN apt-get update && apt-get install -y openjdk-7-jdk curl make unzip jq vim systemd
 
 WORKDIR /usr/local
-RUN wget http://s3.amazonaws.com/ec2metadata/ec2-metadata -O ./bin/ec2-metadata
+RUN curl http://s3.amazonaws.com/ec2metadata/ec2-metadata -o ./bin/ec2-metadata
 
-RUN wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip -O ./ec2-api-tools.zip
+RUN curl http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip -o ./ec2-api-tools.zip
 RUN unzip ./ec2-api-tools.zip -d .
 RUN ln -s ./ec2-api-tools-1.7.5.1 ./ec2
 
-RUN wget https://releases.hashicorp.com/vault/0.4.1/vault_0.4.1_linux_amd64.zip -O ./vault_0.4.1_linux_amd64.zip
+RUN curl https://releases.hashicorp.com/vault/0.4.1/vault_0.4.1_linux_amd64.zip -o ./vault_0.4.1_linux_amd64.zip
 RUN unzip ./vault_0.4.1_linux_amd64.zip -d ./bin
 
-RUN wget https://releases.hashicorp.com/consul-template/0.11.1/consul-template_0.11.1_linux_amd64.zip -O ./consul-template_0.11.1_linux_amd64.zip
+RUN curl https://releases.hashicorp.com/consul-template/0.11.1/consul-template_0.11.1_linux_amd64.zip -o ./consul-template_0.11.1_linux_amd64.zip
 RUN unzip ./consul-template_0.11.1_linux_amd64.zip -d ./bin
 
 RUN chmod +x /usr/local/bin/ec2-metadata /usr/local/ec2/bin/ec2-describe-tags
