@@ -28,10 +28,7 @@ RUN unzip ./consul-template_0.11.1_linux_amd64.zip -d ./bin
 RUN curl https://get.docker.com/builds/Linux/x86_64/docker-1.12.6.tgz -o ./docker.tar
 RUN tar xzvf ./docker.tar && mv ./docker/docker ./bin/docker
 
-
 RUN chmod +x /usr/local/bin/ec2-metadata /usr/local/ec2/bin/ec2-describe-tags
-
-
 
 WORKDIR /
 ADD . /dock-init
