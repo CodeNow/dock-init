@@ -97,4 +97,4 @@ describe 'vault.sh'
   end # end vault::set_s3_keys
 
   exit::restore
-end # upstart.sh
+end # vault.sh
