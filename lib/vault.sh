@@ -83,6 +83,10 @@ vault::set_s3_keys() {
 
 # creates a token for a the organizations-readonly policy
 vault::store_private_registry_token() {
+  rollbar::fatal_trap \
+    "Dock-Init: Cannot store private registry token" \
+    "The user vault token was not generated"
+
   log::info "Storing vault token for private registry key"
   VAULT_TOKEN_TMP=$VAULT_TOKEN
   unset VAULT_TOKEN
@@ -99,4 +103,5 @@ vault::store_private_registry_token() {
   VAULT_TOKEN=$VAULT_TOKEN_TMP
   unset VAULT_TOKEN_TMP
   export VAULT_TOKEN
+  rollbar::clear_trap
 }

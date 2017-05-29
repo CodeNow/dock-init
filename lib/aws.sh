@@ -95,7 +95,7 @@ aws::fetch_poppa_id() {
   log::info "Setting Poppa ID"
 
   # Generate the org-tag fetching script
-  rollbar::fatal_trap \
+  rollbar::warning_trap \
     "Dock-Init: Failed to Render Org Script" \
     "Consule-Template was unable to realize the given template."
 
