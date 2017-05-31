@@ -1,13 +1,3 @@
-# run with --uts=host --privileged --cap-add SYS_ADMIN
-# -v /etc/ssl/docker
-# -v /var/run/docker.sock
-#
-#
-# ENV
-# CONSUL_PORT CONSUL_HOSTNAME VAULT_PORT USER_VAULT_PORT USER_VAULT_HOSTNAME K8_TOKEN K8_HOST
-# VAULT_TOKEN USER_VAULT_TOKEN
-# DOCKER_CERT_PASS DOCKER_CERT_CA_BASE64 DOCKER_CERT_CA_KEY_BASE64
-
 FROM ubuntu:14.04
 
 RUN apt-get update && apt-get install -y openjdk-7-jdk curl make unzip jq vim systemd

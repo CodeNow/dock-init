@@ -15,8 +15,6 @@
 #   $ bash unit.sh test/util/*.sh
 #
 # will run all tests in the the `test/util` directory.
-#
-# @author Ryan Sandor Richards
 
 export LOG_LEVEL=none
 export DOCK_INIT_BASE=$(pwd)

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Unit tests for the `lib/util/backoff.sh` module.
-# @author Ryan Sandor Richards
 
 source "$DOCK_INIT_BASE/lib/util/log.sh"
 source "$DOCK_INIT_BASE/test/fixtures/stub.sh"

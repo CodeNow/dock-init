@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Unit tests for the `lib/util/rollbar.sh` module.
-# @author Ryan Sandor Richards
 
 source "$DOCK_INIT_BASE/lib/util/rollbar.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"

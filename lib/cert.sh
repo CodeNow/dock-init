@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Methods for generating and removing docker host certs on the dock.
-# @author Anand Patel
-# @author Ryan Sandor Richards
-# @author Bryan Kendall
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"

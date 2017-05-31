@@ -5,8 +5,6 @@ source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 source "${DOCK_INIT_BASE}/lib/util/halter.sh"
 
 # AWS utility methods for the main `init.sh` dock-init script.
-# @author Ryan Sandor Richards
-# @module aws
 
 # get aws creds for these scripts...
 aws::get_aws_creds() {

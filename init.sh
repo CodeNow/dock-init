@@ -2,7 +2,6 @@
 
 # Entry-point script for dock initialization. Simply includes the `lib/dock.sh`
 # library and calls the master initialization function.
-# @author Ryan Sandor Richards
 
 export HOST_IP=$(hostname -i)
 source "${DOCK_INIT_BASE}/lib/util/log.sh"

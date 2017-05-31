@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Functions for interacting with vault
-# @author Anandkumar Patel
-# @module vault
 
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"

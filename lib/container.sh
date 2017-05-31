@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Functions for starting container services
-# @author Anandkumar Patel
 
 source "${DOCK_INIT_BASE}/lib/consul.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"

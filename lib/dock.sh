@@ -5,9 +5,6 @@
 # libraries (located in `lib/`)` and composes the exposed methods together to
 # fully initialize, start, and register a dock.
 #
-# @author Ryan Sandor Richards
-# @author Bryan Kendall
-# @module dock
 
 source "${DOCK_INIT_BASE}/lib/cert.sh"
 source "${DOCK_INIT_BASE}/lib/util/backoff.sh"

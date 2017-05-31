@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Consul routines used by the main `init.sh` dock-init script.
+
 source "${DOCK_INIT_BASE}/lib/util/log.sh"
 source "${DOCK_INIT_BASE}/lib/util/rollbar.sh"
 
@@ -20,10 +22,6 @@ fi
 consul::get_connection_url() {
   echo consul://${CONSUL_HOSTNAME}:${CONSUL_PORT}
 }
-
-# Consul routines used by the main `init.sh` dock-init script.
-# @author Ryan Sandor Richards
-# @module consul
 
 # Backoff handler for ensuring the dock can connect to consul
 # @param $1 attempt The attempt number passed by the backoff routine below

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Unit tests for the `lib/container.sh` module.
-# @author Anandkumar Patel
 
 source "$DOCK_INIT_BASE/lib/container.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"

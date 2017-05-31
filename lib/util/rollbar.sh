@@ -6,8 +6,6 @@ source "${DOCK_INIT_BASE}/lib/util/halter.sh"
 # Module for handling reporting to rollbar within dock-init bash scripts. This
 # module exposes various report_* and trap_* methods that can be used to easily
 # ineteract and send messages to rollbar.
-# @author Bryan Kendall
-# @author Ryan Sandor Richards
 # @module util:rollbar
 
 # Ensures the module has a rollbar token

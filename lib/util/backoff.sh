@@ -14,6 +14,7 @@
 # @param $1 action Command to execute under the exponetial backoff
 # @param $2 failureFunc Function to run after errored $action
 # @param $3 successFunc Function to run after successful $action
+
 backoff() {
   local action=${1}
   local failureFunc=${2}
