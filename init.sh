@@ -25,7 +25,7 @@ main() {
   aws::get_org_ids
   dock::set_config_org
   vault::store_private_registry_token
-  k8::set_node_lables
+  k8::set_node_labels
   dock::set_hostname
   container::start
   log::info "Init Done!"

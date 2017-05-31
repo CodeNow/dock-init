@@ -17,7 +17,7 @@ fi
 export NODE=`hostname -f`
 
 # add orgid and github id labels to k8 nodes
-k8::set_node_lables () {
+k8::set_node_labels () {
   curl  -s \
         -k \
         -H "Authorization: Bearer $K8_TOKEN" \
