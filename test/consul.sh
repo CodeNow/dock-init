@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Unit tests for the `lib/consul.sh` module.
-
+source "$DOCK_INIT_BASE/lib/consul.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
 describe 'consul.sh'
@@ -33,4 +32,4 @@ describe 'consul.sh'
 
   log::info::restore
   rollbar::fatal_trap::restore
-end # dock.sh
+end # consul.sh

@@ -22,6 +22,15 @@ export LOG_LEVEL=none
 export DOCK_INIT_BASE=$(pwd)
 export HOST_IP='127.0.0.1'
 export USE_EXIT=true
+export VAULT_PORT=7777
+export VAULT_HOSTNAME=test-vault
+export CONSUL_PORT=8888
+export CONSUL_HOSTNAME=test-consul
+export USER_VAULT_PORT=9999
+export USER_VAULT_HOSTNAME=test-user-vault
+export DOCKER_CERT_CA_BASE64=test-DOCKER_CERT_CA_BASE64
+export DOCKER_CERT_CA_KEY_BASE64=test-DOCKER_CERT_CA_KEY_BASE64
+export DOCKER_CERT_PASS=test-DOCKER_CERT_PASS
 
 # See if the user passed a spcific test path
 test_path="$1"

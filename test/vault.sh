@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Unit tests for the `lib/vault.sh` module.
-# @author Anandkumar Patel
-
 source "$DOCK_INIT_BASE/lib/vault.sh"
 source "$DOCK_INIT_BASE/test/fixtures/shtub.sh"
 
